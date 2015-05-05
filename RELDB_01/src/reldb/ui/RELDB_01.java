@@ -54,10 +54,10 @@ public class RELDB_01 extends Application {
     }
     
     public void callLoginDialog() {
-        Dialogs.loginDialog();
+        Dialogs.loginDialog(this);
     }
 
-    public void logIn(String user, String password) {
+    public void logIn(String user, String password) {        
         connection.EstablishConnection(url, user, password);
         mdManager = new MetaDataManager(connection.getMetadata());
         mdManager.printInfo();

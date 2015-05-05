@@ -10,6 +10,7 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.input.MouseEvent;
+import reldb.ui.dialogs.CustomDialog;
 
 /**
  * FXML Controller class
@@ -18,7 +19,7 @@ import javafx.scene.input.MouseEvent;
  */
 public class MainFrameController implements Initializable {
     private RELDB_01 parent;
-
+    
     /**
      * Initializes the controller class.
      */
@@ -28,13 +29,14 @@ public class MainFrameController implements Initializable {
     }    
 
     @FXML
-    private void btn_connect_pressed(MouseEvent event) {
+    private void btn_connect_pressed(MouseEvent event) {        
         parent.callLoginDialog();
     }
 
     @FXML
     private void btn_close_pressed(MouseEvent event) {
     }
+    
     public void setParent(RELDB_01 parent)
     {
         this.parent = parent;

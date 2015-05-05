@@ -14,6 +14,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 import reldb.ui.RELDB_01;
 
 /**
@@ -21,7 +22,7 @@ import reldb.ui.RELDB_01;
  *
  * @author s6fake
  */
-public class LoginDialogController implements Initializable {
+public class LoginDialogController extends CustomDialog implements Initializable {
 
     @FXML
     private TextField user_field;
@@ -30,7 +31,7 @@ public class LoginDialogController implements Initializable {
     @FXML
     private Button login_button;
     private RELDB_01 parent;
-    private Stage stage;
+    private Pair<String, String> container;
 
     /**
      * Initializes the controller class.
@@ -45,16 +46,17 @@ public class LoginDialogController implements Initializable {
         login_button.setDisable(true);
         user_field.setDisable(true);
         password_field.setDisable(true);
-        //parent.logIn(user_field.getText(), password_field.getText());
-        
+        //container = new Pair(user_field.getText(), password_field.getText());
+
         stage.close();
+        parent.logIn(user_field.getText(), password_field.getText());
     }
 
     public void setParent(RELDB_01 parent) {
         this.parent = parent;
     }
-    public void setStage(Stage stage)
-    {
-        this.stage = stage;
+
+    public void setContainer(Pair<String, String> container) {
+        this.container = container;
     }
 }

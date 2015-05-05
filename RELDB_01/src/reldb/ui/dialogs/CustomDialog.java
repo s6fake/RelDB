@@ -5,10 +5,22 @@
  */
 package reldb.ui.dialogs;
 
+import javafx.stage.Stage;
+import reldb.ui.RELDB_01;
+
 /**
  *
  * @author s6fake
  */
 public abstract class CustomDialog {
     
+
+    protected Stage stage;
+    
+
+    
+    public void setStage(Stage stage)
+    {
+        this.stage = stage;
+    }
 }
