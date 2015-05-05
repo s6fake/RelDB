@@ -9,7 +9,7 @@ package reldb.ui.dialogs;
  *
  * @author s6fake
  */
-public class UserPassword implements CustomDialog{
+public class UserPassword extends CustomDialog{
     /*
     GridPane grid = new GridPane();
 grid.setHgap(10);

@@ -23,7 +23,7 @@ import javafx.util.Pair;
  *
  * @author s6fake
  */
-public class Alerts implements CustomDialog {
+public class Alerts extends CustomDialog {
 
     public static void Information(String str1, String str2) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

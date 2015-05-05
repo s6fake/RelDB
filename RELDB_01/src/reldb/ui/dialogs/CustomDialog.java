@@ -9,6 +9,6 @@ package reldb.ui.dialogs;
  *
  * @author s6fake
  */
-public interface CustomDialog {
+public abstract class CustomDialog {
     
 }

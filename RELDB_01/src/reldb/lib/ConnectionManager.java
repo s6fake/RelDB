@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,6 +51,18 @@ public class ConnectionManager {
         return result;
     }
 
+    public Statement newStatement() {
+        Statement result = null;
+        try {
+            result = connection.createStatement();
+        }
+        catch (SQLException e)
+        {
+            System.err.println(e);
+        }
+        return result;
+    }
+    
     public void EstablishConnection(String url, String user, String pass) {
         if (connection != null) {
             System.err.println("Connection not null!");

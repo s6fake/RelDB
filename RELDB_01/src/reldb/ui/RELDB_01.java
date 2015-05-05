@@ -5,16 +5,17 @@
  */
 package reldb.ui;
 
+import reldb.ui.dialogs.LoginDialogController;
+import java.io.IOException;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import reldb.Placeholder;
-import reldb.ui.dialogs.Alerts;
+import reldb.lib.ConnectionManager;
+import reldb.lib.MetaDataManager;
+import reldb.ui.dialogs.Dialogs;
 
 /**
  *
@@ -22,62 +23,51 @@ import reldb.ui.dialogs.Alerts;
  */
 public class RELDB_01 extends Application {
 
-    private Pair<String, String> loginData = null;
+    private Stage stage;
+    private static final String url = "jdbc:postgresql://dbvm01.iai.uni-bonn.de:5432/imdb";
+    private static ConnectionManager connection;
+    private MetaDataManager mdManager;
 
     @Override
     public void start(Stage primaryStage) {
-        Button btn = new Button();
-        btn.setText("Test Connection");
-        btn.setId("1");
-        btn.setOnAction(new EventHandler<ActionEvent>() {
 
-            @Override
-            public void handle(ActionEvent event) {
-                if (event.getSource().getClass() == Button.class) {
-                    Button tButton = (Button) (event.getSource());
-                    int btnID = 0;
-                    try {
-                        btnID = Integer.parseInt(tButton.getId());
-                    } catch (NumberFormatException e) {
-                        System.out.println(e);
+        try {
+            this.stage = primaryStage;
 
-                    }
+            // FXML für Frame laden
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("MainFrame.fxml"));
 
-                    switch (btnID) {
-                        case 1:
-                            //Alerts.Information("HEY DU!", null);
-                            loginData = Alerts.UserPassword();
-                            if (loginData != null) {
-                                //TODO - Hier muss ein neuer Thread erzeugt werden
-                            Placeholder.main(loginData.getKey(),loginData.getValue());
-                            }
-                            break;
-                        default:
-                            break;
-                    }
+            // Scene aufbauen
+            Scene scene = new Scene(loader.load());
+            stage.setScene(scene);
+            stage.setTitle("RELDB");
 
-                }
-
-            }
-        });
-
-        StackPane root = new StackPane();
-        root.getChildren().add(btn);
-
-        Scene scene = new Scene(root, 300, 250);
-
-        primaryStage.setTitle("Hello World!");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+            // Controller initialisieren
+            MainFrameController controller = loader.<MainFrameController>getController();
+            controller.setParent(this);
+            // Hauptfenster anzeigen
+            stage.show();
+        } catch (IOException e) {
+            System.out.println("Fehler beim Starten der Application");
+            System.exit(1);
+        }
+    }
+    
+    public void callLoginDialog() {
+        Dialogs.loginDialog();
     }
 
-    /**
-     * @param args the command line arguments
-     */
+    public void logIn(String user, String password) {
+        connection.EstablishConnection(url, user, password);
+        mdManager = new MetaDataManager(connection.getMetadata());
+        mdManager.printInfo();
+    }
+
     public static void main(String[] args) {
+        connection = ConnectionManager.getInstance();
         launch(args);
 
-        // String input = Dialogs.showInputDialog(scene, "Please enter your name:", "Input Dialog", "title");
+        connection.CloseConnection();
     }
 
 }

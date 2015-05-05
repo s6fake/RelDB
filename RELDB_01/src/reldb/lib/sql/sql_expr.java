@@ -14,10 +14,7 @@ package reldb.lib.sql;
  */
 class sql_expr {
     
-    protected static void testblabla(){
-        System.out.print("HIER BIN ICH!");
-    }
-    
+   
     protected static  void test(){
         
     }
