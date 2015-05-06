@@ -9,6 +9,7 @@ import java.io.IOException;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import reldb.lib.ConnectionManager;
 import reldb.ui.RELDB_01;
 
 /**
@@ -37,6 +38,29 @@ public class Dialogs {
             stage.show();
         } catch (IOException ex) {
             System.out.println("Fehler beim Starten des Login-Dialogs.");
+            System.exit(1);
+        }
+    }
+    
+    public static void executeDialog(RELDB_01 parent, ConnectionManager connection){
+                try {
+           Stage stage = new Stage();
+            FXMLLoader loader = new FXMLLoader(Dialogs.class.getResource("SQLDialog.fxml"));
+            
+            // Scene aufbauen
+            Scene scene = new Scene(loader.load());
+            stage.setScene(scene);
+            stage.setTitle("SQL");
+            
+            // Controller initialisieren
+            SQLDialogController controller = loader.<SQLDialogController>getController();
+            controller.setStage(stage);
+            controller.setParent(parent);
+            controller.initalize(connection);
+            // Hauptfenster anzeigen
+            stage.show();
+        } catch (IOException ex) {
+            System.out.println("Fehler beim Starten des SQL-Dialogs.");
             System.exit(1);
         }
     }

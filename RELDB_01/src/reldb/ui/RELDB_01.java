@@ -5,14 +5,11 @@
  */
 package reldb.ui;
 
-import reldb.ui.dialogs.LoginDialogController;
 import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.util.Pair;
-import reldb.Placeholder;
 import reldb.lib.ConnectionManager;
 import reldb.lib.MetaDataManager;
 import reldb.ui.dialogs.Dialogs;
@@ -35,7 +32,7 @@ public class RELDB_01 extends Application {
             this.stage = primaryStage;
 
             // FXML für Frame laden
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("MainFrame.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("Main.fxml"));
 
             // Scene aufbauen
             Scene scene = new Scene(loader.load());
@@ -43,7 +40,7 @@ public class RELDB_01 extends Application {
             stage.setTitle("RELDB");
 
             // Controller initialisieren
-            MainFrameController controller = loader.<MainFrameController>getController();
+            MainController controller = loader.<MainController>getController();
             controller.setParent(this);
             // Hauptfenster anzeigen
             stage.show();
@@ -57,6 +54,9 @@ public class RELDB_01 extends Application {
         Dialogs.loginDialog(this);
     }
 
+    public void callSQLDialog() {
+        Dialogs.executeDialog(this, connection);
+    }
     public void logIn(String user, String password) {        
         connection.EstablishConnection(url, user, password);
         mdManager = new MetaDataManager(connection.getMetadata());
