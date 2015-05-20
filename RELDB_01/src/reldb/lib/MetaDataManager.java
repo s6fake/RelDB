@@ -15,8 +15,10 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TreeItem;
 import reldb.StringClass;
 import reldb.lib.sql.StatementManager;
+import reldb.ui.MainController;
 
 /**
  *
@@ -130,18 +132,33 @@ public class MetaDataManager {
         }
 
     }
-
-    public void updateTable(ObservableList<StringClass> tableNames, ResultSet results) {
+    public void updateTable_connection(MainController controller, Reldb_Connection connection, ResultSet results) {
         if (results == null) {
             log.warning("Kein Resultset zum Ausgeben oder Liste uninitalisiert!");
             return;
         }
+
+        String connectionName = connection.getConnectionName();
+        String dataBaseName = connection.getDatabaseName();
+
+        TreeItem<String> root = controller.getTreeItemByName(connectionName);
+        if (root == null) {
+            controller.addTreeItem(connectionName);
+            root = controller.getTreeItemByName(connectionName);
+        }
+
+        TreeItem<String> database = controller.getTreeItemByName(root, dataBaseName);
+        if (database == null) {
+            controller.addTreeItem(root, dataBaseName);
+            database = controller.getTreeItemByName(root, dataBaseName);
+        }
+
         try {
             while (results.next()) {
                 System.out.println(results.getString(1));
-                tableNames.add(new StringClass(results.getString(1)));           
+                controller.addTreeItem(database, results.getString(1));
             }
-            
+
         } catch (SQLException e) {
             System.err.println(e);
         }

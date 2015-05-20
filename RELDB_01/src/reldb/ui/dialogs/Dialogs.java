@@ -42,6 +42,30 @@ public class Dialogs {
         }
     }
     
+        public static void newConnectionDialog(RELDB_01 parent){
+        
+        try {
+           Stage stage = new Stage();
+            FXMLLoader loader = new FXMLLoader(Dialogs.class.getResource("NewConnectionDialog.fxml"));
+            
+            // Scene aufbauen
+            Scene scene = new Scene(loader.load());
+            stage.setScene(scene);
+            stage.setTitle("Neue Verbindung erstellen");
+            
+            // Controller initialisieren
+            NewConnectionDialogController controller = loader.<NewConnectionDialogController>getController();
+            controller.setStage(stage);
+            controller.setParent(parent);
+            
+            // Hauptfenster anzeigen
+            stage.show();
+        } catch (IOException e) {
+            System.out.println(e);
+            System.exit(1);
+        }
+    }
+    
     public static void executeDialog(RELDB_01 parent, Reldb_Connection connection){
                 try {
            Stage stage = new Stage();

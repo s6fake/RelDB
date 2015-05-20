@@ -13,7 +13,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.Stage;
 import javafx.util.Pair;
 import reldb.ui.RELDB_01;
 
@@ -46,7 +45,6 @@ public class LoginDialogController extends CustomDialog implements Initializable
         login_button.setDisable(true);
         user_field.setDisable(true);
         password_field.setDisable(true);
-        //container = new Pair(user_field.getText(), password_field.getText());
 
         stage.close();
         parent.logIn(user_field.getText(), password_field.getText());

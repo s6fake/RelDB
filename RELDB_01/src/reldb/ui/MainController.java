@@ -6,21 +6,15 @@
 package reldb.ui;
 
 import java.net.URL;
-import java.sql.ResultSet;
 import java.util.ResourceBundle;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.cell.PropertyValueFactory;
-import reldb.StringClass;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
+import reldb.ui.dialogs.Dialogs;
 
 /**
  * FXML Controller class
@@ -33,46 +27,56 @@ public class MainController implements Initializable {
     public TextArea textbox;
     @FXML
     public Label label_1;
-    @FXML
-    private ProgressBar pgbar;
     private RELDB_01 parent;
     @FXML
-    private MenuItem edit_sql;
-    @FXML
-    public TableView<StringClass> tables_view;
-    public TableColumn<StringClass, String> tables_column;
+    private TreeView<String> con_treeView;
+    private TreeItem<String> treeConnRoot = new TreeItem<>("Connections");
 
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-       tables_view.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        con_treeView.setRoot(treeConnRoot);
     }
 
-    @FXML
     private void open_connection(ActionEvent event) {
         parent.callLoginDialog();
-    }
-
-    @FXML
-    private void close_connection(ActionEvent event) {
     }
 
     public void setParent(RELDB_01 parent) {
         this.parent = parent;
     }
+    
+        public void addTreeItem(String str) {
+        addTreeItem(treeConnRoot, str);
+    }
 
-    public void setTableNameRef(ObservableList<?> list){
-        tables_column.setCellValueFactory(new PropertyValueFactory<StringClass, String>("string")); 
-        tables_view.setItems((ObservableList<StringClass>) list);
-        
-        tables_view.getColumns().setAll(tables_column);
-
+    public void addTreeItem(TreeItem<String> tParent, String str) {
+        TreeItem<String> item = new TreeItem<>(str);
+        tParent.getChildren().add(item);
     }
     
+    public TreeItem<String> getTreeItemByName(String name) {
+        return getTreeItemByName(treeConnRoot, name);
+    }
+
+    public TreeItem<String> getTreeItemByName(TreeItem<String> tParent, String name) {
+        for (TreeItem iterator : tParent.getChildren()) {
+            if (((String) iterator.getValue()).equals(name)) {
+                return iterator;
+            }
+        }
+        return null;
+    }
+
     @FXML
     private void make_sql_query(ActionEvent event) {
         parent.callSQLDialog();
+    }
+
+    @FXML
+    private void menu_file_newConnection(ActionEvent event) {
+        Dialogs.newConnectionDialog(parent);
     }
 }

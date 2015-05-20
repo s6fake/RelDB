@@ -31,25 +31,31 @@ public class Reldb_Connection {
     private String connectionName = "Unnamed";                                  // Name der Verbindung wie sie in der UI angezeigt wird
 
     /**
-     * @param url  Die url zur Datenbank, not null
-     * @param connectionName  Ein Anzeigename für die Verbindung
+     * @param url Die url zur Datenbank, not null
+     * @param connectionName Ein Anzeigename für die Verbindung
      */
     public Reldb_Connection(String url, String connectionName) {
-        if (url == null)
-               throw new NullPointerException("url must not be null!");
+        if (url == null) {
+            throw new NullPointerException("url must not be null!");
+        }
         this.url = url;
-        if (connectionName != null)
+        if (connectionName != null) {
             this.connectionName = connectionName;
+        }
         addConnection(this, 0);
     }
-    
+
     /**
      * Nimmt eine neue Verbindung in die Liste aller Verbindungen auf.
-     * Exisitiert schon eine Verbingung mit gleichem Namen, wird die neu Verbindung umbenannt.
-     * @param newConn  Die Verbindung die hinzugefügt werden soll
-     * @param counter Zählt die Funktionsaufrufe, default 0     * 
-     * @return  Gibt zurück ob die Verbindung erfolgreich in die Liste eingefügt werden konnte.
-     */    
+     * Exisitiert schon eine Verbingung mit gleichem Namen, wird die neu
+     * Verbindung umbenannt.
+     *
+     * @param newConn Die Verbindung die hinzugefügt werden soll
+     * @param counter Zählt die Funktionsaufrufe, default 0
+     *
+     * @return Gibt zurück ob die Verbindung erfolgreich in die Liste eingefügt
+     * werden konnte.
+     */
     private static boolean addConnection(Reldb_Connection newConn, int counter) {
         for (Reldb_Connection iterator : getConnections()) {
             if (counter == 0) {
@@ -118,23 +124,29 @@ public class Reldb_Connection {
             log.info("Verbindung mit " + databaseName + " geschlossen");
         }
     }
-    
+
     public static void closeAllConnections() {
-        for (Reldb_Connection iterator : connections)
+        for (Reldb_Connection iterator : connections) {
             iterator.CloseConnection();
+        }
     }
 
     public String getConnectionName() {
         return connectionName;
     }
-    
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
     public static List<Reldb_Connection> getConnections() {
         return connections;
     }
+
     /**
-     * To Do:
-     * Implementieren!
-     * @return 
+     * To Do: Implementieren!
+     *
+     * @return
      */
     public static Reldb_Connection getConnectionByName() {
         return null;
