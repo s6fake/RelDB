@@ -54,12 +54,13 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
 
     @FXML
     private void doLogin(MouseEvent event) {
+        if (parent.createConnection(createUrl(), name_field.getText()) == false)
+                return;
         button_login.setDisable(true);
         user_field.setDisable(true);
         password_field.setDisable(true);
 
         stage.close();
-        parent.createConnection(createUrl(), name_field.getText());
         parent.logIn(user_field.getText(), password_field.getText());
     }
 
@@ -69,8 +70,10 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
 
     @FXML
     private void createNewConnection(MouseEvent event) {
+        if (parent.createConnection(createUrl(), name_field.getText()) == false)
+            return;
         stage.close();
-        parent.createConnection(createUrl(), name_field.getText());
+
     }
 
     private String createUrl() {

@@ -36,14 +36,13 @@ public class Alerts extends CustomDialog {
         alert.showAndWait();
     }
 
-    
     /**
      * Größtenteils Copy and Paste...
-     * @return  Username, Password. Ansonsten null!
+     *
+     * @return Username, Password. Ansonsten null!
      */
-    public static Pair<String,String> UserPassword() {
+    public static Pair<String, String> UserPassword() {
 
-        
         // Create the custom dialog.
         Dialog<Pair<String, String>> dialog = new Dialog<>();
         dialog.setTitle("Login Dialog");
@@ -94,11 +93,11 @@ public class Alerts extends CustomDialog {
         });
 
         Optional<Pair<String, String>> result = dialog.showAndWait();
-/*
-        result.ifPresent(usernamePassword -> {
-            System.out.println("Username=" + usernamePassword.getKey() + ", Password=" + usernamePassword.getValue());
-        });
-        */
+        /*
+         result.ifPresent(usernamePassword -> {
+         System.out.println("Username=" + usernamePassword.getKey() + ", Password=" + usernamePassword.getValue());
+         });
+         */
         if (result.isPresent()) {
             return result.get();
         }

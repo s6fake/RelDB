@@ -104,12 +104,12 @@ public class Reldb_Connection {
             return false;
         }
         try {
-            connection = DriverManager.getConnection(url, user, pass);
+            connection = DriverManager.getConnection(getUrl(), user, pass);
         } catch (SQLException e) {
             System.err.println(e);
             return false;
         }
-        log.log(Level.INFO, "Verbindung mit {0} hergestellt.", url);
+        log.log(Level.INFO, "Verbindung mit {0} hergestellt.", getUrl());
         return true;
     }
 
@@ -150,6 +150,13 @@ public class Reldb_Connection {
      */
     public static Reldb_Connection getConnectionByName() {
         return null;
+    }
+
+    /**
+     * @return the url
+     */
+    public String getUrl() {
+        return url;
     }
 
 }

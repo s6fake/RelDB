@@ -10,7 +10,9 @@ import java.util.List;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
+import javax.swing.JOptionPane;
 import reldb.lib.Reldb_Connection;
 import reldb.lib.MetaDataManager;
 import reldb.lib.sql.StatementManager;
@@ -66,9 +68,21 @@ public class RELDB_01 extends Application {
         Dialogs.executeDialog(this, selectetConnection);
     }
 
-    public void createConnection(String url, String name) {
+    public boolean createConnection(String url, String name) {
+        for (Reldb_Connection iterator : Reldb_Connection.getConnections()) {
+            if (iterator.getConnectionName().equals(name)) {
+                JOptionPane.showMessageDialog(null, "Es existiert bereits eine Verbindung mit dem Namen " + name, "Verbindung kann nicht erstellt werden", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+            if (iterator.getUrl().equalsIgnoreCase(url)) {
+                JOptionPane.showMessageDialog(null, "Es existiert bereits eine Verbindung zu " + url, "Verbindung kann nicht erstellt werden", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+        }
         selectetConnection = new Reldb_Connection(url, name);
         controller.addTreeItem(name);
+
+        return true;
     }
 
     public void logIn(String user, String password) {

@@ -14,6 +14,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.MouseEvent;
 import reldb.ui.dialogs.Dialogs;
 
 /**
@@ -78,5 +79,9 @@ public class MainController implements Initializable {
     @FXML
     private void menu_file_newConnection(ActionEvent event) {
         Dialogs.newConnectionDialog(parent);
+    }
+
+    @FXML
+    private void onTreeView_MouseClicked(MouseEvent event) {
     }
 }
