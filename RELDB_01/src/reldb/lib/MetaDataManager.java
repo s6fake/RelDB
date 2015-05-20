@@ -11,6 +11,11 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Logger;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import reldb.StringClass;
 import reldb.lib.sql.StatementManager;
 
 /**
@@ -82,10 +87,25 @@ public class MetaDataManager {
             System.err.println(e);
         }
     }
-    
+
+    public void printInfo(TextArea txtArea) {
+        if (metaData == null) {
+            log.warning("No metaData input");
+            return;
+        }
+        try {
+            txtArea.clear();
+            txtArea.insertText(0, "Database: " + metaData.getDatabaseProductName() + "\n");
+            txtArea.insertText(txtArea.getLength(), "Version: " + metaData.getDatabaseProductVersion() + "\n");
+            txtArea.insertText(txtArea.getLength(), "Catalog Seperator: " + metaData.getCatalogSeparator());
+        } catch (SQLException e) {
+            System.err.println(e);
+        }
+    }
+
     public static void printResultset(ResultSet results) {
         ResultSetMetaData rsmd;
-        
+
         int counter;
         if (results == null) {
             log.warning("Kein Resultset zum Ausgeben");
@@ -100,16 +120,31 @@ public class MetaDataManager {
         } catch (SQLException e) {
             System.err.println(e);
         }
-        
-        try{
-            while(results.next()) {
-              System.out.println(results.getString(1));
+        System.out.println("Zweiter Block");
+        try {
+            while (results.next()) {
+                System.out.println(results.getString(1));
             }
-        }
-        catch(SQLException e)
-        {
-                      System.err.println(e); 
+        } catch (SQLException e) {
+            System.err.println(e);
         }
 
     }
+
+    public void updateTable(ObservableList<StringClass> tableNames, ResultSet results) {
+        if (results == null) {
+            log.warning("Kein Resultset zum Ausgeben oder Liste uninitalisiert!");
+            return;
+        }
+        try {
+            while (results.next()) {
+                System.out.println(results.getString(1));
+                tableNames.add(new StringClass(results.getString(1)));           
+            }
+            
+        } catch (SQLException e) {
+            System.err.println(e);
+        }
+    }
+
 }

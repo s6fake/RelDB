@@ -18,8 +18,11 @@ SELECT table_name
  */
 class sql_expr {
     
-   
-    protected static  void test(){
-        
+      
+    public static String getTableNames(String database)
+    {
+        if (database.equalsIgnoreCase("PostgreSQL"))
+            return "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';";
+        return null;
     }
 }

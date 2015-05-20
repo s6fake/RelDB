@@ -12,7 +12,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
-import reldb.lib.ConnectionManager;
+import reldb.lib.Reldb_Connection;
 import reldb.lib.MetaDataManager;
 import reldb.lib.sql.StatementManager;
 import reldb.ui.RELDB_01;
@@ -25,7 +25,7 @@ import reldb.ui.RELDB_01;
 public class SQLDialogController extends CustomDialog implements Initializable {
 
     @FXML
-    private TextArea txt_area;
+    public TextArea txt_area;
     @FXML
     private Button ok_btn;
     @FXML
@@ -42,7 +42,7 @@ public class SQLDialogController extends CustomDialog implements Initializable {
 
     }
 
-    public void initalize(ConnectionManager connection) {
+    public void initalize(Reldb_Connection connection) {
         statement = new StatementManager(connection.newStatement());
     }
 

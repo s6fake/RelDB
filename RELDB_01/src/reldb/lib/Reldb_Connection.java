@@ -17,21 +17,20 @@ import java.util.logging.Logger;
  *
  * @author s6fake
  */
-public class ConnectionManager {
+public class Reldb_Connection {
 
-    private static final Logger log = Logger.getLogger(ConnectionManager.class.getName());
-
-    private static ConnectionManager Instance = null;
-
+    private static final Logger log = Logger.getLogger(Reldb_Connection.class.getName());
+    private static Reldb_Connection Instance = null;
     private Connection connection = null;
+    private String databaseName = null;
 
-    private ConnectionManager() {
+    private Reldb_Connection() {
         log.setLevel(Level.FINEST);                                               //Macht Singelton überhaupt Sinn? :D
     }
 
-    public static ConnectionManager getInstance() {
+    public static Reldb_Connection getInstance() {
         if (Instance == null) {
-            Instance = new ConnectionManager();
+            Instance = new Reldb_Connection();
         }
         return Instance;
     }
@@ -45,6 +44,7 @@ public class ConnectionManager {
         DatabaseMetaData result = null;
         try {
             result = connection.getMetaData();
+            databaseName = result.getDatabaseProductName();
         } catch (SQLException e) {
             System.err.println(e);
         }
@@ -55,30 +55,28 @@ public class ConnectionManager {
         Statement result = null;
         try {
             result = connection.createStatement();
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             System.err.println(e);
         }
         return result;
     }
-    
-    public void EstablishConnection(String url, String user, String pass) {
+
+    public boolean EstablishConnection(String url, String user, String pass) {
         if (connection != null) {
             System.err.println("Connection not null!");
-            return;
+            return false;
         }
         try {
-            connection = DriverManager.getConnection(url, user, pass);// "imdbuser", "kemperSS15");
+            connection = DriverManager.getConnection(url, user, pass);
         } catch (SQLException e) {
             System.err.println(e);
-            return;
+            return false;
         }
         log.log(Level.INFO, "Verbindung mit {0} hergestellt.", url);
+        return true;
     }
 
     public void CloseConnection() {
-
         if (connection != null) {
             try {
                 connection.close();
@@ -86,7 +84,7 @@ public class ConnectionManager {
                 System.err.println(e);
                 return;
             }
-            log.info("Verbindung mit  geschlossen");
+            log.info("Verbindung mit " + databaseName + " geschlossen");
         }
     }
 

@@ -20,11 +20,11 @@ public class Placeholder {
 
     private static final String url = "jdbc:postgresql://dbvm01.iai.uni-bonn.de:5432/imdb";
 
-    public static ConnectionManager connection;
+    public static Reldb_Connection connection;
     
     public static void main(String arg1, String arg2) {
-        if (arg1 != null && arg2 != null) {
-            connection = ConnectionManager.getInstance();
+        /*if (arg1 != null && arg2 != null) {
+            connection = Reldb_Connection.getInstance();
             connection.EstablishConnection(url, arg1, arg2);
             
             MetaDataManager mdManager = new MetaDataManager(connection.getMetadata());
@@ -48,7 +48,7 @@ public class Placeholder {
             }
 
             
-        }
+        }*/
     }
     
     public static void close()

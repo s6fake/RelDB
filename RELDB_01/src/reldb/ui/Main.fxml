@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="reldb.ui.MainController">
+<VBox prefHeight="446.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="reldb.ui.MainController">
    <children>
       <MenuBar>
         <menus>
@@ -27,15 +28,21 @@
           </Menu>
         </menus>
       </MenuBar>
-      <SplitPane dividerPositions="0.29797979797979796" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0">
+      <SplitPane dividerPositions="0.29797979797979796" minHeight="-Infinity" minWidth="-Infinity">
         <items>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="100.0">
                <children>
-                  <SplitPane dividerPositions="0.8207070707070707" layoutX="129.0" layoutY="62.0" orientation="VERTICAL" prefHeight="398.0" prefWidth="417.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <TableView fx:id="tables_view" layoutX="-39.0" layoutY="8.0" prefWidth="175.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <columns>
+                        <TableColumn fx:id="tables_column" prefWidth="174.0" text="Table" />
+                     </columns></TableView>
+               </children></AnchorPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="100.0">
+               <children>
+                  <SplitPane dividerPositions="0.8207070707070707" layoutX="129.0" layoutY="62.0" orientation="VERTICAL" prefWidth="417.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <items>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" />
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="160.0" />
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="160.0">
                            <children>
                               <TextArea fx:id="textbox" editable="false" layoutX="-51.0" layoutY="-86.0" prefHeight="68.0" prefWidth="415.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                            </children>
@@ -46,15 +53,22 @@
             </AnchorPane>
         </items>
       </SplitPane>
-      <Pane prefHeight="24.0" prefWidth="600.0">
+      <Pane prefHeight="21.0" prefWidth="600.0">
          <children>
-            <Label fx:id="label_1" layoutY="4.0" prefHeight="17.0" prefWidth="175.0" text="No Connection" textFill="#9f9f9f">
-               <font>
-                  <Font size="11.0" />
-               </font>
-            </Label>
-            <ProgressBar fx:id="pgbar" layoutX="400.0" layoutY="3.0" prefWidth="200.0" progress="0.0" />
+            <AnchorPane prefWidth="600.0">
+               <children>
+                  <ProgressBar fx:id="pgbar" prefWidth="200.0" progress="0.0" AnchorPane.rightAnchor="0.0" />
+                  <Label fx:id="label_1" prefHeight="17.0" prefWidth="175.0" text="No Connection" textFill="#9f9f9f" AnchorPane.leftAnchor="0.0">
+                     <font>
+                        <Font size="11.0" />
+                     </font>
+                  </Label>
+               </children>
+            </AnchorPane>
          </children>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
       </Pane>
    </children>
 </VBox>

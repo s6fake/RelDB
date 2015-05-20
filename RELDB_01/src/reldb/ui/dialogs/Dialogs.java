@@ -9,7 +9,7 @@ import java.io.IOException;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import reldb.lib.ConnectionManager;
+import reldb.lib.Reldb_Connection;
 import reldb.ui.RELDB_01;
 
 /**
@@ -42,7 +42,7 @@ public class Dialogs {
         }
     }
     
-    public static void executeDialog(RELDB_01 parent, ConnectionManager connection){
+    public static void executeDialog(RELDB_01 parent, Reldb_Connection connection){
                 try {
            Stage stage = new Stage();
             FXMLLoader loader = new FXMLLoader(Dialogs.class.getResource("SQLDialog.fxml"));
