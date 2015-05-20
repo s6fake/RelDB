@@ -10,6 +10,8 @@ import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,19 +22,48 @@ import java.util.logging.Logger;
 public class Reldb_Connection {
 
     private static final Logger log = Logger.getLogger(Reldb_Connection.class.getName());
-    private static Reldb_Connection Instance = null;
+
+    private static List<Reldb_Connection> connections = new ArrayList<>();      // Liste aller erstellten Verbindungen
+
     private Connection connection = null;
-    private String databaseName = null;
+    private String databaseName = null;                                         // Name der Datenbank, ausgelesen aus den MetaDaten
+    private String url = null;
+    private String connectionName = "Unnamed";                                  // Name der Verbindung wie sie in der UI angezeigt wird
 
-    private Reldb_Connection() {
-        log.setLevel(Level.FINEST);                                               //Macht Singelton überhaupt Sinn? :D
+    /**
+     * @param url  Die url zur Datenbank, not null
+     * @param connectionName  Ein Anzeigename für die Verbindung
+     */
+    public Reldb_Connection(String url, String connectionName) {
+        if (url == null)
+               throw new NullPointerException("url must not be null!");
+        this.url = url;
+        if (connectionName != null)
+            this.connectionName = connectionName;
+        addConnection(this, 0);
     }
-
-    public static Reldb_Connection getInstance() {
-        if (Instance == null) {
-            Instance = new Reldb_Connection();
+    
+    /**
+     * Nimmt eine neue Verbindung in die Liste aller Verbindungen auf.
+     * Exisitiert schon eine Verbingung mit gleichem Namen, wird die neu Verbindung umbenannt.
+     * @param newConn  Die Verbindung die hinzugefügt werden soll
+     * @param counter Zählt die Funktionsaufrufe, default 0     * 
+     * @return  Gibt zurück ob die Verbindung erfolgreich in die Liste eingefügt werden konnte.
+     */    
+    private static boolean addConnection(Reldb_Connection newConn, int counter) {
+        for (Reldb_Connection iterator : getConnections()) {
+            if (counter == 0) {
+                if (iterator.connectionName.equals(newConn.connectionName)) {
+                    return addConnection(newConn, counter++);
+                }
+            } else if (iterator.connectionName.equals(newConn.connectionName + "(" + counter + ")")) {
+                return addConnection(newConn, counter++);
+            }
         }
-        return Instance;
+        if (counter != 0) {
+            newConn.databaseName = newConn.databaseName.concat("(" + counter + ")");
+        }
+        return getConnections().add(newConn);
     }
 
     /**
@@ -61,7 +92,7 @@ public class Reldb_Connection {
         return result;
     }
 
-    public boolean EstablishConnection(String url, String user, String pass) {
+    public boolean connect(String user, String pass) {
         if (connection != null) {
             System.err.println("Connection not null!");
             return false;
@@ -86,6 +117,27 @@ public class Reldb_Connection {
             }
             log.info("Verbindung mit " + databaseName + " geschlossen");
         }
+    }
+    
+    public static void closeAllConnections() {
+        for (Reldb_Connection iterator : connections)
+            iterator.CloseConnection();
+    }
+
+    public String getConnectionName() {
+        return connectionName;
+    }
+    
+    public static List<Reldb_Connection> getConnections() {
+        return connections;
+    }
+    /**
+     * To Do:
+     * Implementieren!
+     * @return 
+     */
+    public static Reldb_Connection getConnectionByName() {
+        return null;
     }
 
 }

@@ -25,7 +25,7 @@ public class Placeholder {
     public static void main(String arg1, String arg2) {
         /*if (arg1 != null && arg2 != null) {
             connection = Reldb_Connection.getInstance();
-            connection.EstablishConnection(url, arg1, arg2);
+            connection.connect(url, arg1, arg2);
             
             MetaDataManager mdManager = new MetaDataManager(connection.getMetadata());
             mdManager.printInfo();

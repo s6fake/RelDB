@@ -6,6 +6,7 @@
 package reldb.ui;
 
 import java.io.IOException;
+import java.util.List;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,7 +27,8 @@ public class RELDB_01 extends Application {
 
     private Stage stage;
     private static final String url = "jdbc:postgresql://dbvm01.iai.uni-bonn.de:5432/imdb";
-    private static Reldb_Connection connection;
+    private static List<Reldb_Connection> connectionsListRef = Reldb_Connection.getConnections();   //Referenz zur Liste mit allen Verbindungen
+    private static Reldb_Connection selectetConnection = null;  //Aktuell betrachtete Connection
     private MetaDataManager mdManager;
 
     private MainController controller;
@@ -64,12 +66,13 @@ public class RELDB_01 extends Application {
     }
 
     public void callSQLDialog() {
-        Dialogs.executeDialog(this, connection);
+        // Einen SQL Dialog öffnen, mit der aktuell betracteten Connection
+        Dialogs.executeDialog(this, selectetConnection);
     }
 
     public void logIn(String user, String password) {
-        if (connection.EstablishConnection(url, user, password)) {
-            mdManager = new MetaDataManager(connection.getMetadata());
+        if (selectetConnection.connect(user, password)) {
+            mdManager = new MetaDataManager(selectetConnection.getMetadata());
             mdManager.printInfo(controller.textbox);
             controller.label_1.setText(url);
             updateTableNames();
@@ -78,16 +81,23 @@ public class RELDB_01 extends Application {
     }
     
     public void updateTableNames() {
-        StatementManager statement = new StatementManager(connection.newStatement());
+        StatementManager statement = new StatementManager(selectetConnection.newStatement());
         mdManager.updateTable(observableTableNames, statement.executeCommand("select table_name from information_schema.tables where table_schema = 'public'"));
         statement.close();
     }
 
     public static void main(String[] args) {
-        connection = Reldb_Connection.getInstance();
+        selectetConnection = new Reldb_Connection(url, "IMDB");
         launch(args);
 
-        connection.CloseConnection();
+        Reldb_Connection.closeAllConnections(); //Alle Verbindungen schließen
     }
 
+    
+    /*
+    ToDo:
+    Statements den Verbindungen zuordnen? -> Dann auch beim beenden alle Statements schließen
+    
+    */
+    
 }
