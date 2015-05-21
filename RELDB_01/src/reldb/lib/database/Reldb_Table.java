@@ -36,14 +36,14 @@ public class Reldb_Table {
     private void createColumns(DatabaseMetaData metaData) {
         ResultSet result;
         try {
-            result = metaData.getColumns(null, null, tableName, null); //Metadaten der Spalten holen
+            result = metaData.getColumns(null, null, getTableName(), null); //Metadaten der Spalten holen
             while (result.next()) {
                 String columnName = result.getString(4);
                 int columnType = result.getInt(5);
                 String columnTypeName = result.getString(6);
                 int columSize = result.getInt(7);
                 Reldb_Column newCol = new Reldb_Column(columnName, columnType, columnTypeName, columSize); // Neue Reldb_Column erstellen
-                columns.add(newCol);    //Spalte in die Spaltenliste hinzufügen
+                getColumns().add(newCol);    //Spalte in die Spaltenliste hinzufügen
             }
         } catch (SQLException ex) {
             Logger.getLogger(Reldb_Table.class.getName()).log(Level.SEVERE, null, ex);
@@ -52,7 +52,7 @@ public class Reldb_Table {
 
     @Override
     public String toString() {
-        return tableName;
+        return getTableName();
     }
 
     /**
@@ -60,10 +60,24 @@ public class Reldb_Table {
      */
     public void print() {
         String result = "";
-        for (Reldb_Column iterator : columns) {
+        for (Reldb_Column iterator : getColumns()) {
             result = result.concat(iterator.toString() + " ");
         }
-        System.out.println("|" + tableName + "|" + result);
+        System.out.println("|" + getTableName() + "|" + result);
+    }
+
+    /**
+     * @return the tableName
+     */
+    public String getTableName() {
+        return tableName;
+    }
+
+    /**
+     * @return the columns
+     */
+    public List<Reldb_Column> getColumns() {
+        return columns;
     }
 
 }

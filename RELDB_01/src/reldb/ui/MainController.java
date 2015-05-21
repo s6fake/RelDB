@@ -1,12 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package reldb.ui;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -20,6 +16,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.WindowEvent;
 import reldb.lib.Reldb_TreeViewElement;
 import reldb.lib.Reldb_Connection;
+import reldb.lib.database.Reldb_Column;
+import reldb.lib.database.Reldb_Database;
+import reldb.lib.database.Reldb_Table;
 import reldb.ui.dialogs.Dialogs;
 
 /**
@@ -60,13 +59,41 @@ public class MainController implements Initializable {
         this.parent = parent;
     }
 
-    public void addTreeItem(Reldb_TreeViewElement item) {
-        addTreeItem(treeConnRoot, item);
+    /**
+     * Fügt eine Datenbank in die TreeView ein
+     *
+     * @param connection Die Verbindung, zu der die Datenbank eingefügt werden
+     * soll.
+     * @param database Die Datenbank die eingefügt werden soll
+     */
+    public void addDatabaseToConnectionInTreeView(Reldb_Connection connection, Reldb_Database database) {
+        TreeItem<Reldb_TreeViewElement> connectionRoot = addTreeItem(new Reldb_TreeViewElement(connection, connection.getConnectionName()));// Neues Verbungs-Wurzelelement
+        TreeItem<Reldb_TreeViewElement> databaseRoot = addTreeItem(connectionRoot, new Reldb_TreeViewElement(database, database.getDatabaseName()));   //Datenbank Element einfügen
+        
+        for (Reldb_Table tableIterator : database.getTableList()) {
+            TreeItem<Reldb_TreeViewElement> tableNode = addTreeItem(databaseRoot, new Reldb_TreeViewElement(tableIterator, tableIterator.getTableName()));
+            for(Reldb_Column columnIterator : tableIterator.getColumns()) {
+                addTreeItem(tableNode, new Reldb_TreeViewElement(columnIterator, columnIterator.getName()));
+            }
+        }
     }
 
-    public void addTreeItem(TreeItem<Reldb_TreeViewElement> tParent, Reldb_TreeViewElement item) {
+    public TreeItem<Reldb_TreeViewElement> addTreeItem(Reldb_TreeViewElement item) {
+        return addTreeItem(treeConnRoot, item);
+    }
+
+    public TreeItem<Reldb_TreeViewElement> addTreeItem(TreeItem<Reldb_TreeViewElement> tParent, Reldb_TreeViewElement item) {
         TreeItem<Reldb_TreeViewElement> newTreeItem = new TreeItem<>(item);
+        ObservableList<TreeItem<Reldb_TreeViewElement>> children = tParent.getChildren();
+        for (TreeItem<Reldb_TreeViewElement> iterator : children) {
+
+            if (iterator.getValue().getDisplayName().equals(item.getDisplayName())) //Prüfen ob das es ein Element mit gleichem Namen schon gibt
+            {
+                return iterator;     //Wenn ja, kein neues anlegen
+            }
+        }
         tParent.getChildren().add(newTreeItem);
+        return newTreeItem;
     }
 
     public TreeItem<Reldb_TreeViewElement> getTreeItemByName(String name) {
@@ -100,7 +127,7 @@ public class MainController implements Initializable {
     @FXML
     private void contextMenu_connect(ActionEvent event) {
         //contextMenu_item_connect ist nur aktiv, wenn das ausgewählte Item eine Verbindung ist
-        Dialogs.loginDialog(parent, (Reldb_Connection)con_treeView.getSelectionModel().getSelectedItem().getValue().getItem());
+        Dialogs.loginDialog(parent, (Reldb_Connection) con_treeView.getSelectionModel().getSelectedItem().getValue().getItem());
     }
 
     @FXML

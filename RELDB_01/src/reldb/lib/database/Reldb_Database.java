@@ -52,7 +52,7 @@ public class Reldb_Database {
      * @param metaData
      */
     private void createTableList(DatabaseMetaData metaData) {
-        tableList = new ArrayList<>();
+        setTableList(new ArrayList<>());
         //Reldb_Statement tableStatement = new Reldb_Statement(connection);
         ResultSet result;
         try {
@@ -60,7 +60,7 @@ public class Reldb_Database {
             result = metaData.getTables(null, "public", null, types);
             while (result.next()) {
                 Reldb_Table newTable = new Reldb_Table(result.getString(3), metaData);
-                tableList.add(newTable);
+                getTableList().add(newTable);
                 //System.out.println(result.getString(1) + " " + result.getString(2) + " " + result.getString(3)+ " " + result.getString(4) + " " + result.getString(5));
             }
         } catch (SQLException ex) {
@@ -73,8 +73,8 @@ public class Reldb_Database {
      * Gibt die Datenbank und alle Tabellen aus
      */
     public void print() {
-        System.out.println(databaseName +" " + version);
-        for (Reldb_Table iterator : tableList) {
+        System.out.println(getDatabaseName() +" " + version);
+        for (Reldb_Table iterator : getTableList()) {
             iterator.print();
         }
     }
@@ -88,7 +88,28 @@ public class Reldb_Database {
     
     @Override
     public String toString() {
+        return getDatabaseName();
+    }
+
+    /**
+     * @return the databaseName
+     */
+    public String getDatabaseName() {
         return databaseName;
+    }
+
+    /**
+     * @return the tableList
+     */
+    public List<Reldb_Table> getTableList() {
+        return tableList;
+    }
+
+    /**
+     * @param tableList the tableList to set
+     */
+    public void setTableList(List<Reldb_Table> tableList) {
+        this.tableList = tableList;
     }
 
 }

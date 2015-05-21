@@ -71,36 +71,4 @@ public class MetaDataManager {
 
     }
     
-    public void updateTable_connection(MainController controller, Reldb_Connection connection, ResultSet results) {
-        if (results == null) {
-            log.warning("Kein Resultset zum Ausgeben!");
-            return;
-        }
-
-        String connectionName = connection.getConnectionName();
-        String dataBaseName = connection.getDatabaseName();
-
-        TreeItem<Reldb_TreeViewElement> root = controller.getTreeItemByName(connectionName);
-        if (root == null) {
-            controller.addTreeItem(new Reldb_TreeViewElement(null,connectionName));
-            root = controller.getTreeItemByName(connectionName);
-        }
-
-        TreeItem<Reldb_TreeViewElement> database = controller.getTreeItemByName(root, dataBaseName);
-        if (database == null) {
-            controller.addTreeItem(root, new Reldb_TreeViewElement(null, dataBaseName));
-            database = controller.getTreeItemByName(root, dataBaseName);
-        }
-
-        try {
-            while (results.next()) {
-                //System.out.println(results.getString(1));
-                controller.addTreeItem(database, new Reldb_TreeViewElement(null, results.getString(1)));
-            }
-
-        } catch (SQLException e) {
-            System.err.println(e);
-        }
-    }
-
 }

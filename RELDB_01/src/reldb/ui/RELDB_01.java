@@ -93,12 +93,8 @@ public class RELDB_01 extends Application {
 
     //Achtung, wird fehlerhaft. Funktion muss ersetzt werden!!!
     public void updateTableNames(Reldb_Connection connection) {
-        Reldb_Statement statement = new Reldb_Statement(connection);
-        mdManager.updateTable_connection(controller, connection, statement.getTables());
-        statement.close();
         Reldb_Database db = new Reldb_Database(connection);
-        db.print();
-
+        controller.addDatabaseToConnectionInTreeView(connection, db);
     }
 
     public static void main(String[] args) {
