@@ -95,9 +95,8 @@ public class RELDB_01 extends Application {
 
     //Achtung, wird fehlerhaft. Funktion muss ersetzt werden!!!
     public void updateTableNames(Reldb_Connection connection) {
-        StatementManager statement = new StatementManager(connection.newStatement());
-        mdManager.updateTable_connection(controller, connection, statement.executeCommand("select table_name from information_schema.tables where table_schema = 'public'"));
-        statement.close();
+        mdManager.updateTable_connection(controller, connection, StatementManager.getTables(connection));
+
     }
 
     public static void main(String[] args) {

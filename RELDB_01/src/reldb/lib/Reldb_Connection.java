@@ -26,7 +26,8 @@ public class Reldb_Connection {
     private static List<Reldb_Connection> connections = new ArrayList<>();      // Liste aller erstellten Verbindungen
 
     private Connection connection = null;
-    private String databaseName = null;                                         // Name der Datenbank, ausgelesen aus den MetaDaten
+    private DatabaseMetaData metaData;
+    private String databaseName, version, catalogSeparator;                    // Name der Datenbank, ausgelesen aus den MetaDaten
     private String url = null;
     private String connectionName = "Unnamed";                                  // Name der Verbindung wie sie in der UI angezeigt wird
 
@@ -42,7 +43,24 @@ public class Reldb_Connection {
         if (connectionName != null) {
             this.connectionName = connectionName;
         }
+
+        try {
+            metaData = connection.getMetaData();
+        } catch (SQLException ex) {
+            Logger.getLogger(Reldb_Connection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        setInformation(metaData);
         addConnection(this, 0);
+    }
+
+    private void setInformation(DatabaseMetaData metaData) {
+        try {
+            databaseName = metaData.getDatabaseProductName();
+            version = metaData.getDatabaseProductVersion();
+            catalogSeparator = metaData.getCatalogSeparator();
+        } catch (SQLException e) {
+            log.warning(e.toString());
+        }
     }
 
     /**
@@ -72,20 +90,8 @@ public class Reldb_Connection {
         return getConnections().add(newConn);
     }
 
-    /**
-     * NullPointer Exception!
-     *
-     * @return
-     */
     public DatabaseMetaData getMetadata() {
-        DatabaseMetaData result = null;
-        try {
-            result = connection.getMetaData();
-            databaseName = result.getDatabaseProductName();
-        } catch (SQLException e) {
-            System.err.println(e);
-        }
-        return result;
+        return metaData;
     }
 
     public Statement newStatement() {
@@ -134,11 +140,14 @@ public class Reldb_Connection {
     public boolean isConnected() {
         return connection != null;
     }
-    
+
     public String getConnectionName() {
         return connectionName;
     }
 
+    /**
+     * @return Name der Datenbank
+     */
     public String getDatabaseName() {
         return databaseName;
     }

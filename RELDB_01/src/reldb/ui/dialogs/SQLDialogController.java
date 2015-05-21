@@ -32,7 +32,7 @@ public class SQLDialogController extends CustomDialog implements Initializable {
     private Button cancel_btn;
     private RELDB_01 parent;
 
-    private StatementManager statement;
+    private Reldb_Connection connection;
 
     /**
      * Initializes the controller class.
@@ -43,12 +43,12 @@ public class SQLDialogController extends CustomDialog implements Initializable {
     }
 
     public void initalize(Reldb_Connection connection) {
-        statement = new StatementManager(connection.newStatement());
+        this.connection = connection;
     }
 
     @FXML
     private void execute(MouseEvent event) {
-        MetaDataManager.printResultset(statement.executeCommand(txt_area.getText()));
+        MetaDataManager.printResultset(StatementManager.executeCommand(connection, txt_area.getText()));
     }
 
     @FXML
