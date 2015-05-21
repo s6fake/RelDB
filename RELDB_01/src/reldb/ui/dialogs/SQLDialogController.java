@@ -14,7 +14,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import reldb.lib.Reldb_Connection;
 import reldb.lib.MetaDataManager;
-import reldb.lib.sql.StatementManager;
+import reldb.lib.sql.Reldb_Statement;
 import reldb.ui.RELDB_01;
 
 /**
@@ -48,7 +48,9 @@ public class SQLDialogController extends CustomDialog implements Initializable {
 
     @FXML
     private void execute(MouseEvent event) {
-        MetaDataManager.printResultset(StatementManager.executeCommand(connection, txt_area.getText()));
+        Reldb_Statement statement = new Reldb_Statement(connection);
+        MetaDataManager.printResultset(statement.executeCommand(connection, txt_area.getText()));
+        statement.close();
     }
 
     @FXML

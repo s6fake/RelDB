@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.logging.Logger;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
-import reldb.lib.sql.StatementManager;
+import reldb.lib.sql.Reldb_Statement;
 import reldb.ui.MainController;
 
 /**
@@ -42,7 +42,7 @@ public class MetaDataManager {
             System.out.println("Database: " + metaData.getDatabaseProductName());
             System.out.println("Version: " + metaData.getDatabaseProductVersion());
             System.out.println("Catalog Seperator: " + metaData.getCatalogSeparator());
-            StatementManager.LastCatalogSeparator = metaData.getCatalogSeparator();
+            Reldb_Statement.LastCatalogSeparator = metaData.getCatalogSeparator();
 
             System.out.println("Table MetaData:");
             tables = metaData.getTables(null, null, null, null);
@@ -122,9 +122,10 @@ public class MetaDataManager {
         }
 
     }
+    
     public void updateTable_connection(MainController controller, Reldb_Connection connection, ResultSet results) {
         if (results == null) {
-            log.warning("Kein Resultset zum Ausgeben oder Liste uninitalisiert!");
+            log.warning("Kein Resultset zum Ausgeben!");
             return;
         }
 

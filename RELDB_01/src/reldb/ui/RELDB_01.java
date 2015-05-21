@@ -15,7 +15,7 @@ import javax.swing.JOptionPane;
 import reldb.lib.Reldb_TreeViewElement;
 import reldb.lib.Reldb_Connection;
 import reldb.lib.MetaDataManager;
-import reldb.lib.sql.StatementManager;
+import reldb.lib.sql.Reldb_Statement;
 import reldb.ui.dialogs.Dialogs;
 
 /**
@@ -95,7 +95,9 @@ public class RELDB_01 extends Application {
 
     //Achtung, wird fehlerhaft. Funktion muss ersetzt werden!!!
     public void updateTableNames(Reldb_Connection connection) {
-        mdManager.updateTable_connection(controller, connection, StatementManager.getTables(connection));
+        Reldb_Statement statement = new Reldb_Statement(connection);
+        mdManager.updateTable_connection(controller, connection, statement.getTables(connection));
+        statement.close();
 
     }
 

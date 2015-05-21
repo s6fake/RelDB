@@ -43,13 +43,6 @@ public class Reldb_Connection {
         if (connectionName != null) {
             this.connectionName = connectionName;
         }
-
-        try {
-            metaData = connection.getMetaData();
-        } catch (SQLException ex) {
-            Logger.getLogger(Reldb_Connection.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        setInformation(metaData);
         addConnection(this, 0);
     }
 
@@ -116,6 +109,14 @@ public class Reldb_Connection {
             return false;
         }
         log.log(Level.INFO, "Verbindung mit {0} hergestellt.", getUrl());
+
+        try {
+            metaData = connection.getMetaData();
+        } catch (SQLException ex) {
+            Logger.getLogger(Reldb_Connection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        setInformation(metaData);
+
         return true;
     }
 

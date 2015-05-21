@@ -10,7 +10,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import reldb.lib.*;
-import reldb.lib.sql.StatementManager;
+import reldb.lib.sql.Reldb_Statement;
 
 /**
  *
@@ -31,7 +31,7 @@ public class Placeholder {
             mdManager.printInfo();
 
             Statement st = connection.newStatement();
-            StatementManager dings = new StatementManager(st);
+            Reldb_Statement dings = new Reldb_Statement(st);
             ResultSet rs = dings.getTables();
             ResultSetMetaData rsmd;
             int counter = 0;
