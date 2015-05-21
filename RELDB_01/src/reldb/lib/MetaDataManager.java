@@ -9,14 +9,9 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.logging.Logger;
-import javafx.collections.ObservableList;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
-import reldb.StringClass;
 import reldb.lib.sql.StatementManager;
 import reldb.ui.MainController;
 
@@ -156,7 +151,7 @@ public class MetaDataManager {
         try {
             while (results.next()) {
                 System.out.println(results.getString(1));
-                controller.addTreeItem(database, new Reldb_TreeViewElement(null, results.getString(1)));
+                controller.addTreeItem(database, new Reldb_TreeViewElement(new Reldb_Table(results.getString(1), 0), results.getString(1)));
             }
 
         } catch (SQLException e) {
