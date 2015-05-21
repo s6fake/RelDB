@@ -15,7 +15,8 @@ import java.util.logging.Logger;
 public class Reldb_Table {
 
     private final String tableName; //Name der Tabelle
-    private List<Reldb_Column> columns = new ArrayList<>(); //Liste alle Spalten
+    private List<Reldb_Column> columns = new ArrayList<>(); //Liste aller Spalten
+    private List<Reldb_Column> primaryKeys = new ArrayList<>(); // Liste aller Primärschlüssel
 
     /**
      * Erstellt einen neue Tabelle
@@ -48,6 +49,27 @@ public class Reldb_Table {
         } catch (SQLException ex) {
             Logger.getLogger(Reldb_Table.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    private void createPrimaryKeys(DatabaseMetaData metaData) {
+        ResultSet result;
+        try {
+            result = metaData.getPrimaryKeys(null, null, getTableName());
+            while (result.next()) {
+                primaryKeys.add(getColumnByName(result.getString(4)));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Reldb_Table.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public Reldb_Column getColumnByName(String columnName) {
+        for (Reldb_Column colIterator : columns) {
+            if (colIterator.getName().equals(columnName)) {
+                return colIterator;
+            }
+        }
+        return null;
     }
 
     @Override
