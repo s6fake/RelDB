@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.util.logging.Logger;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
-import reldb.lib.sql.Reldb_Statement;
 import reldb.ui.MainController;
 
 /**
@@ -27,58 +26,6 @@ public class MetaDataManager {
         }
         this.metaData = metaData;
 
-    }
-
-    public void printInfo() {
-
-        ResultSet tables;
-        ResultSet catalogs, schemas;
-        ResultSetMetaData rsmd;
-        int counter;
-        if (metaData == null) {
-            log.warning("No metaData input");
-            return;
-        }
-        try {
-            System.out.println("Database: " + metaData.getDatabaseProductName());
-            System.out.println("Version: " + metaData.getDatabaseProductVersion());
-            System.out.println("Catalog Seperator: " + metaData.getCatalogSeparator());
-            Reldb_Statement.LastCatalogSeparator = metaData.getCatalogSeparator();
-
-            System.out.println("Table MetaData:");
-            tables = metaData.getTables(null, null, null, null);
-            rsmd = tables.getMetaData();
-            counter = rsmd.getColumnCount();
-            for (int i = 1; i < counter; i++) {
-                System.out.println(rsmd.getColumnName(i));
-            }
-        } catch (SQLException e) {
-            System.err.println(e);
-        }
-
-        try {
-            System.out.println("Schemas:");
-            schemas = metaData.getSchemas();
-            rsmd = schemas.getMetaData();
-            counter = rsmd.getColumnCount();
-            for (int i = 1; i < counter; i++) {
-                System.out.println(rsmd.getColumnName(i));
-            }
-        } catch (SQLException e) {
-            System.err.println(e);
-        }
-
-        try {
-            System.out.println("Catalogs:");
-            catalogs = metaData.getCatalogs();
-            rsmd = catalogs.getMetaData();
-            counter = rsmd.getColumnCount();
-            for (int i = 1; i < counter; i++) {
-                System.out.println(rsmd.getColumnName(i));
-            }
-        } catch (SQLException e) {
-            System.err.println(e);
-        }
     }
 
     public void printInfo(TextArea txtArea) {
@@ -148,7 +95,7 @@ public class MetaDataManager {
         try {
             while (results.next()) {
                 //System.out.println(results.getString(1));
-                controller.addTreeItem(database, new Reldb_TreeViewElement(new Reldb_Table(results.getString(1), 0), results.getString(1)));
+                controller.addTreeItem(database, new Reldb_TreeViewElement(new Reldb_Table(results.getString(1)), results.getString(1)));
             }
 
         } catch (SQLException e) {

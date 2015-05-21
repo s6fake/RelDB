@@ -7,17 +7,19 @@ import java.util.List;
  * @author s6fake
  */
 public class Reldb_Table {
-    private String tableName;
-    private final int itemCount;
+    private final String tableName;
 
-    private List<Reldb_DataContainer> columns;
+    private List<Reldb_Column> columns;
     
-    public Reldb_Table(String name, int itemCount){
+    /**
+     * Erstellt einen neue leere Tabelle
+     * @param name Name der Tabelle
+     */
+    public Reldb_Table(String name){
         this.tableName = name;
-        this.itemCount = itemCount;
     }
     
-    public void addColumn(Reldb_DataContainer col) {
+    public void addColumn(Reldb_Column col) {
         columns.add(col);
     }
     
