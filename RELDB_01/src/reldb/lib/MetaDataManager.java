@@ -146,7 +146,7 @@ public class MetaDataManager {
 
         try {
             while (results.next()) {
-                System.out.println(results.getString(1));
+                //System.out.println(results.getString(1));
                 controller.addTreeItem(database, new Reldb_TreeViewElement(new Reldb_Table(results.getString(1), 0), results.getString(1)));
             }
 

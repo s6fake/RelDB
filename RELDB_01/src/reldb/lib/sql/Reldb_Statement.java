@@ -45,7 +45,7 @@ public class Reldb_Statement {
         }
     }
 
-    public ResultSet getTables(Reldb_Connection connection) {
+    public ResultSet getTables() {
         if (connection == null) {
             throw new NullPointerException();
         }
@@ -71,7 +71,7 @@ public class Reldb_Statement {
      }
      */
 
-    public ResultSet executeCommand(Reldb_Connection connection, String command) {       
+    public ResultSet executeCommand(String command) {       
         ResultSet results = null;
         try {
             results = statement.executeQuery(command);
