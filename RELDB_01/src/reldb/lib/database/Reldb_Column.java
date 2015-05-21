@@ -20,7 +20,7 @@ public class Reldb_Column {
 
     @Override
     public String toString() {
-        return name + " (" + typeName + ") " +"java.sql.Type:"+ type;
+        return name + "\n(" + typeName + ") " +"\njava.sql.Type:"+ type;
     }
 
     /**

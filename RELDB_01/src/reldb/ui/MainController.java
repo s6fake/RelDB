@@ -69,10 +69,10 @@ public class MainController implements Initializable {
     public void addDatabaseToConnectionInTreeView(Reldb_Connection connection, Reldb_Database database) {
         TreeItem<Reldb_TreeViewElement> connectionRoot = addTreeItem(new Reldb_TreeViewElement(connection, connection.getConnectionName()));// Neues Verbungs-Wurzelelement
         TreeItem<Reldb_TreeViewElement> databaseRoot = addTreeItem(connectionRoot, new Reldb_TreeViewElement(database, database.getDatabaseName()));   //Datenbank Element einfügen
-        
+
         for (Reldb_Table tableIterator : database.getTableList()) {
             TreeItem<Reldb_TreeViewElement> tableNode = addTreeItem(databaseRoot, new Reldb_TreeViewElement(tableIterator, tableIterator.getTableName()));
-            for(Reldb_Column columnIterator : tableIterator.getColumns()) {
+            for (Reldb_Column columnIterator : tableIterator.getColumns()) {
                 addTreeItem(tableNode, new Reldb_TreeViewElement(columnIterator, columnIterator.getName()));
             }
         }
@@ -121,21 +121,30 @@ public class MainController implements Initializable {
 
     @FXML
     private void onTreeView_MouseClicked(MouseEvent event) {
-
+        TreeItem<Reldb_TreeViewElement> selectedItem = con_treeView.getSelectionModel().getSelectedItem();
+        if (selectedItem == null || selectedItem == treeConnRoot) {
+            return;
+        }
+        textbox.clear();
+        textbox.insertText(0, selectedItem.getValue().getItem().toString());
+               
     }
 
     @FXML
-    private void contextMenu_connect(ActionEvent event) {
+    private void contextMenu_connect(ActionEvent event
+    ) {
         //contextMenu_item_connect ist nur aktiv, wenn das ausgewählte Item eine Verbindung ist
         Dialogs.loginDialog(parent, (Reldb_Connection) con_treeView.getSelectionModel().getSelectedItem().getValue().getItem());
     }
 
     @FXML
-    private void contextMenu_close(ActionEvent event) {
+    private void contextMenu_close(ActionEvent event
+    ) {
     }
 
     @FXML
-    private void contextMenu_delete(ActionEvent event) {
+    private void contextMenu_delete(ActionEvent event
+    ) {
     }
 
     private void setContextMenuToDefault() {

@@ -138,6 +138,11 @@ public class Reldb_Connection {
         return connection != null;
     }
 
+    @Override
+    public String toString() {
+        return connectionName + "\n" +url;
+    }
+    
     public String getConnectionName() {
         return connectionName;
     }

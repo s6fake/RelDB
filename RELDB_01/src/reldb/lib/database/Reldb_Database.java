@@ -88,7 +88,7 @@ public class Reldb_Database {
     
     @Override
     public String toString() {
-        return getDatabaseName();
+        return "Product: " + databaseName+"\n" + "Version: " + version + "\n" + "CatalogSeparator: " + catalogSeparator;
     }
 
     /**
