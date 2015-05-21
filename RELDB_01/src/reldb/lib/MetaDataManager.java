@@ -95,7 +95,7 @@ public class MetaDataManager {
         try {
             while (results.next()) {
                 //System.out.println(results.getString(1));
-                controller.addTreeItem(database, new Reldb_TreeViewElement(new Reldb_Table(results.getString(1)), results.getString(1)));
+                controller.addTreeItem(database, new Reldb_TreeViewElement(null, results.getString(1)));
             }
 
         } catch (SQLException e) {

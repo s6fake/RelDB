@@ -97,6 +97,7 @@ public class RELDB_01 extends Application {
         mdManager.updateTable_connection(controller, connection, statement.getTables());
         statement.close();
         Reldb_Database db = new Reldb_Database(connection);
+        db.print();
 
     }
 
