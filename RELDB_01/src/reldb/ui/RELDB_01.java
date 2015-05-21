@@ -10,9 +10,9 @@ import java.util.List;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import javax.swing.JOptionPane;
+import reldb.Reldb_TreeViewElement;
 import reldb.lib.Reldb_Connection;
 import reldb.lib.MetaDataManager;
 import reldb.lib.sql.StatementManager;
@@ -27,7 +27,7 @@ public class RELDB_01 extends Application {
     private Stage stage;
     private static final String url = "jdbc:postgresql://dbvm01.iai.uni-bonn.de:5432/imdb";
     private static List<Reldb_Connection> connectionsListRef = Reldb_Connection.getConnections();   //Referenz zur Liste mit allen Verbindungen
-    private static Reldb_Connection selectetConnection = null;  //Aktuell betrachtete Connection
+    private static Reldb_Connection selectetConnection = null;  //Aktuell betrachtete Connection. Muss demnächst mal weg
     private MetaDataManager mdManager;
 
     private MainController controller;
@@ -59,52 +59,44 @@ public class RELDB_01 extends Application {
         //logIn("x","y");
     }
 
-    public void callLoginDialog() {
-        Dialogs.loginDialog(this);
-    }
-
     public void callSQLDialog() {
         // Einen SQL Dialog öffnen, mit der aktuell betracteten Connection
         Dialogs.executeDialog(this, selectetConnection);
     }
 
-    public boolean createConnection(String url, String name) {
+    public Reldb_Connection createConnection(String url, String name) {
         for (Reldb_Connection iterator : Reldb_Connection.getConnections()) {
             if (iterator.getConnectionName().equals(name)) {
                 JOptionPane.showMessageDialog(null, "Es existiert bereits eine Verbindung mit dem Namen " + name, "Verbindung kann nicht erstellt werden", JOptionPane.ERROR_MESSAGE);
-                return false;
+                return null;
             }
             if (iterator.getUrl().equalsIgnoreCase(url)) {
                 JOptionPane.showMessageDialog(null, "Es existiert bereits eine Verbindung zu " + url, "Verbindung kann nicht erstellt werden", JOptionPane.ERROR_MESSAGE);
-                return false;
+                return null;
             }
         }
         selectetConnection = new Reldb_Connection(url, name);
-        controller.addTreeItem(name);
+        controller.addTreeItem(new Reldb_TreeViewElement(selectetConnection, name));    //Verbindung wird zur TreeView hinzugefügt
 
-        return true;
+        return selectetConnection;
     }
 
-    public void logIn(String user, String password) {
-        if (selectetConnection == null) {
+    public void logIn(String user, String password, Reldb_Connection connection) {
+        if (connection == null) {
             return;
         }
-        if (selectetConnection.connect(user, password)) {
-            mdManager = new MetaDataManager(selectetConnection.getMetadata());
+        if (connection.connect(user, password)) {
+            mdManager = new MetaDataManager(connection.getMetadata());
             mdManager.printInfo(controller.textbox);
             controller.label_1.setText(url);
-            updateTableNames();
+            updateTableNames(connection);
         }
-    }
-
-    public void updateTable(Reldb_Connection connection) {
-
     }
 
     //Achtung, wird fehlerhaft. Funktion muss ersetzt werden!!!
-    public void updateTableNames() {
-        StatementManager statement = new StatementManager(selectetConnection.newStatement());
-        mdManager.updateTable_connection(controller, selectetConnection, statement.executeCommand("select table_name from information_schema.tables where table_schema = 'public'"));
+    public void updateTableNames(Reldb_Connection connection) {
+        StatementManager statement = new StatementManager(connection.newStatement());
+        mdManager.updateTable_connection(controller, connection, statement.executeCommand("select table_name from information_schema.tables where table_schema = 'public'"));
         statement.close();
     }
 

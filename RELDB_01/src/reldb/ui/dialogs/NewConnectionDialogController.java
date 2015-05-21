@@ -17,6 +17,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import reldb.lib.Reldb_Connection;
 import reldb.ui.RELDB_01;
 
 /**
@@ -54,14 +55,15 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
 
     @FXML
     private void doLogin(MouseEvent event) {
-        if (parent.createConnection(createUrl(), name_field.getText()) == false)
+        Reldb_Connection newConnection = parent.createConnection(createUrl(), name_field.getText());
+        if (newConnection == null)
                 return;
         button_login.setDisable(true);
         user_field.setDisable(true);
         password_field.setDisable(true);
 
         stage.close();
-        parent.logIn(user_field.getText(), password_field.getText());
+        parent.logIn(user_field.getText(), password_field.getText(), newConnection);
     }
 
     public void setParent(RELDB_01 parent) {
@@ -70,7 +72,7 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
 
     @FXML
     private void createNewConnection(MouseEvent event) {
-        if (parent.createConnection(createUrl(), name_field.getText()) == false)
+        if (parent.createConnection(createUrl(), name_field.getText()) == null)
             return;
         stage.close();
 

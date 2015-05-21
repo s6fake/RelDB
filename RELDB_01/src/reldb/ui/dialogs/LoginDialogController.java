@@ -14,6 +14,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Pair;
+import reldb.lib.Reldb_Connection;
 import reldb.ui.RELDB_01;
 
 /**
@@ -31,6 +32,7 @@ public class LoginDialogController extends CustomDialog implements Initializable
     private Button login_button;
     private RELDB_01 parent;
     private Pair<String, String> container;
+    private Reldb_Connection connection;
 
     /**
      * Initializes the controller class.
@@ -47,13 +49,17 @@ public class LoginDialogController extends CustomDialog implements Initializable
         password_field.setDisable(true);
 
         stage.close();
-        parent.logIn(user_field.getText(), password_field.getText());
+        parent.logIn(user_field.getText(), password_field.getText(), connection);
     }
 
     public void setParent(RELDB_01 parent) {
         this.parent = parent;
     }
-
+    
+    public void setConnection(Reldb_Connection connection)
+    {
+        this.connection = connection;
+    }
     public void setContainer(Pair<String, String> container) {
         this.container = container;
     }

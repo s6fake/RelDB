@@ -131,6 +131,10 @@ public class Reldb_Connection {
         }
     }
 
+    public boolean isConnected() {
+        return connection != null;
+    }
+    
     public String getConnectionName() {
         return connectionName;
     }

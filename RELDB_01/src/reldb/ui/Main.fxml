@@ -56,7 +56,18 @@
                                       <items>
                                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                                              <children>
-                                                <TreeView fx:id="con_treeView" layoutX="14.0" layoutY="14.0" onMouseClicked="#onTreeView_MouseClicked" prefHeight="259.0" prefWidth="185.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                <TreeView fx:id="con_treeView" layoutX="14.0" layoutY="14.0" onMouseClicked="#onTreeView_MouseClicked" prefHeight="259.0" prefWidth="185.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                   <contextMenu>
+                                                      <ContextMenu fx:id="treeView_ContextMenu" onShown="#contextMenu_onShow">
+                                                        <items>
+                                                          <MenuItem fx:id="contextMenu_item_connect" disable="true" mnemonicParsing="false" onAction="#contextMenu_connect" text="Connect" />
+                                                            <MenuItem fx:id="contextMenu_item_close" disable="true" mnemonicParsing="false" onAction="#contextMenu_close" text="Close" />
+                                                            <SeparatorMenuItem mnemonicParsing="false" />
+                                                            <MenuItem fx:id="contextMenu_item_add" mnemonicParsing="false" onAction="#contextMenu_add" text="Add" />
+                                                            <MenuItem fx:id="contextMenu_item_delete" disable="true" mnemonicParsing="false" onAction="#contextMenu_delete" text="Delete" />
+                                                        </items>
+                                                      </ContextMenu>
+                                                   </contextMenu></TreeView>
                                              </children></AnchorPane>
                                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" SplitPane.resizableWithParent="false">
                                              <children>

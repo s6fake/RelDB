@@ -18,7 +18,7 @@ import reldb.ui.RELDB_01;
  */
 public class Dialogs {
     
-    public static void loginDialog(RELDB_01 parent){
+    public static void loginDialog(RELDB_01 parent, Reldb_Connection connection){
         
         try {
            Stage stage = new Stage();
@@ -33,6 +33,7 @@ public class Dialogs {
             LoginDialogController controller = loader.<LoginDialogController>getController();
             controller.setStage(stage);
             controller.setParent(parent);
+            controller.setConnection(connection);
             
             // Hauptfenster anzeigen
             stage.show();

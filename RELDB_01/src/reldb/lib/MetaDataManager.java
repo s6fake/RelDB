@@ -16,6 +16,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
+import reldb.Reldb_TreeViewElement;
 import reldb.StringClass;
 import reldb.lib.sql.StatementManager;
 import reldb.ui.MainController;
@@ -141,22 +142,22 @@ public class MetaDataManager {
         String connectionName = connection.getConnectionName();
         String dataBaseName = connection.getDatabaseName();
 
-        TreeItem<String> root = controller.getTreeItemByName(connectionName);
+        TreeItem<Reldb_TreeViewElement> root = controller.getTreeItemByName(connectionName);
         if (root == null) {
-            controller.addTreeItem(connectionName);
+            controller.addTreeItem(new Reldb_TreeViewElement(null,connectionName));
             root = controller.getTreeItemByName(connectionName);
         }
 
-        TreeItem<String> database = controller.getTreeItemByName(root, dataBaseName);
+        TreeItem<Reldb_TreeViewElement> database = controller.getTreeItemByName(root, dataBaseName);
         if (database == null) {
-            controller.addTreeItem(root, dataBaseName);
+            controller.addTreeItem(root, new Reldb_TreeViewElement(null, dataBaseName));
             database = controller.getTreeItemByName(root, dataBaseName);
         }
 
         try {
             while (results.next()) {
                 System.out.println(results.getString(1));
-                controller.addTreeItem(database, results.getString(1));
+                controller.addTreeItem(database, new Reldb_TreeViewElement(null, results.getString(1)));
             }
 
         } catch (SQLException e) {
