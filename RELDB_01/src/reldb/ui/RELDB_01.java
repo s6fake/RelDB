@@ -12,7 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javax.swing.JOptionPane;
-import reldb.Reldb_TreeViewElement;
+import reldb.lib.Reldb_TreeViewElement;
 import reldb.lib.Reldb_Connection;
 import reldb.lib.MetaDataManager;
 import reldb.lib.sql.StatementManager;

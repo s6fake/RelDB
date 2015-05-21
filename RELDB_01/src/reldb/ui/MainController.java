@@ -18,7 +18,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.WindowEvent;
-import reldb.Reldb_TreeViewElement;
+import reldb.lib.Reldb_TreeViewElement;
 import reldb.lib.Reldb_Connection;
 import reldb.ui.dialogs.Dialogs;
 

@@ -16,7 +16,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
-import reldb.Reldb_TreeViewElement;
 import reldb.StringClass;
 import reldb.lib.sql.StatementManager;
 import reldb.ui.MainController;

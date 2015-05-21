@@ -1,4 +1,4 @@
-package reldb;
+package reldb.lib;
 
 /**
  *
