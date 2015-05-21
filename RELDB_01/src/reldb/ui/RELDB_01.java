@@ -107,7 +107,7 @@ public class RELDB_01 extends Application {
 
     /*
      ToDo:
-     Statements den Verbindungen zuordnen? -> Dann auch beim beenden alle Statements schließen
+
     
      */
 }
