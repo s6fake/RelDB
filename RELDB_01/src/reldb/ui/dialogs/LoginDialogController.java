@@ -44,10 +44,6 @@ public class LoginDialogController extends CustomDialog implements Initializable
 
     @FXML
     private void doLogin(MouseEvent event) {
-        login_button.setDisable(true);
-        user_field.setDisable(true);
-        password_field.setDisable(true);
-
         stage.close();
         parent.logIn(user_field.getText(), password_field.getText(), connection);
     }

@@ -82,11 +82,11 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
         String jdbc = null;
         String result = null;
         if (choicebox_type.getSelectionModel().getSelectedIndex() == 1) {
-            jdbc = "oracle";
+            jdbc = "jdbc:oracle";
         } else {
             jdbc = "jdbc:postgresql";
         }
-        result = jdbc + "://" + url_field.getText() + ":" + port_field.getText() + "/" + database_field.getText();    //
+        result = jdbc + "://" + url_field.getText() + ":" + port_field.getText() + "/" + database_field.getText();    //  jdbc:postgresql://dbvm01.iai.uni-bonn.de:5432/imdb
         return result;
     }
 }

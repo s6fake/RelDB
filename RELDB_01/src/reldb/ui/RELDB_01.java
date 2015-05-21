@@ -15,10 +15,8 @@ import javax.swing.JOptionPane;
 import reldb.lib.Reldb_TreeViewElement;
 import reldb.lib.Reldb_Connection;
 import reldb.lib.MetaDataManager;
-import reldb.lib.Reldb_DataContainer;
 import reldb.lib.Reldb_Database;
 import reldb.lib.sql.Reldb_Statement;
-import reldb.ui.dialogs.Dialogs;
 
 /**
  *
@@ -28,10 +26,8 @@ public class RELDB_01 extends Application {
 
     private Stage stage;
     private static final String url = "jdbc:postgresql://dbvm01.iai.uni-bonn.de:5432/imdb";
-    private static List<Reldb_Connection> connectionsListRef = Reldb_Connection.getConnections();   //Referenz zur Liste mit allen Verbindungen
-    private static Reldb_Connection selectetConnection = null;  //Aktuell betrachtete Connection. Muss demnächst mal weg
+    private static List<Reldb_Connection> connectionsListRef = Reldb_Connection.getConnections();   //Referenz zur Liste in Reldb_Connections mit allen Verbindungen
     private MetaDataManager mdManager;
-
     private MainController controller;
 
     @Override
@@ -58,12 +54,12 @@ public class RELDB_01 extends Application {
             System.out.println("Fehler beim Starten der Application\n" + e);
             System.exit(1);
         }
-        //logIn("x","y");
     }
 
     public void callSQLDialog() {
         // Einen SQL Dialog öffnen, mit der aktuell betracteten Connection
-        Dialogs.executeDialog(this, selectetConnection);
+        //Funktioniert im moment nicht
+        //Dialogs.executeDialog(this, selectetConnection);
     }
 
     public Reldb_Connection createConnection(String url, String name) {
@@ -77,10 +73,10 @@ public class RELDB_01 extends Application {
                 return null;
             }
         }
-        selectetConnection = new Reldb_Connection(url, name);
-        controller.addTreeItem(new Reldb_TreeViewElement(selectetConnection, name));    //Verbindung wird zur TreeView hinzugefügt
+        Reldb_Connection newConnection = new Reldb_Connection(url, name);
+        controller.addTreeItem(new Reldb_TreeViewElement(newConnection, name));    //Verbindung wird zur TreeView hinzugefügt
 
-        return selectetConnection;
+        return newConnection;
     }
 
     public void logIn(String user, String password, Reldb_Connection connection) {
@@ -105,9 +101,7 @@ public class RELDB_01 extends Application {
     }
 
     public static void main(String[] args) {
-        //selectetConnection = new Reldb_Connection(url, "IMDB");
         launch(args);
-
         Reldb_Connection.closeAllConnections(); //Alle Verbindungen schließen
     }
 
