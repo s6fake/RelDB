@@ -6,7 +6,11 @@
 package reldb.ui;
 
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -88,6 +92,7 @@ public class RELDB_01 extends Application {
             mdManager.printInfo(controller.textbox);
             controller.label_1.setText(url);
             updateTableNames(connection);
+            //testQuery(connection);
         }
     }
 
@@ -95,6 +100,25 @@ public class RELDB_01 extends Application {
     public void updateTableNames(Reldb_Connection connection) {
         Reldb_Database db = new Reldb_Database(connection);
         controller.addDatabaseToConnectionInTreeView(connection, db);
+    }
+
+    /**
+     * nur zum testen
+     *
+     * @param connection
+     */
+    public void testQuery(Reldb_Connection connection) {
+        Reldb_Statement statement = new Reldb_Statement(connection);
+        ResultSet results = statement.executeCommand("SELECT * FROM title", 2);
+        try {
+            while (results.next()) {
+                System.out.println("SELECT * FROM title:" + results.getObject(1).toString());
+            }
+            results.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(RELDB_01.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        statement.close();
     }
 
     public static void main(String[] args) {

@@ -111,8 +111,16 @@ public class Reldb_Connection {
             Logger.getLogger(Reldb_Connection.class.getName()).log(Level.SEVERE, null, ex);
         }
         setInformation(metaData);
-
+        setAutoCommit(false);
         return true;
+    }
+    
+    private void setAutoCommit(boolean autoCommit) {
+        try {
+            connection.setAutoCommit(autoCommit);
+        } catch (SQLException ex) {
+            Logger.getLogger(Reldb_Connection.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void CloseConnection() {

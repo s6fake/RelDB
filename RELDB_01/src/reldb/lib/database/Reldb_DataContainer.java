@@ -7,8 +7,8 @@ package reldb.lib.database;
 public class Reldb_DataContainer {
     
     private Object data = null;
-    private int dataType;
-    private Object databaseModel = null;    //TODO ORacle / Postgres
+    private int dataType;                   // DatenTyp im java.sql.Types Format. Unterscheidet sich vom Typformat von Oracle und Postgres
+    private Object databaseModel = null;    //TODO Oracle / Postgres
     
     public Reldb_DataContainer(Object data, int dataType) {
         this.data = data;

@@ -55,7 +55,7 @@ public class Reldb_Statement {
             //statement.executeQuery("SELECT * FROM table_schem;");
         } catch (SQLException e) {
             log.warning(e.getMessage());
-        } 
+        }
         return results;
     }
     /*
@@ -71,15 +71,19 @@ public class Reldb_Statement {
      }
      */
 
-    public ResultSet executeCommand(String command) {       
+    public ResultSet executeCommand(String command, int fetch) {
         ResultSet results = null;
         try {
+            statement.setFetchSize(fetch);
             results = statement.executeQuery(command);
             log.info(command);
         } catch (SQLException e) {
             log.warning(e.getMessage());
-        } 
+        }
         return results;
+    }
 
+    public ResultSet executeCommand(String command) {
+        return executeCommand(command, 0);
     }
 }
