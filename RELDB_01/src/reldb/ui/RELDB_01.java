@@ -15,7 +15,7 @@ import javax.swing.JOptionPane;
 import reldb.lib.Reldb_TreeViewElement;
 import reldb.lib.Reldb_Connection;
 import reldb.lib.MetaDataManager;
-import reldb.lib.Reldb_Database;
+import reldb.lib.database.Reldb_Database;
 import reldb.lib.sql.Reldb_Statement;
 
 /**

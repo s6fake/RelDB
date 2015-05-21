@@ -1,5 +1,6 @@
 package reldb.lib;
 
+import reldb.lib.database.Reldb_Table;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
