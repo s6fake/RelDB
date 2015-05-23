@@ -49,6 +49,7 @@ public class Reldb_Database {
 
     /**
      * Erstellt eine Liste aller public Tables
+     *
      * @param metaData
      */
     private void createTableList(DatabaseMetaData metaData) {
@@ -69,11 +70,20 @@ public class Reldb_Database {
 
     }
 
+    public Reldb_Table getTableByName(String name) {
+        for (Reldb_Table iterator : tableList) {
+            if (iterator.getTableName().equals(name)) {
+                return iterator;
+            }
+        }
+        return null;
+    }
+
     /**
      * Gibt die Datenbank und alle Tabellen aus
      */
     public void print() {
-        System.out.println(getDatabaseName() +" " + version);
+        System.out.println(getDatabaseName() + " " + version);
         for (Reldb_Table iterator : getTableList()) {
             iterator.print();
         }
@@ -85,10 +95,10 @@ public class Reldb_Database {
     public Reldb_Connection getConnection() {
         return connection;
     }
-    
+
     @Override
     public String toString() {
-        return "Product: " + databaseName+"\n" + "Version: " + version + "\n" + "CatalogSeparator: " + catalogSeparator;
+        return "Product: " + databaseName + "\n" + "Version: " + version + "\n" + "CatalogSeparator: " + catalogSeparator;
     }
 
     /**
