@@ -82,12 +82,17 @@ public class RELDB_01 extends Application {
         if (connection == null) {
             return;
         }
+            controller.label_1.setText("Verbinde mit " + connection.getConnectionName());
         if (connection.connect(user, password)) {
             mdManager = new MetaDataManager(connection.getMetadata());
             mdManager.printInfo(controller.textbox);
             controller.label_1.setText(url);
             updateTableNames(connection);
             //testQuery(connection);
+        }
+            else
+        {            
+            controller.label_1.setText("Verbindung fehlgeschlagen");
         }
     }
 

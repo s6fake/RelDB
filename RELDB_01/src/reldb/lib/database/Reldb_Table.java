@@ -14,18 +14,26 @@ import java.util.logging.Logger;
  */
 public class Reldb_Table {
 
-    private final String tableName; //Name der Tabelle
+    private final String TABLE_TYPE;
+    private final String TABLE_CAT;
+    private final String TABLE_SCHEM;
+    private final String TABLE_NAME; //Name der Tabelle
     private List<Reldb_Column> columns = new ArrayList<>(); //Liste aller Spalten
     private List<Reldb_Column> primaryKeys = new ArrayList<>(); // Liste aller Primärschlüssel
 
     /**
      * Erstellt einen neue Tabelle
-     *
-     * @param name Name der Tabelle
+     * @param TABLE_TYPE 
+     * @param TABLE_CAT 
+     * @param TABLE_SCHEM Schema der Tabelle
+     * @param TABLE_NAME Name der Tabelle
      * @param metaData Metadaten, mit der die Tabelle gefüllt werden soll.
      */
-    public Reldb_Table(String name, DatabaseMetaData metaData) {
-        this.tableName = name;
+    public Reldb_Table(String TABLE_TYPE, String TABLE_CAT, String TABLE_SCHEM, String TABLE_NAME, DatabaseMetaData metaData) {
+        this.TABLE_TYPE = TABLE_TYPE;
+        this.TABLE_CAT = TABLE_CAT;
+        this.TABLE_SCHEM = TABLE_SCHEM;
+        this.TABLE_NAME = TABLE_NAME;
         createColumns(metaData);
     }
 
@@ -74,7 +82,7 @@ public class Reldb_Table {
 
     @Override
     public String toString() {
-        return getTableName();
+        return "TYPE: " + TABLE_TYPE + " CAT: " + TABLE_CAT + " SCHEM: " + TABLE_SCHEM + " NAME: " + TABLE_NAME;
     }
 
     /**
@@ -85,14 +93,15 @@ public class Reldb_Table {
         for (Reldb_Column iterator : getColumns()) {
             result = result.concat(iterator.toString() + " ");
         }
+        System.out.print("TYPE: " + TABLE_TYPE + "\nCAT: " + TABLE_CAT + "\nSCHEM: " + TABLE_SCHEM);
         System.out.println("|" + getTableName() + "|" + result);
     }
 
     /**
-     * @return the tableName
+     * @return the TABLE_NAME
      */
     public String getTableName() {
-        return tableName;
+        return TABLE_NAME;
     }
 
     /**

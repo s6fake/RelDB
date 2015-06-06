@@ -18,6 +18,7 @@ import reldb.lib.Reldb_TreeViewElement;
 import reldb.lib.Reldb_Connection;
 import reldb.lib.database.Reldb_Column;
 import reldb.lib.database.Reldb_Database;
+import reldb.lib.database.Reldb_Schema;
 import reldb.lib.database.Reldb_Table;
 import reldb.ui.dialogs.Dialogs;
 
@@ -70,10 +71,13 @@ public class MainController implements Initializable {
         TreeItem<Reldb_TreeViewElement> connectionRoot = addTreeItem(new Reldb_TreeViewElement(connection, connection.getConnectionName()));// Neues Verbungs-Wurzelelement
         TreeItem<Reldb_TreeViewElement> databaseRoot = addTreeItem(connectionRoot, new Reldb_TreeViewElement(database, database.getDatabaseName()));   //Datenbank Element einfügen
 
-        for (Reldb_Table tableIterator : database.getTableList()) {
-            TreeItem<Reldb_TreeViewElement> tableNode = addTreeItem(databaseRoot, new Reldb_TreeViewElement(tableIterator, tableIterator.getTableName()));
-            for (Reldb_Column columnIterator : tableIterator.getColumns()) {
-                addTreeItem(tableNode, new Reldb_TreeViewElement(columnIterator, columnIterator.getName()));
+        for (Reldb_Schema schemaIterator : database.getSchemaList()) {
+            TreeItem<Reldb_TreeViewElement> schemaNode = addTreeItem(databaseRoot, new Reldb_TreeViewElement(schemaIterator, schemaIterator.getSchemaName()));
+            for (Reldb_Table tableIterator : schemaIterator.getTableList()) {
+                TreeItem<Reldb_TreeViewElement> tableNode = addTreeItem(schemaNode, new Reldb_TreeViewElement(tableIterator, tableIterator.getTableName()));
+                for (Reldb_Column columnIterator : tableIterator.getColumns()) {
+                    addTreeItem(tableNode, new Reldb_TreeViewElement(columnIterator, columnIterator.getName()));
+                }
             }
         }
     }
@@ -127,7 +131,7 @@ public class MainController implements Initializable {
         }
         textbox.clear();
         textbox.insertText(0, selectedItem.getValue().getItem().toString());
-               
+
     }
 
     @FXML

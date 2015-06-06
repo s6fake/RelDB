@@ -20,6 +20,7 @@ public class Reldb_Database {
     private String databaseName, version, catalogSeparator;
     private Reldb_Connection connection;
     private List<Reldb_Table> tableList;
+    private List<Reldb_Schema> schemaList;
 
     public Reldb_Database(Reldb_Connection connection) {
         if (connection == null) {
@@ -29,7 +30,8 @@ public class Reldb_Database {
 
         DatabaseMetaData metaData = connection.getMetadata();
         setInformation(metaData);
-        createTableList(metaData);
+        //createTableList(metaData);
+        createSchemaList(metaData);
     }
 
     /**
@@ -49,6 +51,7 @@ public class Reldb_Database {
 
     /**
      * Erstellt eine Liste aller public Tables
+     *
      * @param metaData
      */
     private void createTableList(DatabaseMetaData metaData) {
@@ -57,9 +60,10 @@ public class Reldb_Database {
         ResultSet result;
         try {
             String[] types = {"TABLE"};
-            result = metaData.getTables(null, "public", null, types);
+            String schema = null;//"public";
+            result = metaData.getTables(null, schema, null, types);
             while (result.next()) {
-                Reldb_Table newTable = new Reldb_Table(result.getString(3), metaData);
+                Reldb_Table newTable = new Reldb_Table(result.getString(4), result.getString(1), result.getString(2), result.getString(3), metaData);
                 getTableList().add(newTable);
                 //System.out.println(result.getString(1) + " " + result.getString(2) + " " + result.getString(3)+ " " + result.getString(4) + " " + result.getString(5));
             }
@@ -69,14 +73,47 @@ public class Reldb_Database {
 
     }
 
+    private void createSchemaList(DatabaseMetaData metaData) {
+        setSchemaList(new ArrayList<>());
+        String lastSchemaName = "";         // Name des zuletzt erstelltem Schema
+        String currentSchemaName;      // Name des Schema der aktuell betrachteten Tabelle
+        Reldb_Schema currentSchema = null;  // Aktuelles Schema, in das die Tabelle eingefügt wird
+        ResultSet result;
+        try {
+            String[] types = {"TABLE"};
+            String schema = null;//"public";
+            result = metaData.getTables(null, schema, null, types);
+            while (result.next()) {
+                currentSchemaName = result.getString(2);                        // Schema Name auslesen
+                if (!currentSchemaName.equals(lastSchemaName)) // Prüfen ob wir eine Tabelle aus einem anderem Schema haben
+                {
+                    currentSchema = getSchemaByName(currentSchemaName);         // Falls das Schema schon angelegt wurde, hole es
+                    if (currentSchema == null) {
+                        currentSchema = new Reldb_Schema(currentSchemaName);    // Ansonsten erstelle ein neues Schema
+                        schemaList.add(currentSchema);
+                    }
+                }
+                Reldb_Table newTable = new Reldb_Table(result.getString(4), result.getString(1), result.getString(2), result.getString(3), metaData);
+                currentSchema.addTable(newTable);                               // Tabelle in das Schema einfügen
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Reldb_Database.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     /**
      * Gibt die Datenbank und alle Tabellen aus
      */
     public void print() {
-        System.out.println(getDatabaseName() +" " + version);
-        for (Reldb_Table iterator : getTableList()) {
-            iterator.print();
+        System.out.println(getDatabaseName() + " " + version);
+        for (Reldb_Schema schem : schemaList) {
+            schem.print();
         }
+        /*
+         getTableList().stream().forEach((iterator) -> {
+         iterator.print();
+         });
+         */
     }
 
     /**
@@ -85,10 +122,25 @@ public class Reldb_Database {
     public Reldb_Connection getConnection() {
         return connection;
     }
-    
+
+    /**
+     * Gibt das Schema mit dem gesuchten Namen zurück, ansonsten null
+     *
+     * @param schemaName
+     * @return
+     */
+    public Reldb_Schema getSchemaByName(String schemaName) {
+        for (Reldb_Schema schem : schemaList) {
+            if (schem.getSchemaName().equals(schemaName)) {
+                return schem;
+            }
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
-        return "Product: " + databaseName+"\n" + "Version: " + version + "\n" + "CatalogSeparator: " + catalogSeparator;
+        return "Product: " + databaseName + "\n" + "Version: " + version + "\n" + "CatalogSeparator: " + catalogSeparator;
     }
 
     /**
@@ -110,6 +162,20 @@ public class Reldb_Database {
      */
     public void setTableList(List<Reldb_Table> tableList) {
         this.tableList = tableList;
+    }
+
+    /**
+     * @return the schemaList
+     */
+    public List<Reldb_Schema> getSchemaList() {
+        return schemaList;
+    }
+
+    /**
+     * @param schemaList the schemaList to set
+     */
+    public void setSchemaList(List<Reldb_Schema> schemaList) {
+        this.schemaList = schemaList;
     }
 
 }
