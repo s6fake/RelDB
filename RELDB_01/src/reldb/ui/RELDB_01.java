@@ -3,6 +3,7 @@ package reldb.ui;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,7 +15,9 @@ import javax.swing.JOptionPane;
 import reldb.lib.Reldb_TreeViewElement;
 import reldb.lib.Reldb_Connection;
 import reldb.lib.MetaDataManager;
+import reldb.lib.database.Reldb_DataContainer;
 import reldb.lib.database.Reldb_Database;
+import reldb.lib.database.Reldb_Table;
 import reldb.lib.sql.Reldb_Statement;
 
 /**
@@ -88,7 +91,7 @@ public class RELDB_01 extends Application {
             mdManager.printInfo(controller.textbox);
             controller.label_1.setText(url);
             updateTableNames(connection);
-            //testQuery(connection);
+
         }
             else
         {            
@@ -100,25 +103,43 @@ public class RELDB_01 extends Application {
     public void updateTableNames(Reldb_Connection connection) {
         Reldb_Database db = new Reldb_Database(connection);
         controller.addDatabaseToConnectionInTreeView(connection, db);
+        testQuery(db);
     }
 
     /**
-     * nur zum testen
+     * nur zum testen, liest 5 Datensätze aus der Datenbank aus
      *
      * @param connection
      */
-    public void testQuery(Reldb_Connection connection) {
+    public void testQuery(Reldb_Database db) {
+        String tableName = "title";
+        Reldb_Connection connection = db.getConnection();
         Reldb_Statement statement = new Reldb_Statement(connection);
-        ResultSet results = statement.executeCommand("SELECT * FROM title", 2);
-        try {
-            while (results.next()) {
-                System.out.println("SELECT * FROM title:" + results.getObject(1).toString());
+        Reldb_Table testTable = db.getTableByName(tableName);
+
+        List<Reldb_DataContainer> testData = new ArrayList<>();
+
+        for (int i = 2; i <= 2; i++) {
+            ResultSet results = statement.executeCommand("SELECT * FROM " + tableName + " WHERE ID='" + i + "'", 2); // Im ResultSet landen die Datensätze
+            try {
+                while (results.next()) {
+                    int columnCount = testTable.getColumns().size();
+                    for (int j = 1; j <= columnCount; j++) {
+                        testData.add(new Reldb_DataContainer(results.getObject(j), testTable.getColumns().get(1).getType()));   //DataContainer Objekte erstellen
+                    }
+                    //System.out.println("SELECT * FROM title:" + results.getObject(2).toString());
+                }
+                results.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(RELDB_01.class.getName()).log(Level.SEVERE, null, ex);
             }
-            results.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(RELDB_01.class.getName()).log(Level.SEVERE, null, ex);
         }
         statement.close();
+
+        testData.stream().forEach((data) -> {
+            System.out.print(data.toString() + " ");
+        });
+        System.out.print("\n");
     }
 
     public static void main(String[] args) {
