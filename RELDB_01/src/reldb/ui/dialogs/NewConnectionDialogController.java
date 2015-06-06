@@ -83,12 +83,12 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
         String result = null;
         char separator = '/';
         if (choicebox_type.getSelectionModel().getSelectedIndex() == 1) {
-            jdbc = "jdbc:oracle:thin@";
+            jdbc = "jdbc:oracle:thin:@";
             separator = ':';
         } else {
-            jdbc = "jdbc:postgresql";
-        }                                                                       //jdbc:oracle:thin:@localhost:1521:mkyong
-        result = jdbc + "://" + url_field.getText() + ":" + port_field.getText() + separator + database_field.getText();    //  jdbc:postgresql://dbvm01.iai.uni-bonn.de:5432/imdb
+            jdbc = "jdbc:postgresql://";
+        }                                                                       //jdbc:oracle:thin:@host:1521:dbvm02
+        result = jdbc + url_field.getText() + ":" + port_field.getText() + separator + database_field.getText();    //  jdbc:postgresql://dbvm01.iai.uni-bonn.de:5432/imdb
         return result;
     }
 }
