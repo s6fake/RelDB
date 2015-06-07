@@ -1,6 +1,7 @@
 package reldb.lib.database;
 
 import java.lang.reflect.Field;
+import reldb.lib.sql.Reldb_Types;
 
 /**
  *
@@ -23,7 +24,7 @@ public class Reldb_Column {
 
     @Override
     public String toString() {
-        return name + "\n(" + typeName + ") " +"\njava.sql.Type:"+ type;
+        return name + "\n(" + typeName + ") " +"\njava.sql.Type: "+ Reldb_Types.typeMappings.get(type);
     }
 
     /**

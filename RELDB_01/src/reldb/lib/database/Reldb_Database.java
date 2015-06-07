@@ -60,7 +60,7 @@ public class Reldb_Database {
         ResultSet result;
         try {
             String[] types = {"TABLE"};
-            String schema = "IMDB";//"public";
+            String schema = null;//"public";
             result = metaData.getTables(null, schema, null, types);
             while (result.next()) {
                 Reldb_Table newTable = new Reldb_Table(result.getString(4), result.getString(1), result.getString(2), result.getString(3), metaData);

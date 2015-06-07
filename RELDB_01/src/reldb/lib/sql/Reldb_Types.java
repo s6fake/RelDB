@@ -12,10 +12,13 @@ import java.util.logging.Logger;
  */
 public abstract class Reldb_Types {
     
-    public static Map<Integer, String> typeMappings = getAllTypeNames();
+    /**
+     *  Enthält für jeden java.sql.Types Type den dazugehörigen Namen.
+     */
+    public static final Map<Integer, String> typeMappings = getAllTypeNames();
     
     /**
-     * Funktion ordnet jedem java.sql.Type den dazugehörigen Namen zu
+     * Funktion ordnet jedem java.sql.Type den dazugehörigen Namen zu.
      * @return 
      */
     private static Map<Integer, String> getAllTypeNames() {
