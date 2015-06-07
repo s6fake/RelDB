@@ -1,5 +1,7 @@
 package reldb.lib.database;
 
+import java.lang.reflect.Field;
+
 /**
  *
  * @author s6fake
@@ -13,6 +15,7 @@ public class Reldb_Column {
 
     public Reldb_Column(String name, int type, String typeName, int size) {
         this.name = name;
+        Field[] fields = java.sql.Types.class.getFields();
         this.type = type;
         this.typeName = typeName;
         this.size = size;

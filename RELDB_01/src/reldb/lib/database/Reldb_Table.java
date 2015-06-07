@@ -35,7 +35,7 @@ public class Reldb_Table {
         this.TABLE_SCHEM = TABLE_SCHEM;
         this.TABLE_NAME = TABLE_NAME;
         this.metaData = metaData;
-        //createColumns(metaData);
+        createColumns(metaData);
     }
 
     /**
@@ -53,6 +53,7 @@ public class Reldb_Table {
                 String columnTypeName = result.getString(6);
                 int columSize = result.getInt(7);
                 Reldb_Column newCol = new Reldb_Column(columnName, columnType, columnTypeName, columSize); // Neue Reldb_Column erstellen
+                System.out.println(columnName + " " + columnType+ " " + columnTypeName+ " " + columSize);
                 getColumns().add(newCol);    //Spalte in die Spaltenliste hinzufügen
             }
         } catch (SQLException ex) {

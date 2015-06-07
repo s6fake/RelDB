@@ -97,7 +97,6 @@ public class RELDB_01 extends Application {
             mdManager.printInfo(controller.textbox);
             controller.label_1.setText(url);
             updateTableNames(connection);
-
         }
             else
         {            
@@ -109,7 +108,7 @@ public class RELDB_01 extends Application {
     public void updateTableNames(Reldb_Connection connection) {
         Reldb_Database db = new Reldb_Database(connection);
         controller.addDatabaseToConnectionInTreeView(connection, db);
-        testQuery(db);
+        //testQuery(db);
     }
     
     /**
