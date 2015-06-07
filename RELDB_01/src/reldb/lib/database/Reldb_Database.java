@@ -19,7 +19,6 @@ public class Reldb_Database {
 
     private String databaseName, version, catalogSeparator;
     private Reldb_Connection connection;
-    private List<Reldb_Table> tableList;
     private List<Reldb_Schema> schemaList;
 
     public Reldb_Database(Reldb_Connection connection) {
@@ -32,6 +31,7 @@ public class Reldb_Database {
         setInformation(metaData);
         //createTableList(metaData);
         createSchemaList(metaData);
+        setForeignKeys(metaData);
     }
 
     /**
@@ -47,30 +47,6 @@ public class Reldb_Database {
         } catch (SQLException e) {
             log.warning(e.getMessage());
         }
-    }
-
-    /**
-     * Erstellt eine Liste aller public Tables
-     *
-     * @param metaData
-     */
-    private void createTableList(DatabaseMetaData metaData) {
-        setTableList(new ArrayList<>());
-        //Reldb_Statement tableStatement = new Reldb_Statement(connection);
-        ResultSet result;
-        try {
-            String[] types = {"TABLE"};
-            String schema = null;//"public";
-            result = metaData.getTables(null, schema, null, types);
-            while (result.next()) {
-                Reldb_Table newTable = new Reldb_Table(result.getString(4), result.getString(1), result.getString(2), result.getString(3), metaData);
-                getTableList().add(newTable);
-                //System.out.println(result.getString(1) + " " + result.getString(2) + " " + result.getString(3)+ " " + result.getString(4) + " " + result.getString(5));
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(Reldb_Database.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
     }
 
     private void createSchemaList(DatabaseMetaData metaData) {
@@ -101,6 +77,14 @@ public class Reldb_Database {
         }
     }
 
+    
+    private void setForeignKeys(DatabaseMetaData metaData) {
+        for (Reldb_Schema schema : schemaList) {
+            schema.setForeignKeys(metaData);
+        }
+        
+    }
+    
     /**
      * Gibt die Datenbank und alle Tabellen aus
      */
@@ -148,20 +132,6 @@ public class Reldb_Database {
      */
     public String getDatabaseName() {
         return databaseName;
-    }
-
-    /**
-     * @return the tableList
-     */
-    public List<Reldb_Table> getTableList() {
-        return tableList;
-    }
-
-    /**
-     * @param tableList the tableList to set
-     */
-    public void setTableList(List<Reldb_Table> tableList) {
-        this.tableList = tableList;
     }
 
     /**

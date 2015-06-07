@@ -1,6 +1,4 @@
 package reldb.lib.database;
-
-import java.lang.reflect.Field;
 import reldb.lib.sql.Reldb_Types;
 
 /**
@@ -14,17 +12,32 @@ public class Reldb_Column {
     private final int type;         //Datentyp der Spalte als java.sql.Types
     private final int size;         //Größe der Spalte
 
+    private boolean isPrimaryKey = false;
+    private boolean isForeignKey = false;
+    private String refTableName = null, refColumnName = null;
+    private int foreignKeySequence = 0;
+    
     public Reldb_Column(String name, int type, String typeName, int size) {
         this.name = name;
-        Field[] fields = java.sql.Types.class.getFields();
         this.type = type;
         this.typeName = typeName;
         this.size = size;
     }
+    
+    public void addForeignKey(String refTableName, String refColumnName, int foreignKeySequence) {
+        isForeignKey = true;
+        this.refColumnName = refColumnName;
+        this.foreignKeySequence = foreignKeySequence;
+        this.refTableName = refTableName;
+    }
 
     @Override
     public String toString() {
-        return name + "\n(" + typeName + ") " +"\njava.sql.Type: "+ Reldb_Types.typeMappings.get(type);
+        String ref = "";
+        if (isForeignKey) {
+            ref = " ref: " + refTableName + "." + refColumnName;
+        }
+        return name + "\n(" + typeName + ") " +"\njava.sql.Type: " + Reldb_Types.typeMappings.get(type) + ref;
     }
 
     /**
@@ -53,5 +66,19 @@ public class Reldb_Column {
      */
     public int getSize() {
         return size;
+    }
+
+    /**
+     * @return the isPrimaryKey
+     */
+    public boolean isIsPrimaryKey() {
+        return isPrimaryKey;
+    }
+
+    /**
+     * @param isPrimaryKey the isPrimaryKey to set
+     */
+    public void setIsPrimaryKey(boolean isPrimaryKey) {
+        this.isPrimaryKey = isPrimaryKey;
     }
 }
