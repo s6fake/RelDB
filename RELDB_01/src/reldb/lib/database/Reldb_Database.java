@@ -178,4 +178,8 @@ public class Reldb_Database {
         this.schemaList = schemaList;
     }
 
+    public Reldb_Table getTableByName(String tableName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

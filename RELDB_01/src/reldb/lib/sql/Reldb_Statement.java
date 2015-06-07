@@ -51,7 +51,7 @@ public class Reldb_Statement {
         }
         ResultSet results = null;
         try {
-            results = statement.executeQuery(sql_expr.getTableNames(connection.getDatabaseName()));
+            results = statement.executeQuery(sql_expr.getTableNames(connection.getDatabaseProductName()));
             //statement.executeQuery("SELECT * FROM table_schem;");
         } catch (SQLException e) {
             log.warning(e.getMessage());

@@ -1,15 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package reldb.ui.dialogs;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.collections.FXCollections;
 import static javafx.collections.FXCollections.observableArrayList;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -17,6 +10,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javax.swing.JOptionPane;
 import reldb.lib.Reldb_Connection;
 import reldb.ui.RELDB_01;
 
@@ -48,22 +42,44 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
     @FXML
     private ChoiceBox choicebox_type;
 
+    private Reldb_Connection connection = null;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         choicebox_type.setItems(observableArrayList("PostgreSQL", "Oracle"));
     }
 
-    @FXML
-    private void doLogin(MouseEvent event) {
-        Reldb_Connection newConnection = parent.createConnection(createUrl(), name_field.getText());
-        if (newConnection == null)
-                return;
+    /**
+     * Funktion muss aufgerufen werden, wenn eine Verbindung bearbeitet werden
+     * soll
+     *
+     * @param connection Die Verbindung die geändert werden soll.
+     */
+    public void setConnection(Reldb_Connection connection) {
+        this.connection = connection;
+        name_field.setText(connection.getConnectionName());
+        user_field.setText(connection.getUserName());
+        choicebox_type.getSelectionModel().select(connection.getDatabaseType());
+        url_field.setText(connection.getAdress());
+        port_field.setText(Integer.toString(connection.getPort()));
+        database_field.setText(connection.getDatabaseID());
+    }
+
+    private void disableButtons() {
         button_login.setDisable(true);
+        button_create.setDisable(true);
         user_field.setDisable(true);
         password_field.setDisable(true);
+    }
 
+    @FXML
+    private void doLogin(MouseEvent event) {
+        if (!createNewConnection2()) {
+            return;
+        }
+        disableButtons();
         stage.close();
-        parent.logIn(user_field.getText(), password_field.getText(), newConnection);
+        parent.logIn(user_field.getText(), password_field.getText(), connection);
     }
 
     public void setParent(RELDB_01 parent) {
@@ -72,16 +88,41 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
 
     @FXML
     private void createNewConnection(MouseEvent event) {
-        if (parent.createConnection(createUrl(), name_field.getText()) == null)
+        if (!createNewConnection2()) {
             return;
+        }
+        disableButtons();
         stage.close();
+    }
 
+    private boolean createNewConnection2() {
+        if (createUrl() == null) {
+            JOptionPane.showMessageDialog(null, "Die Angegebene URL ist ungültig", "Verbindung kann nicht erstellt werden", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if (name_field.getText() == null) {
+            JOptionPane.showMessageDialog(null, "Bitte geben Sie einen Namen für die Verbindung an", "Verbindung kann nicht erstellt werden", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        if (connection != null) {
+            parent.removeConnection(connection);
+            connection.changeSettings(createUrl(), name_field.getText(), url_field.getText(), database_field.getText(), Integer.parseInt(port_field.getText()), choicebox_type.getSelectionModel().getSelectedIndex(), user_field.getText());
+        } else {
+            connection = new Reldb_Connection(createUrl(), name_field.getText(), url_field.getText(), database_field.getText(), Integer.parseInt(port_field.getText()), choicebox_type.getSelectionModel().getSelectedIndex(), user_field.getText());
+        }
+        parent.addConnectionToTreeView(connection);
+        return true;
     }
 
     private String createUrl() {
-        String jdbc = null;
-        String result = null;
+        String jdbc, result;
         char separator = '/';
+        // Prüfen ob alle Felder ausgefüllt wurden
+        if (url_field.getText() == null || port_field.getText() == null || database_field.getText() == null) {
+            return null;
+        }
+
         if (choicebox_type.getSelectionModel().getSelectedIndex() == 1) {
             jdbc = "jdbc:oracle:thin:@";
             separator = ':';

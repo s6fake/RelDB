@@ -47,6 +47,8 @@ public class MainController implements Initializable {
     private MenuItem contextMenu_item_add;
     @FXML
     private MenuItem contextMenu_item_delete;
+    @FXML
+    private MenuItem contextMenu_item_edit;
 
     /**
      * Initializes the controller class.
@@ -113,6 +115,16 @@ public class MainController implements Initializable {
         return null;
     }
 
+    public void deleteTreeItem(TreeItem<Reldb_TreeViewElement> element) {
+        for (TreeItem<Reldb_TreeViewElement> child : element.getChildren()) {
+            deleteTreeItem(child);
+        }
+        if (element.getParent() != null) {
+            element.getParent().getChildren().remove(element);
+        }
+                element = null;
+    }
+
     @FXML
     private void make_sql_query(ActionEvent event) {
         parent.callSQLDialog();
@@ -142,19 +154,23 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    private void contextMenu_close(ActionEvent event
-    ) {
+    private void contextMenu_close(ActionEvent event) {
     }
 
     @FXML
-    private void contextMenu_delete(ActionEvent event
-    ) {
+    private void contextMenu_delete(ActionEvent event) {
+        parent.removeConnection((Reldb_Connection) con_treeView.getSelectionModel().getSelectedItem().getValue().getItem());
     }
 
+    /**
+     * Setzt alle Einträge im Kontext Menü der Treeview zurück (Nur Add ist
+     * aktiv)
+     */
     private void setContextMenuToDefault() {
         contextMenu_item_connect.setDisable(true);
         contextMenu_item_add.setDisable(false);
         contextMenu_item_close.setDisable(true);
+        contextMenu_item_edit.setDisable(true);
         contextMenu_item_delete.setDisable(true);
     }
 
@@ -176,6 +192,7 @@ public class MainController implements Initializable {
                 contextMenu_item_connect.setDisable(false);
             }
             contextMenu_item_close.setDisable(false);
+            contextMenu_item_edit.setDisable(false);
             contextMenu_item_delete.setDisable(false);
         }
     }
@@ -183,6 +200,19 @@ public class MainController implements Initializable {
     @FXML
     private void contextMenu_add(ActionEvent event) {
         Dialogs.newConnectionDialog(parent);
+    }
+
+    @FXML
+    private void contextMenu_edit(ActionEvent event) {
+        TreeItem<Reldb_TreeViewElement> selectedItem = con_treeView.getSelectionModel().getSelectedItem();
+        if (selectedItem == null) {
+            return;
+        }
+        Reldb_TreeViewElement element = selectedItem.getValue();
+        if (element.getItem() == null) {
+            return;
+        }
+        Dialogs.newEditConnectionDialog(parent, (Reldb_Connection) element.getItem());
     }
 
 }

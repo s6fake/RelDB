@@ -63,7 +63,8 @@ public class RELDB_01 extends Application {
         //Funktioniert im moment nicht
         //Dialogs.executeDialog(this, selectetConnection);
     }
-
+    
+/*
     public Reldb_Connection createConnection(String url, String name) {
         for (Reldb_Connection iterator : Reldb_Connection.getConnections()) {
             if (iterator.getConnectionName().equals(name)) {
@@ -80,7 +81,12 @@ public class RELDB_01 extends Application {
 
         return newConnection;
     }
-
+*/
+    
+    public void addConnectionToTreeView(Reldb_Connection newConnection) {
+        controller.addTreeItem(new Reldb_TreeViewElement(newConnection, newConnection.getConnectionName()));  
+    }
+    
     public void logIn(String user, String password, Reldb_Connection connection) {
         if (connection == null) {
             return;
@@ -104,6 +110,16 @@ public class RELDB_01 extends Application {
         Reldb_Database db = new Reldb_Database(connection);
         controller.addDatabaseToConnectionInTreeView(connection, db);
         testQuery(db);
+    }
+    
+    /**
+     * Schließt eine Verbindung und entfernt diese aus der TreeView
+     * @param connection 
+     */
+    public void removeConnection(Reldb_Connection connection) {
+        
+        controller.deleteTreeItem(controller.getTreeItemByName(connection.getConnectionName())); 
+        connection.CloseConnection();
     }
 
     /**

@@ -22,9 +22,16 @@ public class Reldb_Connection {
 
     private Connection connection = null;
     private DatabaseMetaData metaData;
-    private String databaseName, version, catalogSeparator;                    // Name der Datenbank, ausgelesen aus den MetaDaten
+    private String databaseProductName, version, catalogSeparator;                    // Name der Datenbank, ausgelesen aus den MetaDaten
     private String url = null;
-    private String connectionName = "Unnamed";                                  // Name der Verbindung wie sie in der UI angezeigt wird
+    private String connectionName = "Neue Verbindung";                                  // Name der Verbindung wie sie in der UI angezeigt wird
+
+    //  Optionale Felder, damit man die Verbindung im Nachhinein bearbeiten kann
+    private String adress = "";
+    private String databaseID = "";
+    private String userName = "";
+    private int port = 0;
+    private int databaseType = 0;   // 0: Postgresql, 1: Oracle
 
     /**
      * @param url Die url zur Datenbank, not null
@@ -41,9 +48,25 @@ public class Reldb_Connection {
         addConnection(this, 0);
     }
 
+    public Reldb_Connection(String url, String connectionName, String adress, String databaseID, int port, int databaseType, String userName) {
+        if (url == null) {
+            throw new NullPointerException("url must not be null!");
+        }
+        this.url = url;
+        this.adress = adress;
+        this.databaseID = databaseID;
+        this.port = port;
+        this.databaseType = databaseType;
+        this.userName = userName;
+        if (connectionName != null) {
+            this.connectionName = connectionName;
+        }
+        addConnection(this, 0);
+    }
+
     private void setInformation(DatabaseMetaData metaData) {
         try {
-            databaseName = metaData.getDatabaseProductName();
+            databaseProductName = metaData.getDatabaseProductName();
             version = metaData.getDatabaseProductVersion();
             catalogSeparator = metaData.getCatalogSeparator();
         } catch (SQLException e) {
@@ -51,9 +74,25 @@ public class Reldb_Connection {
         }
     }
 
+    public void changeSettings(String url, String connectionName, String adress, String databaseID, int port, int databaseType, String userName) {
+        if (url == null) {
+            throw new NullPointerException("url must not be null!");
+        }
+        this.url = url;
+        this.adress = adress;
+        this.databaseID = databaseID;
+        this.port = port;
+        this.databaseType = databaseType;
+        this.userName = userName;
+        if (connectionName != null) {
+            this.connectionName = connectionName;
+        }
+        addConnection(this, 0);
+    }
+
     /**
      * Nimmt eine neue Verbindung in die Liste aller Verbindungen auf.
-     * Exisitiert schon eine Verbingung mit gleichem Namen, wird die neu
+     * Exisitiert schon eine Verbingung mit gleichem Namen, wird die neue
      * Verbindung umbenannt.
      *
      * @param newConn Die Verbindung die hinzugefügt werden soll
@@ -63,17 +102,19 @@ public class Reldb_Connection {
      * werden konnte.
      */
     private static boolean addConnection(Reldb_Connection newConn, int counter) {
+
         for (Reldb_Connection iterator : getConnections()) {
             if (counter == 0) {
                 if (iterator.connectionName.equals(newConn.connectionName)) {
-                    return addConnection(newConn, counter++);
+                    return addConnection(newConn, counter + 1);
                 }
             } else if (iterator.connectionName.equals(newConn.connectionName + "(" + counter + ")")) {
-                return addConnection(newConn, counter++);
+                return addConnection(newConn, counter + 1);
             }
+
         }
         if (counter != 0) {
-            newConn.databaseName = newConn.databaseName.concat("(" + counter + ")");
+            newConn.connectionName = newConn.connectionName.concat("(" + counter + ")");
         }
         return getConnections().add(newConn);
     }
@@ -114,7 +155,23 @@ public class Reldb_Connection {
         setAutoCommit(false);
         return true;
     }
-    
+
+    public static boolean checkIfConnectionExists(String url, String name) {
+        for (Reldb_Connection iterator : getConnections()) {
+            /*
+             if (iterator.getConnectionName().equals(name)) {
+             JOptionPane.showMessageDialog(null, "Es existiert bereits eine Verbindung mit dem Namen " + name, "Verbindung kann nicht erstellt werden", JOptionPane.ERROR_MESSAGE);
+             return false;
+             } */
+            if (iterator.getUrl().equalsIgnoreCase(url)) {
+                //JOptionPane.showMessageDialog(null, "Es existiert bereits eine Verbindung zu " + url, "Verbindung kann nicht erstellt werden", JOptionPane.ERROR_MESSAGE);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void setAutoCommit(boolean autoCommit) {
         try {
             connection.setAutoCommit(autoCommit);
@@ -124,33 +181,35 @@ public class Reldb_Connection {
     }
 
     public void CloseConnection() {
+        connections.remove(this);
         if (connection != null) {
             try {
                 connection.close();
+                log.info("Verbindung mit " + connectionName + " geschlossen");
+                System.out.println(connections.remove(this));
             } catch (SQLException e) {
                 System.err.println(e);
                 return;
             }
-            log.info("Verbindung mit " + databaseName + " geschlossen");
         }
+        log.warning("Verbindung mit " + connectionName + "konnte nicht geschlossen werden!");
     }
 
     public static void closeAllConnections() {
-        for (Reldb_Connection iterator : connections) {
+        connections.stream().forEach((iterator) -> {
             iterator.CloseConnection();
-        }
+        });
     }
 
-    
     public boolean isConnected() {
         return connection != null;
     }
 
     @Override
     public String toString() {
-        return connectionName + "\n" +url;
+        return connectionName + "\n" + url;
     }
-    
+
     public String getConnectionName() {
         return connectionName;
     }
@@ -158,8 +217,8 @@ public class Reldb_Connection {
     /**
      * @return Name der Datenbank
      */
-    public String getDatabaseName() {
-        return databaseName;
+    public String getDatabaseProductName() {
+        return databaseProductName;
     }
 
     public static List<Reldb_Connection> getConnections() {
@@ -180,6 +239,41 @@ public class Reldb_Connection {
      */
     public String getUrl() {
         return url;
+    }
+
+    /**
+     * @return the adress
+     */
+    public String getAdress() {
+        return adress;
+    }
+
+    /**
+     * @return the databaseID
+     */
+    public String getDatabaseID() {
+        return databaseID;
+    }
+
+    /**
+     * @return the port
+     */
+    public int getPort() {
+        return port;
+    }
+
+    /**
+     * @return the databaseType
+     */
+    public int getDatabaseType() {
+        return databaseType;
+    }
+
+    /**
+     * @return the userName
+     */
+    public String getUserName() {
+        return userName;
     }
 
 }

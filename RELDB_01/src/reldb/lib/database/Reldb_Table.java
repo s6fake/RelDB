@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 /**
  *
  * @author s6fake
@@ -18,6 +17,7 @@ public class Reldb_Table {
     private final String TABLE_CAT;
     private final String TABLE_SCHEM;
     private final String TABLE_NAME; //Name der Tabelle
+    private final DatabaseMetaData metaData;
     private List<Reldb_Column> columns = new ArrayList<>(); //Liste aller Spalten
     private List<Reldb_Column> primaryKeys = new ArrayList<>(); // Liste aller Primärschlüssel
 
@@ -34,7 +34,8 @@ public class Reldb_Table {
         this.TABLE_CAT = TABLE_CAT;
         this.TABLE_SCHEM = TABLE_SCHEM;
         this.TABLE_NAME = TABLE_NAME;
-        createColumns(metaData);
+        this.metaData = metaData;
+        //createColumns(metaData);
     }
 
     /**
