@@ -66,6 +66,7 @@
                                                             <MenuItem fx:id="contextMenu_item_add" mnemonicParsing="false" onAction="#contextMenu_add" text="Add" />
                                                             <MenuItem fx:id="contextMenu_item_edit" mnemonicParsing="false" onAction="#contextMenu_edit" text="Edit" />
                                                             <MenuItem fx:id="contextMenu_item_delete" disable="true" mnemonicParsing="false" onAction="#contextMenu_delete" text="Delete" />
+                                                            <MenuItem fx:id="contextMenu_item_query" disable="true" mnemonicParsing="false" onAction="#contextMenu_query" text="Query" />
                                                         </items>
                                                       </ContextMenu>
                                                    </contextMenu></TreeView>

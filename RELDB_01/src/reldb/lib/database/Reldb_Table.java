@@ -14,6 +14,8 @@ import java.util.logging.Logger;
  */
 public class Reldb_Table {
 
+    private static final Logger log = Logger.getLogger(Reldb_Table.class.getName());
+
     private final String TABLE_TYPE;
     private final String TABLE_CAT;
     private final String TABLE_SCHEM;
@@ -37,8 +39,8 @@ public class Reldb_Table {
         this.TABLE_SCHEM = TABLE_SCHEM;
         this.TABLE_NAME = TABLE_NAME;
         this.metaData = metaData;
-        createColumns(metaData);
-        createPrimaryKeys(metaData);
+        //createColumns(metaData);
+        //createPrimaryKeys(metaData);
     }
 
     /**
@@ -46,10 +48,13 @@ public class Reldb_Table {
      *
      * @param metaData
      */
-    private void createColumns(DatabaseMetaData metaData) {
-        ResultSet result;
+    public void createColumns() {
+        if (!columns.isEmpty()) {
+            return;
+        }
+        ResultSet result = null;
         try {
-            result = metaData.getColumns(null, null, getTableName(), null); //Metadaten der Spalten holen
+            result = metaData.getColumns(null, TABLE_SCHEM, getTableName(), null); //Metadaten der Spalten holen
             while (result.next()) {
                 String columnName = result.getString(4);
                 int columnType = result.getInt(5);
@@ -61,32 +66,79 @@ public class Reldb_Table {
             }
         } catch (SQLException ex) {
             Logger.getLogger(Reldb_Table.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                result.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(Reldb_Table.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    private void createPrimaryKeys(DatabaseMetaData metaData) {
-        ResultSet result;
+    public void createPrimaryKeys() {
+        if (!primaryKeys.isEmpty()) {
+            return;
+        }
+        ResultSet result = null;
         try {
-            result = metaData.getPrimaryKeys(TABLE_SCHEM, null, TABLE_NAME);
-            
+            result = metaData.getPrimaryKeys(null, TABLE_SCHEM, TABLE_NAME);
+
             while (result.next()) {
-                Reldb_Column col = getColumnByName(result.getString(4));
+                Reldb_Column col = getColumnByName(result.getString("COLUMN_NAME"));
+                if (col == null) {
+                    log.warning("Column " + result.getString("TABLE_NAME") + " not in Table!");
+                    int count =  result.getMetaData().getColumnCount();
+                    for (int i = 0; i < count; i++) {
+                        System.out.println(result.getString(i+1));
+                    }
+                    
+                    continue;
+                }
                 col.setIsPrimaryKey(true);
                 primaryKeys.add(col);
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Reldb_Table.class.getName()).log(Level.SEVERE, null, ex);
+            log.warning(ex.getMessage());
+            //Logger.getLogger(Reldb_Table.class.getName()).log(Level.SEVERE, null, ex.getMessage());
+        } finally {
+            try {
+                result.close();
+            } catch (SQLException ex) {
+                log.warning(ex.getMessage());
+            }
         }
     }
 
+    public void createForeignKeys() {
+        ResultSet result = null;
+        try {
+            result = metaData.getImportedKeys(null, TABLE_SCHEM, TABLE_NAME);
 
+            while (result.next()) {
+               // System.out.println(TABLE_NAME + " " +result.getString("FKCOLUMN_NAME") +" "+result.getString("PKTABLE_NAME") +" "+ result.getString("PKCOLUMN_NAME"));
+                Reldb_Column col = getColumnByName(result.getString("FKCOLUMN_NAME"));
+                col.addForeignKey(result.getString("PKTABLE_NAME"), result.getString("PKCOLUMN_NAME"), result.getInt("KEY_SEQ"));
 
+            }
+        } catch (SQLException ex) {
+            log.warning(ex.getMessage());
+            //Logger.getLogger(Reldb_Table.class.getName()).log(Level.SEVERE, null, ex.getMessage());
+        } finally {
+            try {
+                result.close();
+            } catch (SQLException ex) {
+                log.warning(ex.getMessage());
+            }
+        }
+    }
+    
     public Reldb_Column getColumnByName(String columnName) {
         for (Reldb_Column colIterator : columns) {
             if (colIterator.getName().equals(columnName)) {
                 return colIterator;
             }
         }
+        log.warning("Spalte " + columnName + " ist nicht in der Tabelle " + getTableName() + " vorhanden!");
         return null;
     }
 
@@ -97,6 +149,7 @@ public class Reldb_Table {
             result = result + col.getName() + " ";
         }
         return "TYPE: " + TABLE_TYPE + " CAT: " + TABLE_CAT + " SCHEM: " + TABLE_SCHEM + " NAME: " + TABLE_NAME + "\nPrimary Keys: " + result;
+
     }
 
     /**

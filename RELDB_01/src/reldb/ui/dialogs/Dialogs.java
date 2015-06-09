@@ -90,7 +90,7 @@ public class Dialogs {
         }
     }
 
-    public static void executeDialog(RELDB_01 parent, Reldb_Connection connection) {
+    public static void newSQLDialog(RELDB_01 parent, Reldb_Connection connection) {
         try {
             Stage stage = new Stage();
             FXMLLoader loader = new FXMLLoader(Dialogs.class.getResource("SQLDialog.fxml"));

@@ -31,7 +31,8 @@ public class Reldb_Database {
         setInformation(metaData);
         //createTableList(metaData);
         createSchemaList(metaData);
-        setForeignKeys(metaData);
+        //setForeignKeys(metaData);
+        
     }
 
     /**
@@ -54,13 +55,22 @@ public class Reldb_Database {
         String lastSchemaName = "";         // Name des zuletzt erstelltem Schema
         String currentSchemaName;      // Name des Schema der aktuell betrachteten Tabelle
         Reldb_Schema currentSchema = null;  // Aktuelles Schema, in das die Tabelle eingefügt wird
-        ResultSet result;
+        ResultSet resultSet = null;
         try {
             String[] types = {"TABLE"};
             String schema = null;//"public";
+            resultSet = metaData.getSchemas();
+            while (resultSet.next()) {
+                currentSchema = new Reldb_Schema(metaData, resultSet.getString("TABLE_SCHEM"), resultSet.getString("TABLE_CATALOG"));
+                schemaList.add(currentSchema);
+            }
+            /*
             result = metaData.getTables(null, schema, null, types);
             while (result.next()) {
-                currentSchemaName = result.getString(2);                        // Schema Name auslesen
+                currentSchemaName = result.getString("TABLE_SCHEM");                        // Schema Name auslesen
+                if (currentSchemaName == null) {
+                    currentSchemaName = "null";
+                }
                 if (!currentSchemaName.equals(lastSchemaName)) // Prüfen ob wir eine Tabelle aus einem anderem Schema haben
                 {
                     currentSchema = getSchemaByName(currentSchemaName);         // Falls das Schema schon angelegt wurde, hole es
@@ -69,19 +79,26 @@ public class Reldb_Database {
                         schemaList.add(currentSchema);
                     }
                 }
-                Reldb_Table newTable = new Reldb_Table(result.getString(4), result.getString(1), result.getString(2), result.getString(3), metaData);
+                Reldb_Table newTable = new Reldb_Table(result.getString("TABLE_TYPE"), result.getString("TABLE_CAT"), currentSchemaName, result.getString("TABLE_NAME"), metaData);
                 currentSchema.addTable(newTable);                               // Tabelle in das Schema einfügen
-            }
+            }*/
         } catch (SQLException ex) {
-            Logger.getLogger(Reldb_Database.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Reldb_Database.class.getName()).log(Level.SEVERE, null, ex.getMessage());
+        }
+        finally {
+            try {
+                resultSet.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(Reldb_Database.class.getName()).log(Level.SEVERE, null, ex.getMessage());
+            }
         }
     }
 
     
     private void setForeignKeys(DatabaseMetaData metaData) {
-        for (Reldb_Schema schema : schemaList) {
+        schemaList.stream().forEach((schema) -> {
             schema.setForeignKeys(metaData);
-        }
+        });
         
     }
     
@@ -119,6 +136,7 @@ public class Reldb_Database {
                 return schem;
             }
         }
+        log.warning("Schema " + schemaName + " existiert nicht!");
         return null;
     }
 
