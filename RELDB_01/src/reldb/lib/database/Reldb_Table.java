@@ -54,7 +54,7 @@ public class Reldb_Table {
         }
         ResultSet result = null;
         try {
-            result = metaData.getColumns(null, TABLE_SCHEM, getTableName(), null); //Metadaten der Spalten holen
+            result = getMetaData().getColumns(null, TABLE_SCHEM, getTableName(), null); //Metadaten der Spalten holen
             while (result.next()) {
                 String columnName = result.getString(4);
                 int columnType = result.getInt(5);
@@ -81,7 +81,7 @@ public class Reldb_Table {
         }
         ResultSet result = null;
         try {
-            result = metaData.getPrimaryKeys(null, TABLE_SCHEM, TABLE_NAME);
+            result = getMetaData().getPrimaryKeys(null, TABLE_SCHEM, TABLE_NAME);
 
             while (result.next()) {
                 Reldb_Column col = getColumnByName(result.getString("COLUMN_NAME"));
@@ -112,7 +112,7 @@ public class Reldb_Table {
     public void createForeignKeys() {
         ResultSet result = null;
         try {
-            result = metaData.getImportedKeys(null, TABLE_SCHEM, TABLE_NAME);
+            result = getMetaData().getImportedKeys(null, TABLE_SCHEM, TABLE_NAME);
 
             while (result.next()) {
                // System.out.println(TABLE_NAME + " " +result.getString("FKCOLUMN_NAME") +" "+result.getString("PKTABLE_NAME") +" "+ result.getString("PKCOLUMN_NAME"));
@@ -176,6 +176,13 @@ public class Reldb_Table {
      */
     public List<Reldb_Column> getColumns() {
         return columns;
+    }
+
+    /**
+     * @return the metaData
+     */
+    public DatabaseMetaData getMetaData() {
+        return metaData;
     }
 
 }

@@ -22,7 +22,7 @@ import reldb.lib.database.Reldb_Database;
 import reldb.lib.database.Reldb_Schema;
 import reldb.lib.database.Reldb_Table;
 import reldb.ui.dialogs.Dialogs;
-
+import reldb.lib.sql.sql_expr;
 /**
  * FXML Controller class
  *
@@ -52,6 +52,8 @@ public class MainController implements Initializable {
     private MenuItem contextMenu_item_edit;
     @FXML
     private MenuItem contextMenu_item_query;
+    @FXML
+    private MenuItem contextMenu_item_export;
 
     /**
      * Initializes the controller class.
@@ -188,6 +190,7 @@ public class MainController implements Initializable {
         contextMenu_item_edit.setDisable(true);
         contextMenu_item_delete.setDisable(true);
         contextMenu_item_query.setDisable(true);
+        contextMenu_item_export.setDisable(true);
     }
 
     @FXML
@@ -212,6 +215,9 @@ public class MainController implements Initializable {
             contextMenu_item_delete.setDisable(false);
             contextMenu_item_query.setDisable(false);
         }
+        if ((element.getItem() instanceof Reldb_Table)) {
+            contextMenu_item_export.setDisable(false);
+        }
     }
 
     @FXML
@@ -235,6 +241,12 @@ public class MainController implements Initializable {
     @FXML
     private void contextMenu_query(ActionEvent event) {
         Dialogs.newSQLDialog(parent, (Reldb_Connection) con_treeView.getSelectionModel().getSelectedItem().getValue().getItem());
+    }
+
+    @FXML
+    private void contextMenu_export(ActionEvent event) {
+        Reldb_Database db = (Reldb_Database) (con_treeView.getSelectionModel().getSelectedItem().getParent().getParent().getValue().getItem());
+        Dialogs.newSQLDialog(parent, db.getConnection(), sql_expr.createTable((Reldb_Table)(con_treeView.getSelectionModel().getSelectedItem().getValue().getItem())));
     }
 
 }

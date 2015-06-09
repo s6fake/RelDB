@@ -45,7 +45,11 @@ public class SQLDialogController extends CustomDialog implements Initializable {
     public void initalize(Reldb_Connection connection) {
         this.connection = connection;
     }
-
+    
+    public void setDefaultCommand(String command) {
+        txt_area.setText(command);
+    }
+    
     @FXML
     private void execute(MouseEvent event) {
         Reldb_Statement statement = new Reldb_Statement(connection);
