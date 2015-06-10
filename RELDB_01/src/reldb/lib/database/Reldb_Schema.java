@@ -17,11 +17,11 @@ public class Reldb_Schema {
     private static final Logger log = Logger.getLogger(Reldb_Schema.class.getName());
 
     private final String SCHEMA_NAME, CATALOG_NAME;
-    private final DatabaseMetaData metaData;
+    private final Reldb_Database database;      // Dazugehörige Datenbank
     private final List<Reldb_Table> tableList;    //Liste aller im Tabellen im Schema
 
-    public Reldb_Schema(DatabaseMetaData metaData, String schemaName, String catalogName) {
-        this.metaData = metaData;
+    public Reldb_Schema(Reldb_Database database, String schemaName, String catalogName) {
+        this.database = database;
         this.SCHEMA_NAME = schemaName;
         this.CATALOG_NAME = catalogName;
         tableList = new ArrayList<>();
@@ -39,11 +39,12 @@ public class Reldb_Schema {
             return;
         }
         ResultSet resultSet = null;
+        DatabaseMetaData metaData = database.getMetaData();
         try {
             String[] tables = {"TABLE"};
             resultSet = metaData.getTables(null, SCHEMA_NAME, null, tables);
             while (resultSet.next()) {
-                Reldb_Table newTable = new Reldb_Table(resultSet.getString("TABLE_TYPE"), resultSet.getString("TABLE_CAT"), SCHEMA_NAME, resultSet.getString("TABLE_NAME"), metaData);
+                Reldb_Table newTable = new Reldb_Table(database, resultSet.getString("TABLE_TYPE"), resultSet.getString("TABLE_CAT"), SCHEMA_NAME, resultSet.getString("TABLE_NAME"));
                 tableList.add(newTable);
             }
         } catch (SQLException ex) {

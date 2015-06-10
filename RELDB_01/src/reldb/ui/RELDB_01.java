@@ -84,7 +84,7 @@ public class RELDB_01 extends Application {
 */
     
     public void addConnectionToTreeView(Reldb_Connection newConnection) {
-        controller.addTreeItem(new Reldb_TreeViewElement(newConnection, newConnection.getConnectionName()));  
+        controller.addConnectionToTreeView(new Reldb_TreeViewElement(newConnection, newConnection.getConnectionName()));  
     }
     
     public void logIn(String user, String password, Reldb_Connection connection) {
@@ -117,7 +117,7 @@ public class RELDB_01 extends Application {
      */
     public void removeConnection(Reldb_Connection connection) {
         
-        controller.deleteTreeItem(controller.getTreeItemByName(connection.getConnectionName())); 
+        controller.deleteConnectionFromTreeView(controller.getTreeItemByName(connection.getConnectionName())); 
         connection.CloseConnection();
     }
 
@@ -140,7 +140,7 @@ public class RELDB_01 extends Application {
                 while (results.next()) {
                     int columnCount = testTable.getColumns().size();
                     for (int j = 1; j <= columnCount; j++) {
-                        testData.add(new Reldb_DataContainer(results.getObject(j), testTable.getColumns().get(1).getType()));   //DataContainer Objekte erstellen
+                        //testData.add(new Reldb_DataContainer(results.getObject(j), testTable.getColumns().get(1).getType()));   //DataContainer Objekte erstellen
                     }
                     //System.out.println("SELECT * FROM title:" + results.getObject(2).toString());
                 }

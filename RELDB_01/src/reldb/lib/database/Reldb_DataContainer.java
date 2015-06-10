@@ -1,7 +1,8 @@
 package reldb.lib.database;
 
 import java.util.logging.Logger;
-import java.sql.Types;
+import reldb.lib.database.Reldb_Database.DATABASETYPE;
+import reldb.lib.sql.Reldb_Types;
 
 /**
  *
@@ -9,20 +10,53 @@ import java.sql.Types;
  */
 public class Reldb_DataContainer {
 
-    public static enum DATABASEMODEL {
-
-        POSTGRESQL, ORACLE
-    };
     private static final Logger log = Logger.getLogger(Reldb_DataContainer.class.getName());
-    private Object data = null;
-    private final int dataType;  // DatenTyp im java.sql.Types Format. Unterscheidet sich vom Typformat von Oracle und Postgres
 
-    public Reldb_DataContainer(Object data, int dataType) {
-        this.data = data;
-        this.dataType = dataType;
+    protected String COLUMN_NAME;       //Name der Spalte
+    protected String TYPE_NAME;         //Name des Datentyps
+    protected int DATA_TYPE;            //Datentyp als java.sql.Types.
+    protected int COLUMN_SIZE;          //Größe der Spalte
+    protected boolean NULLABLE;         //Lässt die Spalte Nullwerte zu?
+    protected boolean AUTOINCREMENT;
+    protected boolean UNIQUE = false;
+    protected Reldb_Database database;
+    private final Object data;
+
+    public Reldb_DataContainer() {
+        this.data = null;
     }
 
-    public Object convertTo(DATABASEMODEL dbm) {
+    public Reldb_DataContainer(Reldb_Database database, String COLUMN_NAME, int DATA_TYPE, String TYPE_NAME, int COLUMN_SIZE, boolean NULLABLE, boolean AUTOINCREMENT) {
+        this.database = database;
+        this.COLUMN_NAME = COLUMN_NAME;
+        this.DATA_TYPE = DATA_TYPE;
+        this.TYPE_NAME = TYPE_NAME;
+        this.COLUMN_SIZE = COLUMN_SIZE;
+        this.NULLABLE = NULLABLE;
+        this.AUTOINCREMENT = AUTOINCREMENT;
+        this.data = null;
+    }
+
+    public Reldb_DataContainer(Reldb_Database database, String COLUMN_NAME, int DATA_TYPE, String TYPE_NAME, int COLUMN_SIZE, boolean NULLABLE, Object data) {
+        this.database = database;
+        this.COLUMN_NAME = COLUMN_NAME;
+        this.DATA_TYPE = DATA_TYPE;
+        this.TYPE_NAME = TYPE_NAME;
+        this.COLUMN_SIZE = COLUMN_SIZE;
+        this.NULLABLE = NULLABLE;
+        this.data = data;
+    }
+
+    @Override
+    public Reldb_DataContainer clone() {
+        Reldb_DataContainer newObj = new Reldb_DataContainer(database, COLUMN_NAME, DATA_TYPE, TYPE_NAME, COLUMN_SIZE, NULLABLE, data);
+        return newObj;
+    }
+
+    public Object convertTo(DATABASETYPE dbm) {
+        if (database.getDatabaseType() == dbm) {
+            return this;
+        }
         switch (dbm) {
             case POSTGRESQL:
                 //ToDo
@@ -37,7 +71,7 @@ public class Reldb_DataContainer {
     }
 
     private Object convertToOracle() {
-        switch (dataType) {
+        switch (DATA_TYPE) {
             case (-7):     //BIT
                 //ToDo
                 break;
@@ -58,6 +92,32 @@ public class Reldb_DataContainer {
         return data.toString();
     }
 
+    protected String getConstructorString(DATABASETYPE dbModel) {
+        String string = "";
+        if (dbModel == DATABASETYPE.ORACLE) {
+            if (DATA_TYPE != 12) {          // Nur VARCHAR muss bearbeitet werden
+                string = Reldb_Types.typeMappings.get(DATA_TYPE);
+                return string;
+            }
+            if (Reldb_Types.typeMappings.get(DATA_TYPE).equalsIgnoreCase("text")) {
+                string = "CLOB";
+                return string;
+            }
+            if (COLUMN_SIZE == 1) {
+                string = "CHAR";
+                return string;
+            }
+            if (COLUMN_SIZE > 400) {
+                string = "LONG VARCHAR";
+                return string;
+            }
+            string = "VARCHAR (" + COLUMN_SIZE + ")";
+            return string;
+        }
+
+        return string;
+    }
+
     /**
      * @return the data
      */
@@ -69,7 +129,21 @@ public class Reldb_DataContainer {
      * @return the dataType
      */
     public int getDataType() {
-        return dataType;
+        return DATA_TYPE;
+    }
+
+    /**
+     * @return the UNIQUE
+     */
+    public boolean isUNIQUE() {
+        return UNIQUE;
+    }
+
+    /**
+     * @param UNIQUE the UNIQUE to set
+     */
+    public void setUNIQUE(boolean UNIQUE) {
+        this.UNIQUE = UNIQUE;
     }
 }
 

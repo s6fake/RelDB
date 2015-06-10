@@ -7,10 +7,12 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
@@ -57,6 +59,8 @@ public class MainController implements Initializable {
     private MenuItem contextMenu_item_query;
     @FXML
     private MenuItem contextMenu_item_export;
+    @FXML
+    private Menu contextMenu_item_exportMenu;
 
     /**
      * Initializes the controller class.
@@ -73,8 +77,7 @@ public class MainController implements Initializable {
             @Override
             public void changed(ObservableValue observable, Object oldValue, Object newValue) {
                 TreeItem<Reldb_TreeViewElement> selectedItem = (TreeItem<Reldb_TreeViewElement>) newValue;
-                
-                
+
                 if (!selectedItem.getValue().discovered) {                  // Prüfen ob das Element schon einmal besucht wurde
                     con_treeView.setDisable(true);                          // TreeView deaktivieren, damit nicht mit unfertigen Daten gearbeitet wird
                     List<?> items = selectedItem.getValue().discover();     // Gegebenenfalls neue Kind-Elemente hinzufügen
@@ -115,7 +118,12 @@ public class MainController implements Initializable {
         }
     }
 
+    public TreeItem<Reldb_TreeViewElement> addConnectionToTreeView(Reldb_TreeViewElement item) {
+        return addTreeItem(treeConnRoot, item);
+    }
+
     public TreeItem<Reldb_TreeViewElement> addTreeItem(Reldb_TreeViewElement item) {
+        updateExportMenu();
         return addTreeItem(treeConnRoot, item);
     }
 
@@ -152,7 +160,12 @@ public class MainController implements Initializable {
         return null;
     }
 
-    public void deleteTreeItem(TreeItem<Reldb_TreeViewElement> element) {
+    public void deleteConnectionFromTreeView(TreeItem<Reldb_TreeViewElement> element) {
+        deleteTreeItem(element);
+        updateExportMenu();
+    }
+
+    private void deleteTreeItem(TreeItem<Reldb_TreeViewElement> element) {
         for (TreeItem<Reldb_TreeViewElement> child : element.getChildren()) {
             deleteTreeItem(child);
         }
@@ -205,6 +218,7 @@ public class MainController implements Initializable {
         contextMenu_item_delete.setDisable(true);
         contextMenu_item_query.setDisable(true);
         contextMenu_item_export.setDisable(true);
+        contextMenu_item_exportMenu.setDisable(true);
     }
 
     @FXML
@@ -231,6 +245,16 @@ public class MainController implements Initializable {
         }
         if ((element.getItem() instanceof Reldb_Table)) {
             contextMenu_item_export.setDisable(false);
+            contextMenu_item_exportMenu.setDisable(false);
+        }
+
+    }
+
+    private void updateExportMenu() {
+        contextMenu_item_exportMenu.getItems().clear();
+        for (Reldb_Connection connection : Reldb_Connection.getConnections()) {
+            MenuItem item = new MenuItem(connection.getConnectionName());
+            contextMenu_item_exportMenu.getItems().add(item);
         }
     }
 
@@ -261,6 +285,11 @@ public class MainController implements Initializable {
     private void contextMenu_export(ActionEvent event) {
         Reldb_Database db = (Reldb_Database) (con_treeView.getSelectionModel().getSelectedItem().getParent().getParent().getValue().getItem());
         Dialogs.newSQLDialog(parent, db.getConnection(), sql_expr.createTable((Reldb_Table) (con_treeView.getSelectionModel().getSelectedItem().getValue().getItem())));
+    }
+
+    @FXML
+    private void contextMenu_exportMenu_onShow(Event event) {
+
     }
 
 }

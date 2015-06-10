@@ -68,6 +68,11 @@
                                                             <MenuItem fx:id="contextMenu_item_delete" disable="true" mnemonicParsing="false" onAction="#contextMenu_delete" text="Delete" />
                                                             <MenuItem fx:id="contextMenu_item_query" disable="true" mnemonicParsing="false" onAction="#contextMenu_query" text="Query" />
                                                             <MenuItem fx:id="contextMenu_item_export" disable="true" mnemonicParsing="false" onAction="#contextMenu_export" text="Export (Oracle)" />
+                                                            <Menu fx:id="contextMenu_item_exportMenu" onShown="#contextMenu_exportMenu_onShow" disable="false" mnemonicParsing="false" text="Export">
+                                                                <items>
+                                                                    <MenuItem disable="true"/>
+                                                                </items>
+                                                            </Menu>
                                                         </items>
                                                       </ContextMenu>
                                                    </contextMenu></TreeView>

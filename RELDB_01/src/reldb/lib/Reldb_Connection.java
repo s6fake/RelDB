@@ -196,9 +196,18 @@ public class Reldb_Connection {
     }
 
     public static void closeAllConnections() {
-        connections.stream().forEach((iterator) -> {
-            iterator.CloseConnection();
-        });
+        for (Reldb_Connection iterator : connections) {
+            try {
+                iterator.connection.close();
+                log.info("Verbindung mit " + iterator.connectionName + " geschlossen");
+
+            } catch (SQLException e) {
+                System.err.println(e);
+                continue;
+            }
+            log.warning("Verbindung mit " + iterator.connectionName + "konnte nicht geschlossen werden!");
+        }
+        connections.clear();
     }
 
     public boolean isConnected() {

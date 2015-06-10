@@ -1,29 +1,33 @@
 package reldb.lib.database;
+
 import reldb.lib.sql.Reldb_Types;
 
 /**
  *
  * @author s6fake
  */
-public class Reldb_Column {
-
-    private final String name;      //Name der Spalte
-    private final String typeName;  //Name des Datentyps
-    private final int type;         //Datentyp der Spalte als java.sql.Types
-    private final int size;         //Größe der Spalte
+public class Reldb_Column extends Reldb_DataContainer {
 
     private boolean isPrimaryKey = false;
     private boolean isForeignKey = false;
+    
+    private final Reldb_Table parentTable;
     private String refTableName = null, refColumnName = null;
     private int foreignKeySequence = 0;
     
-    public Reldb_Column(String name, int type, String typeName, int size) {
-        this.name = name;
-        this.type = type;
-        this.typeName = typeName;
-        this.size = size;
+
+    public Reldb_Column(Reldb_Database database, Reldb_Table table, String name, int type, String typeName, int size, boolean nullable, boolean autoincrement) {
+        this.database = database;
+        this.parentTable = table;
+        this.COLUMN_NAME = name;
+        this.DATA_TYPE = type;
+        this.TYPE_NAME = typeName;
+        this.COLUMN_SIZE = size;
+        this.NULLABLE = nullable;
+        this.AUTOINCREMENT = autoincrement;
+//super(database, typeName, size, typeName, size, nullable);
     }
-    
+
     public void addForeignKey(String refTableName, String refColumnName, int foreignKeySequence) {
         isForeignKey = true;
         this.refColumnName = refColumnName;
@@ -37,35 +41,53 @@ public class Reldb_Column {
         if (isForeignKey) {
             ref = " ref: " + refTableName + "." + refColumnName;
         }
-        return name + "\n(" + typeName + ") " +"\njava.sql.Type: " + Reldb_Types.typeMappings.get(type) + ref;
+        
+        return COLUMN_NAME + "\n(" + TYPE_NAME + ") " + "\njava.sql.Type: " + Reldb_Types.typeMappings.get(DATA_TYPE) + "(" + COLUMN_SIZE + ")" + "\n" + ref +"\nAutoincrement: " + AUTOINCREMENT + " Unique: " + UNIQUE;
+    }
+
+    @Override
+    public String getConstructorString(Reldb_Database.DATABASETYPE dbModel) {
+        String typeStr = super.getConstructorString(dbModel);
+        String constraints = "";
+        String nullable = "";
+        if (dbModel == Reldb_Database.DATABASETYPE.ORACLE) {
+            if (isPrimaryKey) {
+                constraints = constraints + ",\nCONSTRAINT "+ parentTable.getTableName() +"_PK PRIMARY KEY (" + COLUMN_NAME + ")";
+            }
+            if (!NULLABLE) {
+                nullable = nullable + " NOT NULL";
+            }
+            return COLUMN_NAME + " " + typeStr + nullable + constraints;
+        }
+        return COLUMN_NAME + " " + constraints + " " + typeStr;
     }
 
     /**
      * @return the name
      */
     public String getName() {
-        return name;
+        return COLUMN_NAME;
     }
 
     /**
      * @return the type
      */
     public int getType() {
-        return type;
+        return DATA_TYPE;
     }
 
     /**
      * @return the typeName
      */
     public String getTypeName() {
-        return typeName;
+        return TYPE_NAME;
     }
 
     /**
      * @return the size
      */
     public int getSize() {
-        return size;
+        return COLUMN_SIZE;
     }
 
     /**
@@ -80,5 +102,12 @@ public class Reldb_Column {
      */
     public void setIsPrimaryKey(boolean isPrimaryKey) {
         this.isPrimaryKey = isPrimaryKey;
+    }
+
+    /**
+     * @return the NULLABLE
+     */
+    public boolean isNullable() {
+        return NULLABLE;
     }
 }

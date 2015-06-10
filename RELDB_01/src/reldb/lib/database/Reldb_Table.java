@@ -20,35 +20,33 @@ public class Reldb_Table {
     private final String TABLE_CAT;
     private final String TABLE_SCHEM;
     private final String TABLE_NAME; //Name der Tabelle
-    private final DatabaseMetaData metaData;
-    private List<Reldb_Column> columns = new ArrayList<>(); //Liste aller Spalten
-    private List<Reldb_Column> primaryKeys = new ArrayList<>(); // Liste aller Primärschlüssel
+    private final Reldb_Database database;
+    private  List<Reldb_Column> columns = new ArrayList<>(); //Liste aller Spalten
+    private  List<Reldb_Column> primaryKeys = new ArrayList<>(); // Liste aller Primärschlüssel
 
     /**
      * Erstellt einen neue Tabelle
      *
+     * @param database Die Datenbank, der die Tabelle zugehörig ist
      * @param TABLE_TYPE
      * @param TABLE_CAT
      * @param TABLE_SCHEM Schema der Tabelle
      * @param TABLE_NAME Name der Tabelle
-     * @param metaData Metadaten, mit der die Tabelle gefüllt werden soll.
      */
-    public Reldb_Table(String TABLE_TYPE, String TABLE_CAT, String TABLE_SCHEM, String TABLE_NAME, DatabaseMetaData metaData) {
+    public Reldb_Table(Reldb_Database database, String TABLE_TYPE, String TABLE_CAT, String TABLE_SCHEM, String TABLE_NAME) {
         this.TABLE_TYPE = TABLE_TYPE;
         this.TABLE_CAT = TABLE_CAT;
         this.TABLE_SCHEM = TABLE_SCHEM;
         this.TABLE_NAME = TABLE_NAME;
-        this.metaData = metaData;
+        this.database = database;
         //createColumns(metaData);
         //createPrimaryKeys(metaData);
     }
 
     /**
      * Überträgt alle Spalten aus den Metadaten in die interne Spaltenliste
-     *
-     * @param metaData
      */
-    public void createColumns() {
+    public void createColumns() {        
         if (!columns.isEmpty()) {
             return;
         }
@@ -56,13 +54,21 @@ public class Reldb_Table {
         try {
             result = getMetaData().getColumns(null, TABLE_SCHEM, getTableName(), null); //Metadaten der Spalten holen
             while (result.next()) {
-                String columnName = result.getString(4);
-                int columnType = result.getInt(5);
-                String columnTypeName = result.getString(6);
-                int columSize = result.getInt(7);
-                Reldb_Column newCol = new Reldb_Column(columnName, columnType, columnTypeName, columSize); // Neue Reldb_Column erstellen
-                //System.out.println(columnName + " " + columnType + " " + columnTypeName + " " + columSize);
+                String columnName = result.getString("COLUMN_NAME");
+                int columnType = result.getInt("DATA_TYPE");
+                String columnTypeName = result.getString("TYPE_NAME");
+                int columSize = result.getInt("COLUMN_SIZE");
+                boolean nullable = false;
+                if (result.getString("IS_NULLABLE").equalsIgnoreCase("YES")) {
+                    nullable = true;
+                }
+                boolean autoincrement = false;
+                if (result.getString("IS_AUTOINCREMENT").equalsIgnoreCase("YES")) {
+                    autoincrement = true;
+                }
+                Reldb_Column newCol = new Reldb_Column(getDatabase(), this, columnName, columnType, columnTypeName, columSize, nullable, autoincrement); // Neue Reldb_Column erstellen
                 getColumns().add(newCol);    //Spalte in die Spaltenliste hinzufügen
+                log.info(TABLE_NAME +"."+ columnName +" erstellt.");
             }
         } catch (SQLException ex) {
             Logger.getLogger(Reldb_Table.class.getName()).log(Level.SEVERE, null, ex);
@@ -73,8 +79,32 @@ public class Reldb_Table {
                 Logger.getLogger(Reldb_Table.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-    }
 
+    }
+    /**
+     * Funktioniert noch nicht so ganz
+     */
+    private void getUniqueColumns() {
+                ResultSet resultSet = null;
+        try {
+            resultSet = getMetaData().getIndexInfo(TABLE_CAT, TABLE_SCHEM, TABLE_NAME, true, true);
+            while (resultSet.next()) {
+                if (resultSet.getBoolean("NON_UNIQUE")) {
+                    Reldb_Column col = getColumnByName(resultSet.getString("COLUMN_NAME"));
+                    col.setUNIQUE(true);
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Reldb_Table.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                resultSet.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(Reldb_Table.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
     public void createPrimaryKeys() {
         if (!primaryKeys.isEmpty()) {
             return;
@@ -115,7 +145,7 @@ public class Reldb_Table {
             result = getMetaData().getImportedKeys(null, TABLE_SCHEM, TABLE_NAME);
 
             while (result.next()) {
-               // System.out.println(TABLE_NAME + " " +result.getString("FKCOLUMN_NAME") +" "+result.getString("PKTABLE_NAME") +" "+ result.getString("PKCOLUMN_NAME"));
+                System.out.println(TABLE_NAME + " " +result.getString("FKCOLUMN_NAME") +" "+result.getString("PKTABLE_NAME") +" "+ result.getString("PKCOLUMN_NAME"));
                 Reldb_Column col = getColumnByName(result.getString("FKCOLUMN_NAME"));
                 col.addForeignKey(result.getString("PKTABLE_NAME"), result.getString("PKCOLUMN_NAME"), result.getInt("KEY_SEQ"));
 
@@ -133,7 +163,7 @@ public class Reldb_Table {
     }
     
     public Reldb_Column getColumnByName(String columnName) {
-        for (Reldb_Column colIterator : columns) {
+        for (Reldb_Column colIterator : columns) {            
             if (colIterator.getName().equals(columnName)) {
                 return colIterator;
             }
@@ -182,7 +212,14 @@ public class Reldb_Table {
      * @return the metaData
      */
     public DatabaseMetaData getMetaData() {
-        return metaData;
+        return getDatabase().getMetaData();
+    }
+
+    /**
+     * @return the database
+     */
+    public Reldb_Database getDatabase() {
+        return database;
     }
 
 }
