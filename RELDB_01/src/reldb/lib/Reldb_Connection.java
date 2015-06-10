@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import reldb.lib.database.Reldb_Database;
 
 /**
  *
@@ -25,7 +26,8 @@ public class Reldb_Connection {
     private String databaseProductName, version, catalogSeparator;                    // Name der Datenbank, ausgelesen aus den MetaDaten
     private String url = null;
     private String connectionName = "Neue Verbindung";                                  // Name der Verbindung wie sie in der UI angezeigt wird
-
+    private Reldb_Database database;                                       // Die  dieser Verbindung zuzuordnende Datenbank
+    
     //  Optionale Felder, damit man die Verbindung im Nachhinein bearbeiten kann
     private String adress = "";
     private String databaseID = "";
@@ -239,7 +241,12 @@ public class Reldb_Connection {
      *
      * @return
      */
-    public static Reldb_Connection getConnectionByName() {
+    public static Reldb_Connection getConnectionByName(String name) {
+        for (Reldb_Connection connection : connections) {
+            if (connection.connectionName.equals(name)) {
+                return connection;
+            }
+        }
         return null;
     }
 
@@ -284,5 +291,20 @@ public class Reldb_Connection {
     public String getUserName() {
         return userName;
     }
+
+    /**
+     * @return the database
+     */
+    public Reldb_Database getDatabase() {
+        return database;
+    }
+
+    /**
+     * @param database the database to set
+     */
+    public void setDatabase(Reldb_Database database) {
+        this.database = database;
+    }
+
 
 }

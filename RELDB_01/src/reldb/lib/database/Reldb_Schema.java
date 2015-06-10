@@ -115,4 +115,8 @@ public class Reldb_Schema {
         log.warning("Table " + name + " ist nicht in Schema " + SCHEMA_NAME + " vorhanden!");
         return null;
     }
+
+    public Reldb_Database getDatabase() {
+        return database;
+    }
 }

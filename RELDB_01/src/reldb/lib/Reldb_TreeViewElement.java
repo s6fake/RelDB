@@ -11,7 +11,7 @@ import reldb.lib.database.Reldb_Table;
  */
 public class Reldb_TreeViewElement {
 
-    private Object item;
+    private final Object item;
     private String displayName;
     public boolean discovered = false;
 
@@ -22,7 +22,6 @@ public class Reldb_TreeViewElement {
 
     public Reldb_TreeViewElement(Object item) {
         this(item, "Vashta Nerada");
-        this.item = item;
         if (item instanceof Reldb_Table) {
             displayName = ((Reldb_Table) item).getTableName();
         }

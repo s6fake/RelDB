@@ -8,6 +8,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ContextMenu;
@@ -25,6 +26,7 @@ import reldb.lib.database.Reldb_Column;
 import reldb.lib.database.Reldb_Database;
 import reldb.lib.database.Reldb_Schema;
 import reldb.lib.database.Reldb_Table;
+import reldb.lib.migration.Reldb_DataMover;
 import reldb.ui.dialogs.Dialogs;
 import reldb.lib.sql.sql_expr;
 
@@ -221,10 +223,21 @@ public class MainController implements Initializable {
         contextMenu_item_exportMenu.setDisable(true);
     }
 
+    private void setExportMenuVisibility(String selectedConnectionName) {
+
+        for (MenuItem item : contextMenu_item_exportMenu.getItems()) {
+            item.setDisable(false);
+            if (item.getText().equals(selectedConnectionName)) {
+                item.setDisable(true);
+            }
+        }
+    }
+
     @FXML
     private void contextMenu_onShow(WindowEvent event) {
         setContextMenuToDefault();
         TreeItem<Reldb_TreeViewElement> selectedItem = con_treeView.getSelectionModel().getSelectedItem();
+        String selectedConnection;
         if (selectedItem == null) {
             return;
         }
@@ -242,10 +255,23 @@ public class MainController implements Initializable {
             contextMenu_item_edit.setDisable(false);
             contextMenu_item_delete.setDisable(false);
             contextMenu_item_query.setDisable(false);
+            return;
+        }   // End instanceof Reldb_Connection
+
+        if ((element.getItem() instanceof Reldb_Schema)) {
+            selectedConnection = ((Reldb_Schema) (element.getItem())).getDatabase().getConnection().getConnectionName();
+            setExportMenuVisibility(selectedConnection);
+
+            contextMenu_item_exportMenu.setDisable(false);
+            return;
         }
+
         if ((element.getItem() instanceof Reldb_Table)) {
+            selectedConnection = ((Reldb_Table) (element.getItem())).getDatabase().getConnection().getConnectionName();
+            setExportMenuVisibility(selectedConnection);
             contextMenu_item_export.setDisable(false);
             contextMenu_item_exportMenu.setDisable(false);
+            return;
         }
 
     }
@@ -253,7 +279,17 @@ public class MainController implements Initializable {
     private void updateExportMenu() {
         contextMenu_item_exportMenu.getItems().clear();
         for (Reldb_Connection connection : Reldb_Connection.getConnections()) {
-            MenuItem item = new MenuItem(connection.getConnectionName());
+            final MenuItem item = new MenuItem(connection.getConnectionName());
+
+            item.setOnAction(new EventHandler<ActionEvent>() {
+                public void handle(ActionEvent t) {
+                    Reldb_Connection selectedDestinationConnection = Reldb_Connection.getConnectionByName(item.getText());
+                    TreeItem<Reldb_TreeViewElement> selectedItem = con_treeView.getSelectionModel().getSelectedItem();
+                    Reldb_DataMover.copy(selectedItem.getValue().getItem(), selectedDestinationConnection.getDatabase());
+                    //Dialogs.newSQLDialog(parent, selectedDestinationConnection);
+                }
+            });
+
             contextMenu_item_exportMenu.getItems().add(item);
         }
     }

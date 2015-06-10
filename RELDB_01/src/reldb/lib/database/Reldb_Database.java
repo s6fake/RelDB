@@ -46,7 +46,8 @@ public class Reldb_Database {
             throw new NullPointerException("Connection must not be null");
         }
         this.connection = connection;
-
+        connection.setDatabase(this);
+        
         this.metaData = connection.getMetadata();
         setInformation(metaData);
         if (databaseName.equalsIgnoreCase("PostgreSQL")) {
