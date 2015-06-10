@@ -40,7 +40,7 @@ public class MainController implements Initializable {
     private RELDB_01 parent;
     @FXML
     private TreeView<Reldb_TreeViewElement> con_treeView;
-    private TreeItem<Reldb_TreeViewElement> treeConnRoot = new TreeItem<>(new Reldb_TreeViewElement("", "Connections"));
+    private final TreeItem<Reldb_TreeViewElement> treeConnRoot = new TreeItem<>(new Reldb_TreeViewElement("", "Connections"));
     @FXML
     private ContextMenu treeView_ContextMenu;
     @FXML
