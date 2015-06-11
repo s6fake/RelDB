@@ -12,18 +12,22 @@ public class Reldb_DataContainer {
 
     private static final Logger log = Logger.getLogger(Reldb_DataContainer.class.getName());
 
-    protected String COLUMN_NAME;       //Name der Spalte
-    protected String TYPE_NAME;         //Name des Datentyps
-    protected int DATA_TYPE;            //Datentyp als java.sql.Types.
-    protected int COLUMN_SIZE;          //Größe der Spalte
-    protected boolean NULLABLE;         //Lässt die Spalte Nullwerte zu?
-    protected boolean AUTOINCREMENT;
+    protected String COLUMN_NAME = "";       //Name der Spalte
+    protected String TYPE_NAME = "";         //Name des Datentyps
+    protected int DATA_TYPE = 0;            //Datentyp als java.sql.Types.
+    protected int COLUMN_SIZE = 0;          //Größe der Spalte
+    protected boolean NULLABLE = true;         //Lässt die Spalte Nullwerte zu?
+    protected boolean AUTOINCREMENT = false;
     protected boolean UNIQUE = false;
-    protected Reldb_Database database;
+    protected Reldb_Database database = null;
     private final Object data;
 
     public Reldb_DataContainer() {
         this.data = null;
+    }
+
+    public Reldb_DataContainer(Object data) {
+        this.data = data;
     }
 
     public Reldb_DataContainer(Reldb_Database database, String COLUMN_NAME, int DATA_TYPE, String TYPE_NAME, int COLUMN_SIZE, boolean NULLABLE, boolean AUTOINCREMENT) {

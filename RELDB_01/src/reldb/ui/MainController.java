@@ -108,7 +108,7 @@ public class MainController implements Initializable {
     public void addDatabaseToConnectionInTreeView(Reldb_Connection connection, Reldb_Database database) {
         TreeItem<Reldb_TreeViewElement> connectionRoot = addTreeItem(new Reldb_TreeViewElement(connection, connection.getConnectionName()));// Neues Verbungs-Wurzelelement
         TreeItem<Reldb_TreeViewElement> databaseRoot = addTreeItem(connectionRoot, new Reldb_TreeViewElement(database, database.getDatabaseName()));   //Datenbank Element einfügen
-
+/*
         for (Reldb_Schema schemaIterator : database.getSchemaList()) {
             TreeItem<Reldb_TreeViewElement> schemaNode = addTreeItem(databaseRoot, new Reldb_TreeViewElement(schemaIterator, schemaIterator.getSchemaName()));
             for (Reldb_Table tableIterator : schemaIterator.getTableList()) {
@@ -117,7 +117,7 @@ public class MainController implements Initializable {
                     addTreeItem(tableNode, new Reldb_TreeViewElement(columnIterator, columnIterator.getName()));
                 }
             }
-        }
+        }*/
     }
 
     public TreeItem<Reldb_TreeViewElement> addConnectionToTreeView(Reldb_TreeViewElement item) {

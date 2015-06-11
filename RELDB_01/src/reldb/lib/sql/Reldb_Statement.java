@@ -8,6 +8,7 @@ package reldb.lib.sql;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.logging.Logger;
 import reldb.lib.Reldb_Connection;
@@ -71,19 +72,50 @@ public class Reldb_Statement {
      }
      */
 
-    public ResultSet executeCommand(String command, int fetch) {
+    private void printWarnings() {
+        try {
+            SQLWarning warning = statement.getWarnings();
+            while (warning != null) {
+                String errStr = "Message: " + warning.getMessage();
+                errStr = errStr + " SQLState: " + warning.getSQLState();
+                errStr = errStr + " Vendor error code: "+ warning.getErrorCode();
+                log.warning(errStr);
+                warning = warning.getNextWarning();
+            }
+        } catch (SQLException e) {
+            log.warning(e.getMessage());
+        }
+    }
+
+    public boolean execute(String command) {
+        boolean result = false;
+        try {
+            //statement.setFetchSize(fetch);
+            result = statement.execute(command);
+            printWarnings();
+            //log.info(command);
+
+        } catch (SQLException e) {
+            log.warning(e.getMessage() + "\n" + command);            
+        }
+        return result;
+    }
+
+    public ResultSet executeQuery(String command, int fetch) {
         ResultSet results = null;
         try {
             statement.setFetchSize(fetch);
             results = statement.executeQuery(command);
+            printWarnings();
             log.info(command);
         } catch (SQLException e) {
-            log.warning(e.getMessage());
+            log.warning(e.getMessage() + "\n" + command);    
+            printWarnings();
         }
         return results;
     }
 
-    public ResultSet executeCommand(String command) {
-        return executeCommand(command, 0);
+    public ResultSet executeQuery(String command) {
+        return Reldb_Statement.this.executeQuery(command, 0);
     }
 }

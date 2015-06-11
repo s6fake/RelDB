@@ -53,7 +53,8 @@ public class SQLDialogController extends CustomDialog implements Initializable {
     @FXML
     private void execute(MouseEvent event) {
         Reldb_Statement statement = new Reldb_Statement(connection);
-        MetaDataManager.printResultset(statement.executeCommand(txt_area.getText()));
+        //MetaDataManager.printResultset(statement.executeQuery(txt_area.getText()));
+        MetaDataManager.printResultset(statement.executeQuery(txt_area.getText(), 5));
         statement.close();
     }
 

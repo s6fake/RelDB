@@ -20,6 +20,8 @@ public class Reldb_Schema {
     private final Reldb_Database database;      // Dazugehörige Datenbank
     private final List<Reldb_Table> tableList;    //Liste aller im Tabellen im Schema
 
+    private boolean listsFilled = false;
+    
     public Reldb_Schema(Reldb_Database database, String schemaName, String catalogName) {
         this.database = database;
         this.SCHEMA_NAME = schemaName;
@@ -34,7 +36,7 @@ public class Reldb_Schema {
         return getTableList().add(table);
     }
 
-    public void createTableList() {
+    void createTableList() {
         if (!tableList.isEmpty()) {
             return;
         }
@@ -46,6 +48,7 @@ public class Reldb_Schema {
             while (resultSet.next()) {
                 Reldb_Table newTable = new Reldb_Table(database, resultSet.getString("TABLE_TYPE"), resultSet.getString("TABLE_CAT"), SCHEMA_NAME, resultSet.getString("TABLE_NAME"));
                 tableList.add(newTable);
+                database.addTable(newTable);
             }
         } catch (SQLException ex) {
             log.warning(ex.getMessage());
@@ -56,6 +59,7 @@ public class Reldb_Schema {
                 log.warning(ex.getMessage());
             }
         }
+        listsFilled = true;
     }
 
     /**
@@ -103,6 +107,10 @@ public class Reldb_Schema {
      * @return the tableList
      */
     public List<Reldb_Table> getTableList() {
+        if (!listsFilled) {
+            createTableList();
+            listsFilled = true;
+        }
         return tableList;
     }
 

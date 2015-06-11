@@ -15,20 +15,6 @@ import reldb.lib.Reldb_Connection;
  */
 public class Reldb_Database {
 
-    /**
-     * @return the metaData
-     */
-    public DatabaseMetaData getMetaData() {
-        return metaData;
-    }
-
-    /**
-     * @return the databaseType
-     */
-    public DATABASETYPE getDatabaseType() {
-        return databaseType;
-    }
-
     public static enum DATABASETYPE {
 
         UNKNOWN, POSTGRESQL, ORACLE
@@ -40,14 +26,17 @@ public class Reldb_Database {
     private String databaseName, version, catalogSeparator;
     private Reldb_Connection connection;
     private final List<Reldb_Schema> schemaList = new ArrayList<>();
+    private final List<Reldb_Table> tableList = new ArrayList<>();
 
+    private boolean listsFilled = false;
+    
     public Reldb_Database(Reldb_Connection connection) {
         if (connection == null) {
             throw new NullPointerException("Connection must not be null");
         }
         this.connection = connection;
         connection.setDatabase(this);
-        
+
         this.metaData = connection.getMetadata();
         setInformation(metaData);
         if (databaseName.equalsIgnoreCase("PostgreSQL")) {
@@ -147,8 +136,44 @@ public class Reldb_Database {
         return schemaList;
     }
 
-    public Reldb_Table getTableByName(String tableName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    void addTable(Reldb_Table table) {
+        tableList.add(table);
     }
 
+    public Reldb_Table getTableByName(String tableName) {
+        for (Reldb_Table table : getTables()) {
+            if (table.getTableName().equals(tableName)) {
+                return table;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * @return the metaData
+     */
+    public DatabaseMetaData getMetaData() {
+        return metaData;
+    }
+
+    /**
+     * @return the databaseType
+     */
+    public DATABASETYPE getDatabaseType() {
+        return databaseType;
+    }
+
+    /**
+     * @return the tableList
+     */
+    public List<Reldb_Table> getTables() {
+        if (!listsFilled) {
+            for (Reldb_Schema schema : getSchemaList()) {
+                schema.createTableList();
+            }
+            listsFilled = true;
+        }
+        return tableList;
+    }
+    
 }

@@ -10,11 +10,10 @@ public class Reldb_Column extends Reldb_DataContainer {
 
     private boolean isPrimaryKey = false;
     private boolean isForeignKey = false;
-    
+
     private final Reldb_Table parentTable;
     private String refTableName = null, refColumnName = null;
     private int foreignKeySequence = 0;
-    
 
     public Reldb_Column(Reldb_Database database, Reldb_Table table, String name, int type, String typeName, int size, boolean nullable, boolean autoincrement) {
         this.database = database;
@@ -38,11 +37,11 @@ public class Reldb_Column extends Reldb_DataContainer {
     @Override
     public String toString() {
         String ref = "";
-        if (isForeignKey) {
+        if (isIsForeignKey()) {
             ref = " ref: " + refTableName + "." + refColumnName;
         }
-        
-        return COLUMN_NAME + "\n(" + TYPE_NAME + ") " + "\njava.sql.Type: " + Reldb_Types.typeMappings.get(DATA_TYPE) + "(" + COLUMN_SIZE + ")" + "\n" + ref +"\nAutoincrement: " + AUTOINCREMENT + " Unique: " + UNIQUE;
+
+        return COLUMN_NAME + "\n(" + TYPE_NAME + ") " + "\njava.sql.Type: " + Reldb_Types.typeMappings.get(DATA_TYPE) + "(" + COLUMN_SIZE + ")" + "\n" + ref + "\nAutoincrement: " + AUTOINCREMENT + " Unique: " + UNIQUE;
     }
 
     @Override
@@ -50,16 +49,54 @@ public class Reldb_Column extends Reldb_DataContainer {
         String typeStr = super.getConstructorString(dbModel);
         String constraints = "";
         String nullable = "";
+
         if (dbModel == Reldb_Database.DATABASETYPE.ORACLE) {
             if (isPrimaryKey) {
-                constraints = constraints + ",\nCONSTRAINT "+ parentTable.getTableName() +"_PK PRIMARY KEY (" + COLUMN_NAME + ")";
+                constraints = constraints + ",\nCONSTRAINT " + parentTable.getTableName() + "_PK PRIMARY KEY (" + COLUMN_NAME + ")";
             }
+
             if (!NULLABLE) {
                 nullable = nullable + " NOT NULL";
             }
             return COLUMN_NAME + " " + typeStr + nullable + constraints;
         }
         return COLUMN_NAME + " " + constraints + " " + typeStr;
+    }
+
+    private String shorten(String str) {
+        if (str.contains("_")) {
+            String result = "";
+            String[] segments = str.split("_");
+            result = "";
+            for (int i = 0; i < segments.length - 1; i++) {
+                if (!segments[i].equals("")) {
+                    result = result + segments[i].charAt(0);
+                }
+            }
+            result = result + segments[segments.length - 1];
+            return result;
+        }
+        return str;
+    }
+    
+    public String getForeignKeyConstraintName() {
+        String constraint = "";
+        if (isForeignKey)
+        {
+            constraint = parentTable.getTableName() + "_FK_" + shorten(COLUMN_NAME) + "_" + shorten(refColumnName);
+        }
+        return constraint;
+    }
+
+    public String getForeignKeyConstructorString(Reldb_Database.DATABASETYPE dbModel) {
+        String constraints = "";
+        if (dbModel == Reldb_Database.DATABASETYPE.ORACLE) {
+            if (isIsForeignKey()) {
+                constraints = constraints + "CONSTRAINT " + getForeignKeyConstraintName();
+                constraints = constraints + " FOREIGN KEY (" + COLUMN_NAME + ") REFERENCES " + refTableName + "(" + refColumnName + ")";
+            }
+        }
+        return constraints;
     }
 
     /**
@@ -109,5 +146,12 @@ public class Reldb_Column extends Reldb_DataContainer {
      */
     public boolean isNullable() {
         return NULLABLE;
+    }
+
+    /**
+     * @return the isForeignKey
+     */
+    public boolean isIsForeignKey() {
+        return isForeignKey;
     }
 }

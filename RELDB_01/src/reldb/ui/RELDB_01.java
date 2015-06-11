@@ -108,7 +108,7 @@ public class RELDB_01 extends Application {
     public void updateTableNames(Reldb_Connection connection) {
         Reldb_Database db = new Reldb_Database(connection);
         controller.addDatabaseToConnectionInTreeView(connection, db);
-        //testQuery(db);
+        testQuery(db);
     }
     
     /**
@@ -131,24 +131,27 @@ public class RELDB_01 extends Application {
         Reldb_Connection connection = db.getConnection();
         Reldb_Statement statement = new Reldb_Statement(connection);
         Reldb_Table testTable = db.getTableByName(tableName);
-
+        int fetchSize = 10;
         List<Reldb_DataContainer> testData = new ArrayList<>();
 
-        for (int i = 2; i <= 2; i++) {
-            ResultSet results = statement.executeCommand("SELECT * FROM " + tableName + " WHERE ID='" + i + "'", 2); // Im ResultSet landen die Datensätze
+        
+            ResultSet results = statement.executeQuery("SELECT * FROM " + tableName, fetchSize); // Im ResultSet landen die Datensätze
             try {
-                while (results.next()) {
-                    int columnCount = testTable.getColumns().size();
+                int columnCount = testTable.getColumns().size();
+                while (fetchSize >= 0 && results.next()) {
+                    
                     for (int j = 1; j <= columnCount; j++) {
+                        testData.add(new Reldb_DataContainer(results.getObject(j)));
                         //testData.add(new Reldb_DataContainer(results.getObject(j), testTable.getColumns().get(1).getType()));   //DataContainer Objekte erstellen
                     }
                     //System.out.println("SELECT * FROM title:" + results.getObject(2).toString());
+                    fetchSize--;
                 }
                 results.close();
             } catch (SQLException ex) {
                 Logger.getLogger(RELDB_01.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
+        
         statement.close();
 
         testData.stream().forEach((data) -> {

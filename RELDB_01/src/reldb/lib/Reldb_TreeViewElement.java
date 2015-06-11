@@ -2,6 +2,7 @@ package reldb.lib;
 
 import java.util.List;
 import reldb.lib.database.Reldb_Column;
+import reldb.lib.database.Reldb_Database;
 import reldb.lib.database.Reldb_Schema;
 import reldb.lib.database.Reldb_Table;
 
@@ -55,16 +56,19 @@ public class Reldb_TreeViewElement {
     public List<?> discover() {
         if (!discovered) {
             discovered = true;
+            if (item instanceof Reldb_Database) {
+                Reldb_Database database_item = (Reldb_Database) item;
+                return database_item.getSchemaList();
+            }
             if (item instanceof Reldb_Schema) {
                 Reldb_Schema schema_item = (Reldb_Schema) item;
-                schema_item.createTableList();
                 return schema_item.getTableList();
             }
             if (item instanceof Reldb_Table) {
                 Reldb_Table table_item = (Reldb_Table) item;
-                table_item.createColumns();
-                table_item.createPrimaryKeys();
-                table_item.createForeignKeys();
+                //table_item.createColumns();
+                //table_item.createPrimaryKeys();
+                //table_item.createForeignKeys();
                 return table_item.getColumns();
             }
         }

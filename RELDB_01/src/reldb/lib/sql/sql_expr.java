@@ -82,7 +82,8 @@ public class sql_expr {
         }
         command = command.substring(0, command.length() - 1);                   // Letztes Komma wieder entfernen
         command = command + "\n)";
-        System.out.println(command);
+        //System.out.println(command);
         return command;
     }
+    
 }

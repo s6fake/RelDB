@@ -21,8 +21,10 @@ public class Reldb_Table {
     private final String TABLE_SCHEM;
     private final String TABLE_NAME; //Name der Tabelle
     private final Reldb_Database database;
-    private  List<Reldb_Column> columns = new ArrayList<>(); //Liste aller Spalten
-    private  List<Reldb_Column> primaryKeys = new ArrayList<>(); // Liste aller Primärschlüssel
+    private List<Reldb_Column> columns = new ArrayList<>(); //Liste aller Spalten
+    private List<Reldb_Column> primaryKeys = new ArrayList<>(); // Liste aller Primärschlüssel
+
+    private boolean listsFilled = false;
 
     /**
      * Erstellt einen neue Tabelle
@@ -43,10 +45,19 @@ public class Reldb_Table {
         //createPrimaryKeys(metaData);
     }
 
+    void initalize() {
+        if (!listsFilled) {
+        createColumns();
+        createPrimaryKeys();
+        createForeignKeys();
+        listsFilled = true;
+        }
+    }
+
     /**
      * Überträgt alle Spalten aus den Metadaten in die interne Spaltenliste
      */
-    public void createColumns() {        
+    public void createColumns() {
         if (!columns.isEmpty()) {
             return;
         }
@@ -67,8 +78,8 @@ public class Reldb_Table {
                     autoincrement = true;
                 }
                 Reldb_Column newCol = new Reldb_Column(getDatabase(), this, columnName, columnType, columnTypeName, columSize, nullable, autoincrement); // Neue Reldb_Column erstellen
-                getColumns().add(newCol);    //Spalte in die Spaltenliste hinzufügen
-                log.info(TABLE_NAME +"."+ columnName +" erstellt.");
+                columns.add(newCol);    //Spalte in die Spaltenliste hinzufügen
+                //log.info(TABLE_NAME + "." + columnName + " erstellt.");
             }
         } catch (SQLException ex) {
             Logger.getLogger(Reldb_Table.class.getName()).log(Level.SEVERE, null, ex);
@@ -79,13 +90,13 @@ public class Reldb_Table {
                 Logger.getLogger(Reldb_Table.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-
     }
+
     /**
      * Funktioniert noch nicht so ganz
      */
     private void getUniqueColumns() {
-                ResultSet resultSet = null;
+        ResultSet resultSet = null;
         try {
             resultSet = getMetaData().getIndexInfo(TABLE_CAT, TABLE_SCHEM, TABLE_NAME, true, true);
             while (resultSet.next()) {
@@ -104,7 +115,7 @@ public class Reldb_Table {
             }
         }
     }
-    
+
     public void createPrimaryKeys() {
         if (!primaryKeys.isEmpty()) {
             return;
@@ -117,11 +128,11 @@ public class Reldb_Table {
                 Reldb_Column col = getColumnByName(result.getString("COLUMN_NAME"));
                 if (col == null) {
                     log.warning("Column " + result.getString("TABLE_NAME") + " not in Table!");
-                    int count =  result.getMetaData().getColumnCount();
+                    int count = result.getMetaData().getColumnCount();
                     for (int i = 0; i < count; i++) {
-                        System.out.println(result.getString(i+1));
+                        System.out.println(result.getString(i + 1));
                     }
-                    
+
                     continue;
                 }
                 col.setIsPrimaryKey(true);
@@ -145,7 +156,7 @@ public class Reldb_Table {
             result = getMetaData().getImportedKeys(null, TABLE_SCHEM, TABLE_NAME);
 
             while (result.next()) {
-                System.out.println(TABLE_NAME + " " +result.getString("FKCOLUMN_NAME") +" "+result.getString("PKTABLE_NAME") +" "+ result.getString("PKCOLUMN_NAME"));
+                //System.out.println(TABLE_NAME + " " + result.getString("FKCOLUMN_NAME") + " " + result.getString("PKTABLE_NAME") + " " + result.getString("PKCOLUMN_NAME"));
                 Reldb_Column col = getColumnByName(result.getString("FKCOLUMN_NAME"));
                 col.addForeignKey(result.getString("PKTABLE_NAME"), result.getString("PKCOLUMN_NAME"), result.getInt("KEY_SEQ"));
 
@@ -161,9 +172,9 @@ public class Reldb_Table {
             }
         }
     }
-    
+
     public Reldb_Column getColumnByName(String columnName) {
-        for (Reldb_Column colIterator : columns) {            
+        for (Reldb_Column colIterator : columns) {
             if (colIterator.getName().equals(columnName)) {
                 return colIterator;
             }
@@ -205,6 +216,9 @@ public class Reldb_Table {
      * @return the columns
      */
     public List<Reldb_Column> getColumns() {
+        if (!listsFilled) {
+            this.initalize();
+        }
         return columns;
     }
 
