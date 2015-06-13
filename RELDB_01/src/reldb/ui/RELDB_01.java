@@ -17,6 +17,7 @@ import reldb.lib.Reldb_Connection;
 import reldb.lib.MetaDataManager;
 import reldb.lib.database.Reldb_DataContainer;
 import reldb.lib.database.Reldb_Database;
+import reldb.lib.database.Reldb_Row;
 import reldb.lib.database.Reldb_Table;
 import reldb.lib.sql.Reldb_Statement;
 
@@ -28,7 +29,6 @@ public class RELDB_01 extends Application {
 
     private Stage stage;
     private static final String url = "jdbc:postgresql://dbvm01.iai.uni-bonn.de:5432/imdb";
-    private static List<Reldb_Connection> connectionsListRef = Reldb_Connection.getConnections();   //Referenz zur Liste in Reldb_Connections mit allen Verbindungen
     private MetaDataManager mdManager;
     private MainController controller;
 
@@ -108,7 +108,7 @@ public class RELDB_01 extends Application {
     public void updateTableNames(Reldb_Connection connection) {
         Reldb_Database db = new Reldb_Database(connection);
         controller.addDatabaseToConnectionInTreeView(connection, db);
-        testQuery(db);
+        //testQuery(db);
     }
     
     /**
@@ -133,17 +133,17 @@ public class RELDB_01 extends Application {
         Reldb_Table testTable = db.getTableByName(tableName);
         int fetchSize = 10;
         List<Reldb_DataContainer> testData = new ArrayList<>();
-
+        List<Reldb_Row> testData2 = new ArrayList<>();
         
             ResultSet results = statement.executeQuery("SELECT * FROM " + tableName, fetchSize); // Im ResultSet landen die Datensätze
             try {
                 int columnCount = testTable.getColumns().size();
-                while (fetchSize >= 0 && results.next()) {
-                    
-                    for (int j = 1; j <= columnCount; j++) {
-                        testData.add(new Reldb_DataContainer(results.getObject(j)));
+                while (fetchSize > 0 && results.next()) {
+                    testData2.add(new Reldb_Row(testTable, results));
+                    //for (int j = 1; j <= columnCount; j++) {
+                      //  testData.add(new Reldb_DataContainer(results.getObject(j)));
                         //testData.add(new Reldb_DataContainer(results.getObject(j), testTable.getColumns().get(1).getType()));   //DataContainer Objekte erstellen
-                    }
+                    //}
                     //System.out.println("SELECT * FROM title:" + results.getObject(2).toString());
                     fetchSize--;
                 }
@@ -153,10 +153,10 @@ public class RELDB_01 extends Application {
             }
         
         statement.close();
-
-        testData.stream().forEach((data) -> {
-            System.out.print(data.toString() + " ");
-        });
+        int tableSize = testTable.getColumns().size();
+        for (int i = 0; i < testData2.size(); i++) {
+            System.out.println(testData2.get(i).toString());
+        }
         System.out.print("\n");
     }
 

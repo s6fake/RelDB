@@ -91,10 +91,23 @@ public class Reldb_DataContainer {
     @Override
     public String toString() {
         if (data == null) {
-            return "(null)";
+            return "NULL";
+        }
+        if (data instanceof String) {
+            String str = data.toString();
+            if (str.contains("'")) {
+                String[] elements = str.split("'");
+                str = "";
+                for (int i = 0; i < elements.length; i ++) {
+                    str = str + elements[i]+"''";
+                }
+                str = str.substring(str.length() - 2);
+            }
+            return "'"+str+"'";
         }
         return data.toString();
     }
+    
 
     protected String getConstructorString(DATABASETYPE dbModel) {
         String string = "";

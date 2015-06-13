@@ -5,7 +5,6 @@
  */
 package reldb.lib.sql;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
@@ -55,22 +54,10 @@ public class Reldb_Statement {
             results = statement.executeQuery(sql_expr.getTableNames(connection.getDatabaseProductName()));
             //statement.executeQuery("SELECT * FROM table_schem;");
         } catch (SQLException e) {
-            log.warning(e.getMessage());
+            log.warning(e.getMessage() );
         }
         return results;
     }
-    /*
-     public ResultSet getTables(String database) {
-     ResultSet results = null;
-     try {
-     results = statement.executeQuery("SELECT * FROM PostgreSQL" + CatalogSeparator + "company_name;");
-     //statement.executeQuery("SELECT * FROM table_schem;");
-     } catch (SQLException e) {
-     System.err.println(e);
-     }
-     return results;
-     }
-     */
 
     private void printWarnings() {
         try {
@@ -92,7 +79,7 @@ public class Reldb_Statement {
         try {
             //statement.setFetchSize(fetch);
             result = statement.execute(command);
-            printWarnings();
+            //printWarnings();
             //log.info(command);
 
         } catch (SQLException e) {
@@ -106,11 +93,10 @@ public class Reldb_Statement {
         try {
             statement.setFetchSize(fetch);
             results = statement.executeQuery(command);
-            printWarnings();
-            log.info(command);
+            //printWarnings();            
         } catch (SQLException e) {
             log.warning(e.getMessage() + "\n" + command);    
-            printWarnings();
+            //printWarnings();
         }
         return results;
     }

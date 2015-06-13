@@ -22,11 +22,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.WindowEvent;
 import reldb.lib.Reldb_TreeViewElement;
 import reldb.lib.Reldb_Connection;
-import reldb.lib.database.Reldb_Column;
 import reldb.lib.database.Reldb_Database;
 import reldb.lib.database.Reldb_Schema;
 import reldb.lib.database.Reldb_Table;
 import reldb.lib.migration.Reldb_DataMover;
+import reldb.lib.migration.Reldb_DatabasePattern;
 import reldb.ui.dialogs.Dialogs;
 import reldb.lib.sql.sql_expr;
 
@@ -109,15 +109,15 @@ public class MainController implements Initializable {
         TreeItem<Reldb_TreeViewElement> connectionRoot = addTreeItem(new Reldb_TreeViewElement(connection, connection.getConnectionName()));// Neues Verbungs-Wurzelelement
         TreeItem<Reldb_TreeViewElement> databaseRoot = addTreeItem(connectionRoot, new Reldb_TreeViewElement(database, database.getDatabaseName()));   //Datenbank Element einfügen
 /*
-        for (Reldb_Schema schemaIterator : database.getSchemaList()) {
-            TreeItem<Reldb_TreeViewElement> schemaNode = addTreeItem(databaseRoot, new Reldb_TreeViewElement(schemaIterator, schemaIterator.getSchemaName()));
-            for (Reldb_Table tableIterator : schemaIterator.getTableList()) {
-                TreeItem<Reldb_TreeViewElement> tableNode = addTreeItem(schemaNode, new Reldb_TreeViewElement(tableIterator, tableIterator.getTableName()));
-                for (Reldb_Column columnIterator : tableIterator.getColumns()) {
-                    addTreeItem(tableNode, new Reldb_TreeViewElement(columnIterator, columnIterator.getName()));
-                }
-            }
-        }*/
+         for (Reldb_Schema schemaIterator : database.getSchemaList()) {
+         TreeItem<Reldb_TreeViewElement> schemaNode = addTreeItem(databaseRoot, new Reldb_TreeViewElement(schemaIterator, schemaIterator.getSchemaName()));
+         for (Reldb_Table tableIterator : schemaIterator.getTableList()) {
+         TreeItem<Reldb_TreeViewElement> tableNode = addTreeItem(schemaNode, new Reldb_TreeViewElement(tableIterator, tableIterator.getTableName()));
+         for (Reldb_Column columnIterator : tableIterator.getColumns()) {
+         addTreeItem(tableNode, new Reldb_TreeViewElement(columnIterator, columnIterator.getName()));
+         }
+         }
+         }*/
     }
 
     public TreeItem<Reldb_TreeViewElement> addConnectionToTreeView(Reldb_TreeViewElement item) {
@@ -285,7 +285,19 @@ public class MainController implements Initializable {
                 public void handle(ActionEvent t) {
                     Reldb_Connection selectedDestinationConnection = Reldb_Connection.getConnectionByName(item.getText());
                     TreeItem<Reldb_TreeViewElement> selectedItem = con_treeView.getSelectionModel().getSelectedItem();
-                    Reldb_DataMover.copy(selectedItem.getValue().getItem(), selectedDestinationConnection.getDatabase());
+                    //Reldb_DatabasePattern collection = null;
+                    Reldb_TreeViewElement item = selectedItem.getValue();
+                    if (item.getItem() instanceof Reldb_Database) {
+                       // collection = new Reldb_DatabasePattern((Reldb_Database) selectedItem.getValue().getItem());
+                    } else if (item.getItem() instanceof Reldb_Schema) {
+                        Reldb_DataMover dataMover = new Reldb_DataMover(((Reldb_Schema) item.getItem()).getTableList(), selectedDestinationConnection.getDatabase());
+                        dataMover.start();
+                        //collection = new Reldb_DatabasePattern((Reldb_Schema) selectedItem.getValue().getItem());
+                    } else if (item.getItem() instanceof Reldb_Table) {
+                        //collection = new Reldb_DatabasePattern((Reldb_Table) selectedItem.getValue().getItem());
+                    }
+
+                    //Reldb_DataMover.copy(selectedItem.getValue().getItem(), selectedDestinationConnection.getDatabase());
                     //Dialogs.newSQLDialog(parent, selectedDestinationConnection);
                 }
             });

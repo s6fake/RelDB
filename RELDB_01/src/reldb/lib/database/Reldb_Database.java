@@ -21,14 +21,33 @@ public class Reldb_Database {
     };
 
     private static final Logger log = Logger.getLogger(Reldb_Database.class.getName());
-    private final DATABASETYPE databaseType;
-    private final DatabaseMetaData metaData;
+    protected Reldb_Database.DATABASETYPE databaseType;
+    private DatabaseMetaData metaData;
     private String databaseName, version, catalogSeparator;
     private Reldb_Connection connection;
-    private final List<Reldb_Schema> schemaList = new ArrayList<>();
-    private final List<Reldb_Table> tableList = new ArrayList<>();
+    protected List<Reldb_Schema> schemaList = new ArrayList<>();
+    private List<Reldb_Table> tableList = new ArrayList<>();
 
-    private boolean listsFilled = false;
+    private boolean tableListFilled = false;
+
+    protected Reldb_Database() {
+        this.databaseType = DATABASETYPE.UNKNOWN;
+        this.connection = null;
+        this.metaData = null;
+    }
+
+    protected Reldb_Database(Reldb_Database reference) {
+        if (reference == null) {
+            this.databaseType = DATABASETYPE.UNKNOWN;
+            this.connection = null;
+            this.metaData = null;
+        } else {
+            this.databaseType = reference.getDatabaseType();
+            this.metaData = reference.getMetaData();
+            this.connection = reference.getConnection();
+            this.schemaList = reference.getSchemaList();
+        }
+    }
     
     public Reldb_Database(Reldb_Connection connection) {
         if (connection == null) {
@@ -82,8 +101,8 @@ public class Reldb_Database {
                 Logger.getLogger(Reldb_Database.class.getName()).log(Level.SEVERE, null, ex.getMessage());
             }
         }
-    }
-
+    }   
+    
     /**
      * Gibt die Datenbank und alle Tabellen aus
      */
@@ -94,6 +113,22 @@ public class Reldb_Database {
         }
     }
 
+    
+    /**
+     * @param schemaList the schemaList to set
+     */
+    protected void setSchemaList(List<Reldb_Schema> schemaList) {
+        this.schemaList = schemaList;
+    }
+
+    /**
+     * @param tableList the tableList to set
+     */
+    protected void setTableList(List<Reldb_Table> tableList) {
+        tableListFilled = true;
+        this.tableList = tableList;
+    }
+    
     /**
      * @return the connection
      */
@@ -148,7 +183,7 @@ public class Reldb_Database {
         }
         return null;
     }
-    
+
     /**
      * @return the metaData
      */
@@ -167,13 +202,13 @@ public class Reldb_Database {
      * @return the tableList
      */
     public List<Reldb_Table> getTables() {
-        if (!listsFilled) {
+        if (!tableListFilled) {
             for (Reldb_Schema schema : getSchemaList()) {
                 schema.createTableList();
             }
-            listsFilled = true;
+            tableListFilled = true;
         }
         return tableList;
     }
-    
+
 }

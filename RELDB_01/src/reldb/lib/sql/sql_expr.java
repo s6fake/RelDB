@@ -5,9 +5,11 @@
  */
 package reldb.lib.sql;
 
+import java.util.List;
 import reldb.lib.database.Reldb_Column;
+import reldb.lib.database.Reldb_DataContainer;
 import reldb.lib.database.Reldb_Database;
-import reldb.lib.database.Reldb_Schema;
+import reldb.lib.database.Reldb_Row;
 import reldb.lib.database.Reldb_Table;
 
 /**
@@ -26,6 +28,11 @@ public class sql_expr {
             return "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';";
         }
         return null;
+    }
+    
+    public static String selectAllFrom(Reldb_Table table) {
+        String command = "SELECT * FROM " + table.getTableName();
+        return command;
     }
 
     /**
@@ -83,6 +90,34 @@ public class sql_expr {
         command = command.substring(0, command.length() - 1);                   // Letztes Komma wieder entfernen
         command = command + "\n)";
         //System.out.println(command);
+        return command;
+    }
+    
+    /**
+     * Erzeugt den INSERT INTO TABLE Befehl aber ohne Values
+     * @param pattern
+     * @return 
+     */
+    public static String insertIntoTable(Reldb_Table pattern) {
+        String command = "INSERT INTO " + pattern.getTableName() + "\n(";
+        List<Reldb_Column> columns = pattern.getColumns();
+        for (Reldb_Column column : columns) {
+            command = command + column.getName() + ", ";
+        }
+        command = command.substring(0, command.length() - 2);
+        command = command + ")\n";
+        return command;
+    }
+    
+    public static String values(Reldb_Row values) {
+        String command = "VALUES\n(";
+        Reldb_DataContainer[] cells;
+        cells = values.getCells();
+        for (int i = 0; i < cells.length; i++) {
+            command = command + cells[i].toString() + ", ";
+        }
+        command = command.substring(0, command.length() - 2);
+        command = command + ")";
         return command;
     }
     
