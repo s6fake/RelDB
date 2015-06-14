@@ -30,13 +30,9 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
 
     private RELDB_01 parent;
     @FXML
-    private TextField name_field;
-    @FXML
     private TextField port_field;
     @FXML
     private TextField database_field;
-    @FXML
-    private Button button_create;
     @FXML
     private Button button_login;
     @FXML
@@ -57,7 +53,6 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
      */
     public void setConnection(Reldb_Connection connection) {
         this.connection = connection;
-        name_field.setText(connection.getConnectionName());
         user_field.setText(connection.getUserName());
         choicebox_type.getSelectionModel().select(connection.getDatabaseType());
         url_field.setText(connection.getAdress());
@@ -66,8 +61,7 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
     }
 
     private void disableButtons() {
-        button_login.setDisable(true);
-        button_create.setDisable(true);
+        button_login.setDisable(true);       
         user_field.setDisable(true);
         password_field.setDisable(true);
     }
@@ -86,32 +80,19 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
         this.parent = parent;
     }
 
-    @FXML
-    private void createNewConnection(MouseEvent event) {
-        if (!createNewConnection2()) {
-            return;
-        }
-        disableButtons();
-        stage.close();
-    }
-
     private boolean createNewConnection2() {
         if (createUrl() == null) {
             JOptionPane.showMessageDialog(null, "Die Angegebene URL ist ungültig", "Verbindung kann nicht erstellt werden", JOptionPane.ERROR_MESSAGE);
             return false;
         }
-        if (name_field.getText() == null) {
-            JOptionPane.showMessageDialog(null, "Bitte geben Sie einen Namen für die Verbindung an", "Verbindung kann nicht erstellt werden", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
 
         if (connection != null) {
             parent.removeConnection(connection);
-            connection.changeSettings(createUrl(), name_field.getText(), url_field.getText(), database_field.getText(), Integer.parseInt(port_field.getText()), choicebox_type.getSelectionModel().getSelectedIndex(), user_field.getText());
+            connection.changeSettings(createUrl(), database_field.getText(), url_field.getText(), database_field.getText(), Integer.parseInt(port_field.getText()), choicebox_type.getSelectionModel().getSelectedIndex(), user_field.getText());
         } else {
-            connection = new Reldb_Connection(createUrl(), name_field.getText(), url_field.getText(), database_field.getText(), Integer.parseInt(port_field.getText()), choicebox_type.getSelectionModel().getSelectedIndex(), user_field.getText());
+            connection = new Reldb_Connection(createUrl(), database_field.getText(), url_field.getText(), database_field.getText(), Integer.parseInt(port_field.getText()), choicebox_type.getSelectionModel().getSelectedIndex(), user_field.getText());
         }
-        parent.addConnectionToTreeView(connection);
+        
         return true;
     }
 

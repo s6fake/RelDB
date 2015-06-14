@@ -38,7 +38,7 @@ public class MainController implements Initializable {
     private RELDB_01 parent;
     @FXML
     private TreeView<IReldb_TreeViewElement> con_treeView;
-    private final TreeItem<IReldb_TreeViewElement> treeConnRoot = new TreeItem(new Reldb_TreeViewElement("", "Connections"));
+    private TreeItem<IReldb_TreeViewElement> treeConnRoot = new TreeItem(new Reldb_TreeViewElement("", "No Connections"));
     @FXML
     private ContextMenu treeView_ContextMenu;
     @FXML
@@ -73,8 +73,11 @@ public class MainController implements Initializable {
             @Override
             public void changed(ObservableValue observable, Object oldValue, Object newValue) {
                 TreeItem<IReldb_TreeViewElement> selectedItem = (TreeItem<IReldb_TreeViewElement>) newValue;
-
+                if (selectedItem.getValue() == null) {
+                    return;
+                }
                 if (!selectedItem.getValue().isDiscovered()) {                  // Prüfen ob das Element schon einmal besucht wurde
+
                     con_treeView.setDisable(true);                          // TreeView deaktivieren, damit nicht mit unfertigen Daten gearbeitet wird
                     List<?> items = selectedItem.getValue().discover();     // Gegebenenfalls neue Kind-Elemente hinzufügen
                     if (items != null) {
@@ -92,6 +95,12 @@ public class MainController implements Initializable {
         this.parent = parent;
     }
 
+    public void setTreeRoot(Reldb_Database database) {
+        treeConnRoot = new TreeItem(new Reldb_TreeViewElement(database, database.getDatabaseName()));
+        //treeConnRoot 
+        con_treeView.setRoot(treeConnRoot);
+    }
+
     /**
      * Fügt eine Datenbank in die TreeView ein
      *
@@ -99,6 +108,7 @@ public class MainController implements Initializable {
      * soll.
      * @param database Die Datenbank die eingefügt werden soll
      */
+    @Deprecated
     public void addDatabaseToConnectionInTreeView(Reldb_Connection connection, Reldb_Database database) {
         TreeItem<IReldb_TreeViewElement> connectionRoot = addTreeItem(new Reldb_TreeViewElement(connection, connection.getConnectionName()));// Neues Verbungs-Wurzelelement
         addTreeItem(connectionRoot, new Reldb_TreeViewElement(database, database.getDatabaseName()));   //Datenbank Element einfügen
@@ -122,17 +132,16 @@ public class MainController implements Initializable {
     public TreeItem<IReldb_TreeViewElement> addTreeItem(TreeItem<IReldb_TreeViewElement> tParent, IReldb_TreeViewElement item) {
         TreeItem<IReldb_TreeViewElement> newTreeItem = new TreeItem<>(item);
         ObservableList<TreeItem<IReldb_TreeViewElement>> children = tParent.getChildren();
-        
+
         //VERBESSERN:
-        
         for (TreeItem<IReldb_TreeViewElement> iterator : children) {
-            
+
             if (iterator.getValue().getDisplayName().equals(item.getDisplayName())) //Prüfen ob das es ein Element mit gleichem Namen schon gibt
             {
                 return iterator;     //Wenn ja, kein neues anlegen
             }
         }
-        
+
         tParent.getChildren().add(newTreeItem);
         return newTreeItem;
     }
@@ -176,6 +185,7 @@ public class MainController implements Initializable {
     }
 
     @FXML
+    @Deprecated
     private void onTreeView_MouseClicked(MouseEvent event) {
         // Kann weg...
     }
@@ -212,7 +222,6 @@ public class MainController implements Initializable {
     }
 
     private void setExportMenuVisibility(String selectedConnectionName) {
-
         for (MenuItem item : contextMenu_item_exportMenu.getItems()) {
             item.setDisable(false);
             if (item.getText().equals(selectedConnectionName)) {
@@ -276,8 +285,8 @@ public class MainController implements Initializable {
                     //Reldb_DatabasePattern collection = null;
                     IReldb_TreeViewElement item = selectedItem.getValue();
                     if (item.getItem() instanceof Reldb_Database) {
-                       // collection = new Reldb_DatabasePattern((Reldb_Database) selectedItem.getValue().getItem());
-                    }  else if (item.getItem() instanceof Reldb_Table) {
+                        // collection = new Reldb_DatabasePattern((Reldb_Database) selectedItem.getValue().getItem());
+                    } else if (item.getItem() instanceof Reldb_Table) {
                         //collection = new Reldb_DatabasePattern((Reldb_Table) selectedItem.getValue().getItem());
                     }
 

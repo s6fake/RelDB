@@ -3,9 +3,6 @@ package reldb.lib;
 
 import java.util.List;
 import javafx.scene.control.CheckBox;
-import reldb.lib.database.Reldb_Column;
-import reldb.lib.database.Reldb_Database;
-import reldb.lib.database.Reldb_Table;
 
 /**
  *
@@ -13,35 +10,25 @@ import reldb.lib.database.Reldb_Table;
  */
 public class Reldb_TreeViewCheckElement extends CheckBox implements IReldb_TreeViewElement{
 
-    private final Object item;
-    private String displayName;
-    private boolean discovered = false;
+    private final Reldb_TreeViewElement reference;
     
     public Reldb_TreeViewCheckElement(Object item, String displayName) {
         super(item.toString());
-        this.item = item;
-        this.displayName = displayName;
+        this.reference = new Reldb_TreeViewElement(item, displayName);
         setText(displayName);
     }
 
     public Reldb_TreeViewCheckElement(Object item) {
         super(item.toString());
-        this.item = item;
-        this.displayName =  "Vashta Nerada";
-        if (item instanceof Reldb_Table) {
-            displayName = ((Reldb_Table) item).getTableName();
-        }
-        if (item instanceof Reldb_Column) {
-            displayName = ((Reldb_Column) item).getName();
-        }
-        setText(displayName);
+        this.reference = new Reldb_TreeViewElement(item);
+        setText(reference.getDisplayName());
     }
 
 
 
     @Override
     public String toString() {
-        return displayName;
+        return reference.toString();
     }
 
     /**
@@ -49,7 +36,7 @@ public class Reldb_TreeViewCheckElement extends CheckBox implements IReldb_TreeV
      */
     @Override
     public Object getItem() {
-        return item;
+        return reference.getItem();
     }
 
     /**
@@ -57,27 +44,12 @@ public class Reldb_TreeViewCheckElement extends CheckBox implements IReldb_TreeV
      */
     @Override
     public String getDisplayName() {
-        return displayName;
+        return reference.getDisplayName();
     }
 
     @Override
     public List<?> discover() {
-        if (!isDiscovered()) {
-            discovered = true;
-            if (item instanceof Reldb_Database) {
-                Reldb_Database database_item = (Reldb_Database) item;
-                return database_item.getTables();
-            }
-            if (item instanceof Reldb_Table) {
-                Reldb_Table table_item = (Reldb_Table) item;
-                //table_item.createColumns();
-                //table_item.createPrimaryKeys();
-                //table_item.createForeignKeys();
-                return table_item.getColumns();
-            }
-        }
-
-        return null;
+        return reference.discover();
     }
 
     /**
@@ -85,7 +57,7 @@ public class Reldb_TreeViewCheckElement extends CheckBox implements IReldb_TreeV
      */
     @Override
     public boolean isDiscovered() {
-        return discovered;
+        return reference.isDiscovered();
     }
 
 }

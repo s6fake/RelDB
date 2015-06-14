@@ -10,14 +10,9 @@ import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.TreeItem;
 import javafx.stage.Stage;
-import javax.swing.JOptionPane;
-import reldb.lib.IReldb_TreeViewElement;
-import reldb.lib.Reldb_TreeViewElement;
 import reldb.lib.Reldb_Connection;
 import reldb.lib.MetaDataManager;
-import reldb.lib.database.IReldb_DatabaseObject;
 import reldb.lib.database.Reldb_DataContainer;
 import reldb.lib.database.Reldb_Database;
 import reldb.lib.database.Reldb_Row;
@@ -34,6 +29,7 @@ public class RELDB_01 extends Application {
     private static final String url = "jdbc:postgresql://dbvm01.iai.uni-bonn.de:5432/imdb";
     private MetaDataManager mdManager;
     private MainController controller;
+    private Reldb_Connection currentConnection;
 
     @Override
     public void start(Stage primaryStage) {
@@ -86,15 +82,13 @@ public class RELDB_01 extends Application {
     }
 */
     
-    public void addConnectionToTreeView(Reldb_Connection newConnection) {
-        IReldb_TreeViewElement newConn =  new Reldb_TreeViewElement(newConnection, newConnection.getConnectionName());
-        controller.addConnectionToTreeView(newConn);  
-    }
-    
     public void logIn(String user, String password, Reldb_Connection connection) {
         if (connection == null) {
             return;
         }
+            if (currentConnection != null) {
+                currentConnection.CloseConnection();
+            }
             controller.label_1.setText("Verbinde mit " + connection.getConnectionName());
         if (connection.connect(user, password)) {
             mdManager = new MetaDataManager(connection.getMetadata());
@@ -106,12 +100,14 @@ public class RELDB_01 extends Application {
         {            
             controller.label_1.setText("Verbindung fehlgeschlagen");
         }
+        currentConnection = connection;
     }
 
     //Achtung, wird fehlerhaft. Funktion muss ersetzt werden!!!
     public void updateTableNames(Reldb_Connection connection) {
         Reldb_Database db = new Reldb_Database(connection);
-        controller.addDatabaseToConnectionInTreeView(connection, db);
+        //controller.addDatabaseToConnectionInTreeView(connection, db);
+        controller.setTreeRoot(db);
         //testQuery(db);
     }
     

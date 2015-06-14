@@ -39,6 +39,7 @@ public class Reldb_TreeViewElement implements IReldb_TreeViewElement {
     /**
      * @return the item
      */
+    @Override
     public Object getItem() {
         return item;
     }
@@ -46,15 +47,19 @@ public class Reldb_TreeViewElement implements IReldb_TreeViewElement {
     /**
      * @return the displayName
      */
+    @Override
     public String getDisplayName() {
         return displayName;
     }
 
+    @Override
     public List<?> discover() {
+        System.out.println(item.getClass().toString());
         if (!discovered) {
             discovered = true;
             if (item instanceof Reldb_Database) {
                 Reldb_Database database_item = (Reldb_Database) item;
+                System.out.println("HIER!");
                 return database_item.getTables();
             }
             if (item instanceof Reldb_Table) {
