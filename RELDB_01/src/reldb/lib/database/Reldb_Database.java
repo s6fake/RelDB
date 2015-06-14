@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import reldb.lib.Reldb_Connection;
 
@@ -25,7 +24,6 @@ public class Reldb_Database {
     private DatabaseMetaData metaData;
     private String databaseName, version, catalogSeparator;
     private Reldb_Connection connection;
-    protected List<Reldb_Schema> schemaList = new ArrayList<>();
     private List<Reldb_Table> tableList = new ArrayList<>();
 
     private boolean tableListFilled = false;
@@ -45,7 +43,6 @@ public class Reldb_Database {
             this.databaseType = reference.getDatabaseType();
             this.metaData = reference.getMetaData();
             this.connection = reference.getConnection();
-            this.schemaList = reference.getSchemaList();
         }
     }
     
@@ -65,9 +62,36 @@ public class Reldb_Database {
         } else {
             databaseType = DATABASETYPE.UNKNOWN;
         }
-        createSchemaList(metaData);
+        createTableList(metaData);
     }
 
+    
+        private void createTableList(DatabaseMetaData metaData) {
+        if (!tableList.isEmpty()) {
+            return;
+        }
+        ResultSet resultSet = null;
+        try {
+            String[] tables = {"TABLE"};
+            String SCHEMA_NAME = "public";
+            resultSet = metaData.getTables(null, SCHEMA_NAME, null, tables);
+            while (resultSet.next()) {
+                Reldb_Table newTable = new Reldb_Table(this, resultSet.getString("TABLE_TYPE"), resultSet.getString("TABLE_CAT"), SCHEMA_NAME, resultSet.getString("TABLE_NAME"));
+                tableList.add(newTable);                
+            }
+        } catch (SQLException ex) {
+            log.warning(ex.getMessage());
+        } finally {
+            try {
+                resultSet.close();
+            } catch (SQLException ex) {
+                log.warning(ex.getMessage());
+            }
+        }
+        tableListFilled = true;
+    }
+    
+    
     /**
      * Setzt die Datenbankinformationen
      *
@@ -81,46 +105,19 @@ public class Reldb_Database {
         } catch (SQLException e) {
             log.warning(e.getMessage());
         }
-    }
-
-    private void createSchemaList(DatabaseMetaData metaData) {
-        Reldb_Schema currentSchema;  // Aktuelles Schema, in das die Tabelle eingefügt wird
-        ResultSet resultSet = null;
-        try {
-            resultSet = metaData.getSchemas();
-            while (resultSet.next()) {
-                currentSchema = new Reldb_Schema(this, resultSet.getString("TABLE_SCHEM"), resultSet.getString("TABLE_CATALOG"));
-                getSchemaList().add(currentSchema);
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(Reldb_Database.class.getName()).log(Level.SEVERE, null, ex.getMessage());
-        } finally {
-            try {
-                resultSet.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(Reldb_Database.class.getName()).log(Level.SEVERE, null, ex.getMessage());
-            }
-        }
-    }   
+    }  
     
     /**
      * Gibt die Datenbank und alle Tabellen aus
      */
     public void print() {
         System.out.println(getDatabaseName() + " " + version);
-        for (Reldb_Schema schem : getSchemaList()) {
-            schem.print();
+        for (Reldb_Table table : tableList) {
+            table.print();
         }
     }
 
     
-    /**
-     * @param schemaList the schemaList to set
-     */
-    protected void setSchemaList(List<Reldb_Schema> schemaList) {
-        this.schemaList = schemaList;
-    }
-
     /**
      * @param tableList the tableList to set
      */
@@ -136,21 +133,6 @@ public class Reldb_Database {
         return connection;
     }
 
-    /**
-     * Gibt das Schema mit dem gesuchten Namen zurück, ansonsten null
-     *
-     * @param schemaName
-     * @return
-     */
-    Reldb_Schema getSchemaByName(String schemaName) {
-        for (Reldb_Schema schem : getSchemaList()) {
-            if (schem.getSchemaName().equals(schemaName)) {
-                return schem;
-            }
-        }
-        log.warning("Schema " + schemaName + " existiert nicht!");
-        return null;
-    }
 
     @Override
     public String toString() {
@@ -162,13 +144,6 @@ public class Reldb_Database {
      */
     public String getDatabaseName() {
         return databaseName;
-    }
-
-    /**
-     * @return the schemaList
-     */
-    public List<Reldb_Schema> getSchemaList() {
-        return schemaList;
     }
 
     void addTable(Reldb_Table table) {
@@ -202,12 +177,6 @@ public class Reldb_Database {
      * @return the tableList
      */
     public List<Reldb_Table> getTables() {
-        if (!tableListFilled) {
-            for (Reldb_Schema schema : getSchemaList()) {
-                schema.createTableList();
-            }
-            tableListFilled = true;
-        }
         return tableList;
     }
 

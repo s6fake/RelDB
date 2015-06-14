@@ -4,7 +4,6 @@ package reldb.lib;
 import java.util.List;
 import reldb.lib.database.Reldb_Column;
 import reldb.lib.database.Reldb_Database;
-import reldb.lib.database.Reldb_Schema;
 import reldb.lib.database.Reldb_Table;
 
 /**
@@ -26,9 +25,6 @@ public class Reldb_TreeViewElement implements IReldb_TreeViewElement {
         this(item, "Vashta Nerada");
         if (item instanceof Reldb_Table) {
             displayName = ((Reldb_Table) item).getTableName();
-        }
-        if (item instanceof Reldb_Schema) {
-            displayName = ((Reldb_Schema) item).getSchemaName();
         }
         if (item instanceof Reldb_Column) {
             displayName = ((Reldb_Column) item).getName();
@@ -59,11 +55,7 @@ public class Reldb_TreeViewElement implements IReldb_TreeViewElement {
             discovered = true;
             if (item instanceof Reldb_Database) {
                 Reldb_Database database_item = (Reldb_Database) item;
-                return database_item.getSchemaList();
-            }
-            if (item instanceof Reldb_Schema) {
-                Reldb_Schema schema_item = (Reldb_Schema) item;
-                return schema_item.getTableList();
+                return database_item.getTables();
             }
             if (item instanceof Reldb_Table) {
                 Reldb_Table table_item = (Reldb_Table) item;

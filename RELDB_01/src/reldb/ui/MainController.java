@@ -19,7 +19,6 @@ import reldb.lib.Reldb_TreeViewElement;
 import reldb.lib.Reldb_Connection;
 import reldb.lib.Reldb_TreeViewCheckElement;
 import reldb.lib.database.Reldb_Database;
-import reldb.lib.database.Reldb_Schema;
 import reldb.lib.database.Reldb_Table;
 import reldb.lib.migration.Reldb_DataMover;
 import reldb.ui.dialogs.Dialogs;
@@ -247,8 +246,8 @@ public class MainController implements Initializable {
             return;
         }   // End instanceof Reldb_Connection
 
-        if ((element.getItem() instanceof Reldb_Schema)) {
-            selectedConnection = ((Reldb_Schema) (element.getItem())).getDatabase().getConnection().getConnectionName();
+        if ((element.getItem() instanceof Reldb_Database)) {
+            selectedConnection = ((Reldb_Database) (element.getItem())).getConnection().getConnectionName();
             setExportMenuVisibility(selectedConnection);
 
             contextMenu_item_exportMenu.setDisable(false);
@@ -278,12 +277,7 @@ public class MainController implements Initializable {
                     IReldb_TreeViewElement item = selectedItem.getValue();
                     if (item.getItem() instanceof Reldb_Database) {
                        // collection = new Reldb_DatabasePattern((Reldb_Database) selectedItem.getValue().getItem());
-                    } else if (item.getItem() instanceof Reldb_Schema) {
-                        Reldb_DataMover dataMover = new Reldb_DataMover(((Reldb_Schema) item.getItem()).getTableList(), selectedDestinationConnection.getDatabase());
-                        dataMover.start();
-                        Dialogs.newProgressDialog();
-                        //collection = new Reldb_DatabasePattern((Reldb_Schema) selectedItem.getValue().getItem());
-                    } else if (item.getItem() instanceof Reldb_Table) {
+                    }  else if (item.getItem() instanceof Reldb_Table) {
                         //collection = new Reldb_DatabasePattern((Reldb_Table) selectedItem.getValue().getItem());
                     }
 
