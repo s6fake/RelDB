@@ -4,14 +4,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import reldb.lib.database.Reldb_Column;
 import reldb.lib.database.Reldb_Database;
 import reldb.lib.database.Reldb_Row;
-import reldb.lib.database.Reldb_Schema;
 import reldb.lib.database.Reldb_Table;
 import reldb.lib.sql.Reldb_Statement;
 import reldb.lib.sql.sql_expr;
+import reldb.ui.dialogs.ProgressDialogController;
 
 /**
  *
@@ -21,13 +22,25 @@ public class Reldb_DataMover extends Thread {
 
     private static final Logger log = Logger.getLogger(Reldb_DataMover.class.getName());
 
-    private final static int MAX_ROW = 2;
+    private final static int MAX_ROW = -1;
+    private final static int fetchSize = 20;
+
+    public static Progress progress_current, progress_total;
+    public static String progress_string = "Erstelle Tabelle ";
+
     private static ResultSet fetchedResults;
 
     private final int ThreadID;
     private final Reldb_Database source;
     private final List<Reldb_Table> sourceTables;
+    private final List<Reldb_Row> invalidRows = new ArrayList<>();
     private final Reldb_Database destination;
+
+    public Reldb_DataMover(Reldb_DatabasePattern source, Reldb_Database destination, ProgressDialogController dialog) {
+        this(source, destination);
+        dialog.initalizeChangeListener();
+
+    }
 
     public Reldb_DataMover(Reldb_DatabasePattern source, Reldb_Database destination) {
         this.source = source;
@@ -43,6 +56,8 @@ public class Reldb_DataMover extends Thread {
         this.source = tables.get(0).getDatabase();
         this.sourceTables = tables;
         this.destination = destination;
+        progress_total = new Progress(sourceTables.size() + 1);
+        progress_current = new Progress(1);
         ThreadID = 0;
     }
 
@@ -57,67 +72,33 @@ public class Reldb_DataMover extends Thread {
     public void run() {
         System.out.println("Thread " + ThreadID + " gestartet!");
         if (ThreadID == 0) {
+
             System.out.println("Tabellen zu kopieren: " + sourceTables.size());
             System.out.println("Zieldatenbank: " + destination.getDatabaseName());
             new Reldb_DataMover(this).start();
             copy();
         }
         System.out.println("Thread " + ThreadID + " ist fertig!");
+        if (!invalidRows.isEmpty()) {
+            System.out.println("Fehlerhafte Einträge:");
+            for (Reldb_Row row : invalidRows) {
+                row.print();
+            }
+        }
     }
 
     public void copy() {
-
         dropAll();
         createAllTables();
         //createAllForeignKeys();
-        copyAllData();
-
+        progress_total.increaseCurrentProgress();
+        progress_string = "Kopiere Datensatz ";
+        copyAllData2();
+        
+        createAllForeignKeys();
     }
 
-    public void copy(Object object, Reldb_Database destinationDatabase) {
-        if (object instanceof Reldb_Database) {
-            copy((Reldb_Database) object, destinationDatabase);
-            return;
-        }
-        if (object instanceof Reldb_Table) {
-            copy((Reldb_Table) object, destinationDatabase);
-            return;
-        }
-        if (object instanceof Reldb_Schema) {
-            copy((Reldb_Schema) object, destinationDatabase);
-            return;
-        }
-        return;
-    }
-
-    public void copy(Reldb_Database sourceDatabase, Reldb_Database destinationDatabase) {
-        for (Reldb_Schema schema : sourceDatabase.getSchemaList()) {
-            copy(schema, destinationDatabase);
-        }
-    }
-
-    public void copy(Reldb_Schema source, Reldb_Database destinationDatabase) {
-        List<Reldb_Table> tables = source.getTableList();
-        // DROP Foreignkeys
-        for (Reldb_Table table : tables) {
-            dropForeignKeys(table, destinationDatabase);
-        }
-
-        for (Reldb_Table table : tables) {
-            copy(table, destinationDatabase);
-        }
-
-        for (Reldb_Table table : tables) {
-            createForeignKeys(table, destinationDatabase);
-        }
-
-        //Daten einfügen
-        for (Reldb_Table table : tables) {
-            copyData(table, destinationDatabase);
-        }
-
-    }
-
+    @Deprecated
     public void copy(Reldb_Table source, Reldb_Database destinationDatabase) {
         Reldb_Statement statement = new Reldb_Statement(destinationDatabase.getConnection());
 
@@ -130,38 +111,16 @@ public class Reldb_DataMover extends Thread {
         statement.close();
     }
 
-    private void copyAllData() {
-        sourceTables.stream().forEach((table) -> {
-            copyData(table, destination);
-        });
-    }
-
-    private void copyData(Reldb_Table source, Reldb_Database destinationDatabase) {
-        Reldb_Statement statement;
-        String valuesCmd, insertIntoCmd = sql_expr.insertIntoTable(source);
-        List<Reldb_Row> data = getData(source);        // Daten holen
-        if (data.isEmpty()) {
-            return;
-        }
-        // Daten kopieren
-        for (int i = 0; i < MAX_ROW; i++) {
-            valuesCmd = sql_expr.values(data.get(i));
-            statement = new Reldb_Statement(destinationDatabase.getConnection());
-            statement.execute(insertIntoCmd + valuesCmd);
-            //System.out.println(insertIntoCmd + valuesCmd);
-            statement.close();
-        }
-    }
-
+    @Deprecated
     private List<Reldb_Row> getData(Reldb_Table source) {
         List<Reldb_Row> rows = new ArrayList<>();
         Reldb_Statement statement = new Reldb_Statement(source.getDatabase().getConnection());
-        ResultSet results = statement.executeQuery(sql_expr.selectAllFrom(source), MAX_ROW); // Im ResultSet landen die Datensätze
+        ResultSet results = statement.executeQuery(sql_expr.selectAllFrom(source), fetchSize); // Im ResultSet landen die Datensätze
         try {
-            int fetchSize = MAX_ROW;
-            while (fetchSize > 0 && results.next()) {
+            int rowCount = MAX_ROW;
+            while (rowCount > 0 && results.next()) {
                 rows.add(new Reldb_Row(source, results));
-                fetchSize--;
+                rowCount--;
             }
             results.close();
         } catch (SQLException ex) {
@@ -169,6 +128,26 @@ public class Reldb_DataMover extends Thread {
         }
         statement.close();
         return rows;
+    }
+
+    @Deprecated
+    private ResultSet getDataResultSet(Reldb_Table source, Reldb_Statement statement) {
+        statement = new Reldb_Statement(source.getDatabase().getConnection());
+        return statement.executeQuery(sql_expr.selectAllFrom(source), fetchSize);
+    }
+
+    @Deprecated
+    private void insertData(Reldb_Table source, Reldb_Database destinationDatabase, ResultSet data) {
+        try {
+            int rowCount = MAX_ROW;
+            while (rowCount > 0 && data.next()) {
+                //rows.add(new Reldb_Row(source, data));
+                rowCount--;
+            }
+
+        } catch (SQLException ex) {
+            log.warning(ex.toString());
+        }
     }
 
     private void createAllForeignKeys() {
@@ -187,6 +166,83 @@ public class Reldb_DataMover extends Thread {
                 statement.close();
             }
         }
+    }
+
+    private void copyAllData() {
+        sourceTables.stream().forEach((table) -> {
+            setRowCounter(table);
+            copyData(table, destination);
+            progress_total.increaseCurrentProgress();
+        });
+    }
+
+    private void copyAllData2() {
+        sourceTables.stream().forEach((table) -> {
+            setRowCounter(table);
+            copyData2(table, destination);
+            progress_total.increaseCurrentProgress();
+        });
+    }
+
+    private void copyData(Reldb_Table source, Reldb_Database destinationDatabase) {
+        Reldb_Statement statement;
+        String valuesCmd, insertIntoCmd = sql_expr.insertIntoTable(source);
+        List<Reldb_Row> data = getData(source);        // Daten holen
+        if (data.isEmpty()) {
+            return;
+        }
+        // Daten kopieren
+        for (int i = 0; i < data.size() - 1; i++) {
+            valuesCmd = sql_expr.values(data.get(i));
+            statement = new Reldb_Statement(destinationDatabase.getConnection());
+            statement.execute(insertIntoCmd + valuesCmd);
+            progress_current.increaseCurrentProgress();
+            //System.out.println(insertIntoCmd + valuesCmd);
+            statement.close();
+        }
+    }
+
+    private void copyData2(Reldb_Table source, Reldb_Database destinationDatabase) {
+        String insertIntoCmd = sql_expr.insertIntoTable(source);
+
+        Reldb_Row newRow;
+        Reldb_Statement statement = new Reldb_Statement(source.getDatabase().getConnection());
+        ResultSet results = statement.executeQuery(sql_expr.selectAllFrom(source), fetchSize); // Im ResultSet landen die Datensätze
+        try {
+            int rowCount = MAX_ROW;
+            while ((rowCount > 0 || MAX_ROW == -1) && results.next()) {
+                newRow = new Reldb_Row(source, results);
+                if (!insert2(newRow, insertIntoCmd, destinationDatabase)) {
+                    invalidRows.add(newRow);
+                }
+                rowCount--;
+            }
+            results.close();
+        } catch (SQLException ex) {
+            log.warning(ex.toString());
+        }
+        finally {
+            try {
+                results.close();
+            } catch (SQLException ex) {
+                log.warning(ex.getMessage());
+            }
+        }
+        statement.close();
+
+    }
+
+    private boolean insert2(Reldb_Row data, String insertIntoCmd, Reldb_Database destinationDatabase) {
+        if (data == null) {
+            return false;
+        }
+        String valuesCmd = sql_expr.values(data);
+        Reldb_Statement statement = new Reldb_Statement(destinationDatabase.getConnection());
+        statement.execute(insertIntoCmd + valuesCmd);
+        progress_current.increaseCurrentProgress();
+        //System.out.println(insertIntoCmd + valuesCmd);
+        statement.close();
+        return true;
     }
 
     private void dropAll() {
@@ -221,6 +277,7 @@ public class Reldb_DataMover extends Thread {
     private void createAllTables() {
         sourceTables.stream().forEach((table) -> {
             createTable(table);
+            progress_current.increaseCurrentProgress();
         });
     }
 
@@ -230,4 +287,35 @@ public class Reldb_DataMover extends Thread {
         statement.execute(command);
         statement.close();
     }
+
+
+    /*
+     Funktionen für die Statistik
+     */
+    private void setRowCounter(Reldb_Table source) {
+        Reldb_Statement statement = new Reldb_Statement(source.getDatabase().getConnection());
+        ResultSet result = statement.executeQuery(sql_expr.selectCount(source));
+        int rowCount = 0;
+        try {
+            result.next();
+            rowCount = result.getInt(1);
+            System.out.println("COUNT("+source.getTableName()+"): " + rowCount);
+        } catch (SQLException ex) {
+            log.warning(ex.getMessage());
+        } finally {
+            try {
+                result.close();
+            } catch (SQLException ex) {
+                log.warning(ex.getMessage());
+            }
+        }
+        statement.close();
+        if (MAX_ROW == -1 || rowCount < MAX_ROW) {
+            progress_current.reset(rowCount);
+        } else {
+            progress_current.reset(MAX_ROW);
+        }
+    }
+
 }
+        // 40774215

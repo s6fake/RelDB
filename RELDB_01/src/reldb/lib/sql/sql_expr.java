@@ -121,4 +121,15 @@ public class sql_expr {
         return command;
     }
     
+    /**
+     * Erzeugt einen Befehl um die Anzahl der Elemente in der Tabelle zu erfassen
+     * @param table
+     * @return 
+     */
+    public static String selectCount(Reldb_Table table) {
+        String command = "SELECT COUNT(*) FROM ";
+        command = command + table.getTableName();
+        return command;
+    }
+    
 }

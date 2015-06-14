@@ -1,7 +1,8 @@
+
 package reldb.lib;
 
-
 import java.util.List;
+import javafx.scene.control.CheckBox;
 import reldb.lib.database.Reldb_Column;
 import reldb.lib.database.Reldb_Database;
 import reldb.lib.database.Reldb_Schema;
@@ -11,19 +12,23 @@ import reldb.lib.database.Reldb_Table;
  *
  * @author s6fake
  */
-public class Reldb_TreeViewElement implements IReldb_TreeViewElement {
+public class Reldb_TreeViewCheckElement extends CheckBox implements IReldb_TreeViewElement{
 
     private final Object item;
     private String displayName;
-    public boolean discovered = false;
-
-    public Reldb_TreeViewElement(Object item, String displayName) {
+    private boolean discovered = false;
+    
+    public Reldb_TreeViewCheckElement(Object item, String displayName) {
+        super(item.toString());
         this.item = item;
         this.displayName = displayName;
+        setText(displayName);
     }
 
-    public Reldb_TreeViewElement(Object item) {
-        this(item, "Vashta Nerada");
+    public Reldb_TreeViewCheckElement(Object item) {
+        super(item.toString());
+        this.item = item;
+        this.displayName =  "Vashta Nerada";
         if (item instanceof Reldb_Table) {
             displayName = ((Reldb_Table) item).getTableName();
         }
@@ -33,7 +38,10 @@ public class Reldb_TreeViewElement implements IReldb_TreeViewElement {
         if (item instanceof Reldb_Column) {
             displayName = ((Reldb_Column) item).getName();
         }
+        setText(displayName);
     }
+
+
 
     @Override
     public String toString() {
@@ -43,6 +51,7 @@ public class Reldb_TreeViewElement implements IReldb_TreeViewElement {
     /**
      * @return the item
      */
+    @Override
     public Object getItem() {
         return item;
     }
@@ -50,12 +59,14 @@ public class Reldb_TreeViewElement implements IReldb_TreeViewElement {
     /**
      * @return the displayName
      */
+    @Override
     public String getDisplayName() {
         return displayName;
     }
 
+    @Override
     public List<?> discover() {
-        if (!discovered) {
+        if (!isDiscovered()) {
             discovered = true;
             if (item instanceof Reldb_Database) {
                 Reldb_Database database_item = (Reldb_Database) item;
@@ -76,10 +87,11 @@ public class Reldb_TreeViewElement implements IReldb_TreeViewElement {
 
         return null;
     }
-    
-        /**
+
+    /**
      * @return the discovered
      */
+    @Override
     public boolean isDiscovered() {
         return discovered;
     }

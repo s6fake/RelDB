@@ -42,6 +42,11 @@ public class Reldb_Row {
         }
         return result;
     }
+    
+    public void print() {
+        System.out.println(table.getTableName());
+        System.out.println(this.toString());
+    }
 
     /**
      * @return the cells

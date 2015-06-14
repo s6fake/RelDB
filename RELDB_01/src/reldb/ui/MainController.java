@@ -11,22 +11,17 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.WindowEvent;
+import reldb.lib.IReldb_TreeViewElement;
 import reldb.lib.Reldb_TreeViewElement;
 import reldb.lib.Reldb_Connection;
+import reldb.lib.Reldb_TreeViewCheckElement;
 import reldb.lib.database.Reldb_Database;
 import reldb.lib.database.Reldb_Schema;
 import reldb.lib.database.Reldb_Table;
 import reldb.lib.migration.Reldb_DataMover;
-import reldb.lib.migration.Reldb_DatabasePattern;
 import reldb.ui.dialogs.Dialogs;
 import reldb.lib.sql.sql_expr;
 
@@ -43,8 +38,8 @@ public class MainController implements Initializable {
     public Label label_1;
     private RELDB_01 parent;
     @FXML
-    private TreeView<Reldb_TreeViewElement> con_treeView;
-    private final TreeItem<Reldb_TreeViewElement> treeConnRoot = new TreeItem<>(new Reldb_TreeViewElement("", "Connections"));
+    private TreeView<IReldb_TreeViewElement> con_treeView;
+    private final TreeItem<IReldb_TreeViewElement> treeConnRoot = new TreeItem(new Reldb_TreeViewElement("", "Connections"));
     @FXML
     private ContextMenu treeView_ContextMenu;
     @FXML
@@ -78,9 +73,9 @@ public class MainController implements Initializable {
 
             @Override
             public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-                TreeItem<Reldb_TreeViewElement> selectedItem = (TreeItem<Reldb_TreeViewElement>) newValue;
+                TreeItem<IReldb_TreeViewElement> selectedItem = (TreeItem<IReldb_TreeViewElement>) newValue;
 
-                if (!selectedItem.getValue().discovered) {                  // Prüfen ob das Element schon einmal besucht wurde
+                if (!selectedItem.getValue().isDiscovered()) {                  // Prüfen ob das Element schon einmal besucht wurde
                     con_treeView.setDisable(true);                          // TreeView deaktivieren, damit nicht mit unfertigen Daten gearbeitet wird
                     List<?> items = selectedItem.getValue().discover();     // Gegebenenfalls neue Kind-Elemente hinzufügen
                     if (items != null) {
@@ -106,55 +101,49 @@ public class MainController implements Initializable {
      * @param database Die Datenbank die eingefügt werden soll
      */
     public void addDatabaseToConnectionInTreeView(Reldb_Connection connection, Reldb_Database database) {
-        TreeItem<Reldb_TreeViewElement> connectionRoot = addTreeItem(new Reldb_TreeViewElement(connection, connection.getConnectionName()));// Neues Verbungs-Wurzelelement
-        TreeItem<Reldb_TreeViewElement> databaseRoot = addTreeItem(connectionRoot, new Reldb_TreeViewElement(database, database.getDatabaseName()));   //Datenbank Element einfügen
-/*
-         for (Reldb_Schema schemaIterator : database.getSchemaList()) {
-         TreeItem<Reldb_TreeViewElement> schemaNode = addTreeItem(databaseRoot, new Reldb_TreeViewElement(schemaIterator, schemaIterator.getSchemaName()));
-         for (Reldb_Table tableIterator : schemaIterator.getTableList()) {
-         TreeItem<Reldb_TreeViewElement> tableNode = addTreeItem(schemaNode, new Reldb_TreeViewElement(tableIterator, tableIterator.getTableName()));
-         for (Reldb_Column columnIterator : tableIterator.getColumns()) {
-         addTreeItem(tableNode, new Reldb_TreeViewElement(columnIterator, columnIterator.getName()));
-         }
-         }
-         }*/
+        TreeItem<IReldb_TreeViewElement> connectionRoot = addTreeItem(new Reldb_TreeViewElement(connection, connection.getConnectionName()));// Neues Verbungs-Wurzelelement
+        addTreeItem(connectionRoot, new Reldb_TreeViewElement(database, database.getDatabaseName()));   //Datenbank Element einfügen
     }
 
-    public TreeItem<Reldb_TreeViewElement> addConnectionToTreeView(Reldb_TreeViewElement item) {
+    public TreeItem<IReldb_TreeViewElement> addConnectionToTreeView(IReldb_TreeViewElement item) {
         return addTreeItem(treeConnRoot, item);
     }
 
-    public TreeItem<Reldb_TreeViewElement> addTreeItem(Reldb_TreeViewElement item) {
+    public TreeItem<IReldb_TreeViewElement> addTreeItem(IReldb_TreeViewElement item) {
         updateExportMenu();
         return addTreeItem(treeConnRoot, item);
     }
 
-    public void addTreeItems(TreeItem<Reldb_TreeViewElement> tParent, List<?> items) {
+    public void addTreeItems(TreeItem<IReldb_TreeViewElement> tParent, List<?> items) {
         items.stream().forEach((item) -> {
-            addTreeItem(tParent, new Reldb_TreeViewElement(item));
+            addTreeItem(tParent, new Reldb_TreeViewCheckElement(item));
         });
     }
 
-    public TreeItem<Reldb_TreeViewElement> addTreeItem(TreeItem<Reldb_TreeViewElement> tParent, Reldb_TreeViewElement item) {
-        TreeItem<Reldb_TreeViewElement> newTreeItem = new TreeItem<>(item);
-        ObservableList<TreeItem<Reldb_TreeViewElement>> children = tParent.getChildren();
-        for (TreeItem<Reldb_TreeViewElement> iterator : children) {
-
+    public TreeItem<IReldb_TreeViewElement> addTreeItem(TreeItem<IReldb_TreeViewElement> tParent, IReldb_TreeViewElement item) {
+        TreeItem<IReldb_TreeViewElement> newTreeItem = new TreeItem<>(item);
+        ObservableList<TreeItem<IReldb_TreeViewElement>> children = tParent.getChildren();
+        
+        //VERBESSERN:
+        
+        for (TreeItem<IReldb_TreeViewElement> iterator : children) {
+            
             if (iterator.getValue().getDisplayName().equals(item.getDisplayName())) //Prüfen ob das es ein Element mit gleichem Namen schon gibt
             {
                 return iterator;     //Wenn ja, kein neues anlegen
             }
         }
+        
         tParent.getChildren().add(newTreeItem);
         return newTreeItem;
     }
 
-    public TreeItem<Reldb_TreeViewElement> getTreeItemByName(String name) {
+    public TreeItem<IReldb_TreeViewElement> getTreeItemByName(String name) {
         return getTreeItemByName(treeConnRoot, name);
     }
 
-    public TreeItem<Reldb_TreeViewElement> getTreeItemByName(TreeItem<Reldb_TreeViewElement> tParent, String name) {
-        for (TreeItem<Reldb_TreeViewElement> iterator : tParent.getChildren()) {
+    public TreeItem<IReldb_TreeViewElement> getTreeItemByName(TreeItem<IReldb_TreeViewElement> tParent, String name) {
+        for (TreeItem<IReldb_TreeViewElement> iterator : tParent.getChildren()) {
             if ((iterator.getValue().toString()).equals(name)) {
                 return iterator;
             }
@@ -162,13 +151,13 @@ public class MainController implements Initializable {
         return null;
     }
 
-    public void deleteConnectionFromTreeView(TreeItem<Reldb_TreeViewElement> element) {
+    public void deleteConnectionFromTreeView(TreeItem<IReldb_TreeViewElement> element) {
         deleteTreeItem(element);
         updateExportMenu();
     }
 
-    private void deleteTreeItem(TreeItem<Reldb_TreeViewElement> element) {
-        for (TreeItem<Reldb_TreeViewElement> child : element.getChildren()) {
+    private void deleteTreeItem(TreeItem<IReldb_TreeViewElement> element) {
+        for (TreeItem<IReldb_TreeViewElement> child : element.getChildren()) {
             deleteTreeItem(child);
         }
         if (element.getParent() != null) {
@@ -236,12 +225,12 @@ public class MainController implements Initializable {
     @FXML
     private void contextMenu_onShow(WindowEvent event) {
         setContextMenuToDefault();
-        TreeItem<Reldb_TreeViewElement> selectedItem = con_treeView.getSelectionModel().getSelectedItem();
+        TreeItem<IReldb_TreeViewElement> selectedItem = con_treeView.getSelectionModel().getSelectedItem();
         String selectedConnection;
         if (selectedItem == null) {
             return;
         }
-        Reldb_TreeViewElement element = selectedItem.getValue();
+        IReldb_TreeViewElement element = selectedItem.getValue();
         if (element.getItem() == null) {
             return;
         }
@@ -284,14 +273,15 @@ public class MainController implements Initializable {
             item.setOnAction(new EventHandler<ActionEvent>() {
                 public void handle(ActionEvent t) {
                     Reldb_Connection selectedDestinationConnection = Reldb_Connection.getConnectionByName(item.getText());
-                    TreeItem<Reldb_TreeViewElement> selectedItem = con_treeView.getSelectionModel().getSelectedItem();
+                    TreeItem<IReldb_TreeViewElement> selectedItem = con_treeView.getSelectionModel().getSelectedItem();
                     //Reldb_DatabasePattern collection = null;
-                    Reldb_TreeViewElement item = selectedItem.getValue();
+                    IReldb_TreeViewElement item = selectedItem.getValue();
                     if (item.getItem() instanceof Reldb_Database) {
                        // collection = new Reldb_DatabasePattern((Reldb_Database) selectedItem.getValue().getItem());
                     } else if (item.getItem() instanceof Reldb_Schema) {
                         Reldb_DataMover dataMover = new Reldb_DataMover(((Reldb_Schema) item.getItem()).getTableList(), selectedDestinationConnection.getDatabase());
                         dataMover.start();
+                        Dialogs.newProgressDialog();
                         //collection = new Reldb_DatabasePattern((Reldb_Schema) selectedItem.getValue().getItem());
                     } else if (item.getItem() instanceof Reldb_Table) {
                         //collection = new Reldb_DatabasePattern((Reldb_Table) selectedItem.getValue().getItem());
@@ -313,11 +303,11 @@ public class MainController implements Initializable {
 
     @FXML
     private void contextMenu_edit(ActionEvent event) {
-        TreeItem<Reldb_TreeViewElement> selectedItem = con_treeView.getSelectionModel().getSelectedItem();
+        TreeItem<IReldb_TreeViewElement> selectedItem = con_treeView.getSelectionModel().getSelectedItem();
         if (selectedItem == null) {
             return;
         }
-        Reldb_TreeViewElement element = selectedItem.getValue();
+        IReldb_TreeViewElement element = selectedItem.getValue();
         if (element.getItem() == null) {
             return;
         }

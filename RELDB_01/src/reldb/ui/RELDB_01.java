@@ -10,11 +10,14 @@ import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.TreeItem;
 import javafx.stage.Stage;
 import javax.swing.JOptionPane;
+import reldb.lib.IReldb_TreeViewElement;
 import reldb.lib.Reldb_TreeViewElement;
 import reldb.lib.Reldb_Connection;
 import reldb.lib.MetaDataManager;
+import reldb.lib.database.IReldb_DatabaseObject;
 import reldb.lib.database.Reldb_DataContainer;
 import reldb.lib.database.Reldb_Database;
 import reldb.lib.database.Reldb_Row;
@@ -84,7 +87,8 @@ public class RELDB_01 extends Application {
 */
     
     public void addConnectionToTreeView(Reldb_Connection newConnection) {
-        controller.addConnectionToTreeView(new Reldb_TreeViewElement(newConnection, newConnection.getConnectionName()));  
+        IReldb_TreeViewElement newConn =  new Reldb_TreeViewElement(newConnection, newConnection.getConnectionName());
+        controller.addConnectionToTreeView(newConn);  
     }
     
     public void logIn(String user, String password, Reldb_Connection connection) {

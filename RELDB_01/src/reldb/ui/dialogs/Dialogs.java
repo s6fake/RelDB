@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import reldb.lib.Reldb_Connection;
+import reldb.lib.migration.Reldb_DataMover;
 import reldb.ui.RELDB_01;
 
 /**
@@ -136,4 +137,25 @@ public class Dialogs {
             System.exit(1);
         }
     }
+        
+        public static void newProgressDialog() {
+                    try {
+            Stage stage = new Stage();
+            FXMLLoader loader = new FXMLLoader(Dialogs.class.getResource("ProgressDialog.fxml"));
+
+            // Scene aufbauen
+            Scene scene = new Scene(loader.load());
+            stage.setScene(scene);
+            stage.setTitle("Kopiere Daten");
+
+            // Controller initialisieren
+            ProgressDialogController controller = loader.<ProgressDialogController>getController();
+            controller.setStage(stage);
+            // Hauptfenster anzeigen
+            stage.show();
+        } catch (IOException ex) {
+            System.out.println("Fehler beim Starten des Progress-Dialogs.");
+            
+        }
+        }
 }
