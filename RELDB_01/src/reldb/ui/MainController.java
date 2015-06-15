@@ -1,5 +1,6 @@
 package reldb.ui;
 
+import static com.sun.applet2.preloader.event.ConfigEvent.STATUS;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -52,7 +53,6 @@ public class MainController implements Initializable {
     private MenuItem contextMenu_item_query;
     @FXML
     private MenuItem contextMenu_item_export;
-    @FXML
     private Menu contextMenu_item_exportMenu;
 
     /**
@@ -324,8 +324,9 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    private void contextMenu_exportMenu_onShow(Event event) {
-
+    private void on_quit(ActionEvent event) {
+        System.exit(0);
     }
+
 
 }
