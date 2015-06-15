@@ -34,8 +34,8 @@ public class Reldb_Column extends Reldb_DataContainer {
         this.refTableName = refTableName;
     }
 
-    @Override
-    public String toString() {
+    
+    public String printInfo() {
         String ref = "";
         if (isIsForeignKey()) {
             ref = " ref: " + refTableName + "." + refColumnName;
@@ -44,6 +44,11 @@ public class Reldb_Column extends Reldb_DataContainer {
         return COLUMN_NAME + "\n(" + TYPE_NAME + ") " + "\njava.sql.Type: " + Reldb_Types.typeMappings.get(DATA_TYPE) + "(" + COLUMN_SIZE + ")" + "\n" + ref + "\nAutoincrement: " + AUTOINCREMENT + " Unique: " + UNIQUE;
     }
 
+    @Override
+    public String toString() {
+        return COLUMN_NAME;
+    }
+    
     @Override
     public String getConstructorString(Reldb_Database.DATABASETYPE dbModel) {
         String typeStr = super.getConstructorString(dbModel);

@@ -132,13 +132,15 @@ public class Reldb_Database {
     public Reldb_Connection getConnection() {
         return connection;
     }
-
-
-    @Override
-    public String toString() {
+    
+    public String printInfo() {
         return "Product: " + databaseName + "\n" + "Version: " + version + "\n" + "CatalogSeparator: " + catalogSeparator + "\n dbm: " + getDatabaseType().name();
     }
 
+    @Override
+    public String toString() {
+        return databaseName;
+    }
     /**
      * @return the databaseName
      */

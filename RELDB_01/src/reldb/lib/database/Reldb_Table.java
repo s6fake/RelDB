@@ -183,14 +183,18 @@ public class Reldb_Table {
         return null;
     }
 
-    @Override
-    public String toString() {
+    
+    public String printInfo() {
         String result = "";
         for (Reldb_Column col : primaryKeys) {
             result = result + col.getName() + " ";
         }
         return "TYPE: " + TABLE_TYPE + " CAT: " + TABLE_CAT + " SCHEM: " + TABLE_SCHEM + " NAME: " + TABLE_NAME + "\nPrimary Keys: " + result;
-
+    }
+    
+    @Override
+    public String toString() {
+        return TABLE_NAME;
     }
 
     /**
