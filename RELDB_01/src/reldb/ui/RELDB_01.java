@@ -52,21 +52,6 @@ public class RELDB_01 extends Application {
             //remove window decoration
             primaryStage.initStyle(StageStyle.UNDECORATED);
 
-            root.setOnMousePressed(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    xOffset = event.getSceneX();
-                    yOffset = event.getSceneY();
-                }
-            });
-            root.setOnMouseDragged(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    primaryStage.setX(event.getScreenX() - xOffset);
-                    primaryStage.setY(event.getScreenY() - yOffset);
-                }
-            });
-
             // Scene aufbauen
             Scene scene = new Scene(root);
             stage.setScene(scene);
@@ -75,6 +60,22 @@ public class RELDB_01 extends Application {
             // Controller initialisieren
             controller = loader.<MainController>getController();
             controller.setParent(this);
+
+            controller.getMenuBar().setOnMousePressed(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    xOffset = event.getSceneX();
+                    yOffset = event.getSceneY();
+                }
+            });
+            controller.getMenuBar().setOnMouseDragged(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    stage.setX(event.getScreenX() - xOffset);
+                    stage.setY(event.getScreenY() - yOffset);
+                }
+            });
+
             // Hauptfenster anzeigen
             stage.show();
         } catch (IOException e) {

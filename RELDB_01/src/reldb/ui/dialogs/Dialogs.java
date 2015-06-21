@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import reldb.lib.Reldb_Connection;
+import reldb.lib.database.Reldb_Column;
 import reldb.lib.migration.Reldb_DataMover;
 import reldb.ui.RELDB_01;
 
@@ -114,7 +115,7 @@ public class Dialogs {
         }
     }
 
-        public static void newSQLDialog(RELDB_01 parent, Reldb_Connection connection, String command) {
+    public static void newSQLDialog(RELDB_01 parent, Reldb_Connection connection, String command) {
         try {
             Stage stage = new Stage();
             FXMLLoader loader = new FXMLLoader(Dialogs.class.getResource("SQLDialog.fxml"));
@@ -137,9 +138,9 @@ public class Dialogs {
             System.exit(1);
         }
     }
-        
-        public static void newProgressDialog() {
-                    try {
+
+    public static void newProgressDialog() {
+        try {
             Stage stage = new Stage();
             FXMLLoader loader = new FXMLLoader(Dialogs.class.getResource("ProgressDialog.fxml"));
 
@@ -155,7 +156,31 @@ public class Dialogs {
             stage.show();
         } catch (IOException ex) {
             System.out.println("Fehler beim Starten des Progress-Dialogs.");
-            
+
         }
+    }
+    
+        public static void newFilterDialog(Reldb_Column column) {
+        try {
+            Stage stage = new Stage();
+            FXMLLoader loader = new FXMLLoader(Dialogs.class.getResource("newFilterDialog.fxml"));
+
+            // Scene aufbauen
+            Scene scene = new Scene(loader.load());
+            stage.setScene(scene);
+            stage.setTitle("Neuer Filter");
+
+            // Controller initialisieren
+            NewFilterDialogController controller = loader.<NewFilterDialogController>getController();
+            controller.setStage(stage);
+            controller.setColumn(column);
+            // Hauptfenster anzeigen
+            stage.show();
+        } catch (IOException ex) {
+            System.out.println("Fehler beim Starten des Filter-Dialogs.");
+            System.out.println(ex.getMessage());
+
         }
+    }
+    
 }

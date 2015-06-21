@@ -53,12 +53,12 @@ public class Reldb_DataContainer {
 
     @Override
     public Reldb_DataContainer clone() {
-        Reldb_DataContainer newObj = new Reldb_DataContainer(database, COLUMN_NAME, DATA_TYPE, TYPE_NAME, COLUMN_SIZE, NULLABLE, data);
+        Reldb_DataContainer newObj = new Reldb_DataContainer(getDatabase(), COLUMN_NAME, DATA_TYPE, TYPE_NAME, COLUMN_SIZE, NULLABLE, data);
         return newObj;
     }
 
     public Object convertTo(DATABASETYPE dbm) {
-        if (database.getDatabaseType() == dbm) {
+        if (getDatabase().getDatabaseType() == dbm) {
             return this;
         }
         switch (dbm) {
@@ -161,6 +161,13 @@ public class Reldb_DataContainer {
      */
     public void setUNIQUE(boolean UNIQUE) {
         this.UNIQUE = UNIQUE;
+    }
+
+    /**
+     * @return the database
+     */
+    public Reldb_Database getDatabase() {
+        return database;
     }
 }
 

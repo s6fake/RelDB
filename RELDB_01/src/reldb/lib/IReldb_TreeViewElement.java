@@ -6,6 +6,7 @@ import java.util.List;
  *
  * @author s6fake
  */
+@Deprecated
 public interface IReldb_TreeViewElement {
     public Object getItem();
     public String getDisplayName();

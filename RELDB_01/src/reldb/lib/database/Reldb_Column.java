@@ -57,7 +57,7 @@ public class Reldb_Column extends Reldb_DataContainer {
 
         if (dbModel == Reldb_Database.DATABASETYPE.ORACLE) {
             if (isPrimaryKey) {
-                constraints = constraints + ",\nCONSTRAINT " + parentTable.getTableName() + "_PK PRIMARY KEY (" + COLUMN_NAME + ")";
+                constraints = constraints + ",\nCONSTRAINT " + getTable().getTableName() + "_PK PRIMARY KEY (" + COLUMN_NAME + ")";
             }
 
             if (!NULLABLE) {
@@ -88,7 +88,7 @@ public class Reldb_Column extends Reldb_DataContainer {
         String constraint = "";
         if (isForeignKey)
         {
-            constraint = parentTable.getTableName() + "_FK_" + shorten(COLUMN_NAME) + "_" + shorten(refColumnName);
+            constraint = getTable().getTableName() + "_FK_" + shorten(COLUMN_NAME) + "_" + shorten(refColumnName);
         }
         return constraint;
     }
@@ -158,5 +158,12 @@ public class Reldb_Column extends Reldb_DataContainer {
      */
     public boolean isIsForeignKey() {
         return isForeignKey;
+    }
+
+    /**
+     * @return the parentTable
+     */
+    public Reldb_Table getTable() {
+        return parentTable;
     }
 }

@@ -7,7 +7,7 @@
 
 <VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="reldb.ui.MainController">
     <children>
-        <MenuBar VBox.vgrow="NEVER">
+        <MenuBar fx:id="menuBar" VBox.vgrow="NEVER">
             <menus>
                 <Menu mnemonicParsing="false" text="File">
                     <items>
@@ -26,6 +26,7 @@
                 <Menu mnemonicParsing="false" text="Edit">
                     <items>
                         <MenuItem mnemonicParsing="false" onAction="#make_sql_query" text="SQL Query" />
+                        <!--<MenuItem mnemonicParsing="false" onAction="#make_new_filter" text="Filtern" />-->
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">
@@ -56,14 +57,15 @@
                                                                     <contextMenu>
                                                                         <ContextMenu fx:id="treeView_ContextMenu" onShown="#contextMenu_onShow">
                                                                             <items>
-                                                                                <MenuItem fx:id="contextMenu_item_connect" disable="true" mnemonicParsing="false" onAction="#contextMenu_connect" text="Connect" />
-                                                                                <MenuItem fx:id="contextMenu_item_close" disable="true" mnemonicParsing="false" onAction="#contextMenu_close" text="Close" />
+                                                                                <MenuItem fx:id="contextMenu_item_connect" disable="true" mnemonicParsing="false" onAction="#contextMenu_connect" text="Verbinden" />
+                                                                                <MenuItem fx:id="contextMenu_item_close" disable="true" mnemonicParsing="false" onAction="#contextMenu_close" text="Trennen" />
                                                                                 <SeparatorMenuItem mnemonicParsing="false" />
-                                                                                <MenuItem fx:id="contextMenu_item_add" mnemonicParsing="false" onAction="#contextMenu_add" text="Add" />
-                                                                                <MenuItem fx:id="contextMenu_item_edit" mnemonicParsing="false" onAction="#contextMenu_edit" text="Edit" />
-                                                                                <MenuItem fx:id="contextMenu_item_delete" disable="true" mnemonicParsing="false" onAction="#contextMenu_delete" text="Delete" />
+                                                                                <!--MenuItem fx:id="contextMenu_item_add" mnemonicParsing="false" onAction="#contextMenu_add" text="Verbindung hinzufügen" />-->
+                                                                                <MenuItem fx:id="contextMenu_item_edit" mnemonicParsing="false" onAction="#contextMenu_edit" text="Bearbeiten" />
+                                                                                <MenuItem fx:id="contextMenu_item_delete" disable="true" mnemonicParsing="false" onAction="#contextMenu_delete" text="Löschen" />
                                                                                 <MenuItem fx:id="contextMenu_item_query" disable="true" mnemonicParsing="false" onAction="#contextMenu_query" text="Query" />
-                                                                                <MenuItem fx:id="contextMenu_item_export" disable="true" mnemonicParsing="false" onAction="#contextMenu_export" text="Export (Oracle)" />
+                                                                                <MenuItem fx:id="contextMenu_item_filter" disable="true" mnemonicParsing="false" onAction="#make_new_filter" text="Filtern" />  
+                                                                                <MenuItem fx:id="contextMenu_item_export" disable="true" mnemonicParsing="false" onAction="#on_export" text="Auswahl exportieren" />
                                                                             </items>
                                                                         </ContextMenu>
                                                                     </contextMenu>
@@ -80,34 +82,33 @@
                                             </children>
                                         </AnchorPane>
                                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                                 <children>
-                                    <GridPane layoutX="122.0" layoutY="128.0" prefHeight="345.0" prefWidth="443.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                      <columnConstraints>
-                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                      </columnConstraints>
-                                      <rowConstraints>
-                                        <RowConstraints maxHeight="261.0" minHeight="10.0" prefHeight="261.0" vgrow="SOMETIMES" />
-                                        <RowConstraints maxHeight="167.0" minHeight="10.0" prefHeight="84.0" vgrow="SOMETIMES" />
-                                      </rowConstraints>
-                                       <children>
-                                          <ScrollPane>
-                                             <content>
-                                                <GridPane maxHeight="1.7976931348623157E308" prefHeight="252.0" prefWidth="441.0">
-                                                  <columnConstraints>
-                                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                  </columnConstraints>
-                                                  <rowConstraints>
-                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                  </rowConstraints>
+                                            <children>
+                                                <GridPane layoutX="122.0" layoutY="128.0" prefHeight="345.0" prefWidth="443.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                    <columnConstraints>
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                    </columnConstraints>
+                                                    <rowConstraints>
+                                                        <RowConstraints maxHeight="261.0" minHeight="10.0" prefHeight="261.0" vgrow="SOMETIMES" />
+                                                        <RowConstraints maxHeight="167.0" minHeight="10.0" prefHeight="84.0" vgrow="SOMETIMES" />
+                                                    </rowConstraints>
+                                                    <children>
+                                                        <ScrollPane>
+                                                            <content>
+                                                                <GridPane fx:id="gridpane_selection" maxHeight="1.7976931348623157E308" prefHeight="252.0" prefWidth="441.0">
+                                                                    <columnConstraints>
+                                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" maxWidth="415.0" />
+                                                                    </columnConstraints>
+                                                                    <rowConstraints>
+                                                                        <RowConstraints minHeight="37.0" prefHeight="37.0" maxHeight="37.0" vgrow="SOMETIMES" />
+                                                                    </rowConstraints>
+                                                                    
+                                                                </GridPane>
+                                                            </content>
+                                                        </ScrollPane>
+                                                        <Button fx:id="btn_export" mnemonicParsing="false" onAction="#on_export" text="Exportieren" GridPane.rowIndex="1" />
+                                                    </children>
                                                 </GridPane>
-                                             </content>
-                                          </ScrollPane>
-                                       </children>
-                                    </GridPane>
-                                 </children>
+                                            </children>
                                         </AnchorPane>
                                     </items>
                                 </SplitPane>

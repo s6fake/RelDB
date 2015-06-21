@@ -1,6 +1,5 @@
 package reldb.ui;
 
-import static com.sun.applet2.preloader.event.ConfigEvent.STATUS;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -8,18 +7,16 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.stage.WindowEvent;
-import reldb.lib.Reldb_Connection;
-import reldb.lib.Reldb_TreeItem;
-import reldb.lib.database.Reldb_Database;
-import reldb.lib.database.Reldb_Table;
+import reldb.lib.*;
+import reldb.lib.database.*;
 import reldb.ui.dialogs.Dialogs;
 
 /**
@@ -43,8 +40,7 @@ public class MainController implements Initializable {
     private MenuItem contextMenu_item_connect;
     @FXML
     private MenuItem contextMenu_item_close;
-    @FXML
-    private MenuItem contextMenu_item_add;
+
     @FXML
     private MenuItem contextMenu_item_delete;
     @FXML
@@ -53,7 +49,15 @@ public class MainController implements Initializable {
     private MenuItem contextMenu_item_query;
     @FXML
     private MenuItem contextMenu_item_export;
-    private Menu contextMenu_item_exportMenu;
+
+    @FXML
+    private MenuBar menuBar;
+    @FXML
+    private GridPane gridpane_selection;
+    @FXML
+    private Button btn_export;
+    @FXML
+    private MenuItem contextMenu_item_filter;
 
     /**
      * Initializes the controller class.
@@ -61,12 +65,13 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         con_treeView.setRoot(treeConnRoot);
-        
+        //addConstraint().setVisbility(false);
+
         /**
          * Event Handler zur TreeView hinzufügen
          */
         con_treeView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
-            
+
             @Override
             public void changed(ObservableValue observable, Object oldValue, Object newValue) {
                 Reldb_TreeItem selectedItem = (Reldb_TreeItem) newValue;
@@ -112,7 +117,7 @@ public class MainController implements Initializable {
     }
 
     public Reldb_TreeItem addTreeItem(Object item) {
-        updateExportMenu();
+        //updateExportMenu();
         return addTreeItem(treeConnRoot, item);
     }
 
@@ -146,7 +151,7 @@ public class MainController implements Initializable {
     public Reldb_TreeItem getTreeItemByName(Reldb_TreeItem tParent, String name) {
         for (Object iterator : tParent.getChildren()) {
             if ((iterator.toString()).equals(name)) {
-                return (Reldb_TreeItem)iterator;
+                return (Reldb_TreeItem) iterator;
             }
         }
         return null;
@@ -154,12 +159,12 @@ public class MainController implements Initializable {
 
     public void deleteConnectionFromTreeView(Reldb_TreeItem element) {
         deleteTreeItem(element);
-        updateExportMenu();
+        //updateExportMenu();
     }
 
     private void deleteTreeItem(Reldb_TreeItem element) {
         for (Object child : element.getChildren()) {
-            deleteTreeItem((Reldb_TreeItem)child);
+            deleteTreeItem((Reldb_TreeItem) child);
         }
         if (element.getParent() != null) {
             element.getParent().getChildren().remove(element);
@@ -184,10 +189,8 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    private void contextMenu_connect(ActionEvent event
-    ) {
-        //contextMenu_item_connect ist nur aktiv, wenn das ausgewählte Item eine Verbindung ist
-        Dialogs.loginDialog(parent, (Reldb_Connection) con_treeView.getSelectionModel().getSelectedItem());
+    private void contextMenu_connect(ActionEvent event) {
+        Dialogs.newConnectionDialog(parent);
     }
 
     @FXML
@@ -204,31 +207,36 @@ public class MainController implements Initializable {
      * aktiv)
      */
     private void setContextMenuToDefault() {
-        contextMenu_item_connect.setDisable(true);
-        contextMenu_item_add.setDisable(false);
+        contextMenu_item_connect.setDisable(false);
         contextMenu_item_close.setDisable(true);
         contextMenu_item_edit.setDisable(true);
         contextMenu_item_delete.setDisable(true);
         contextMenu_item_query.setDisable(true);
         contextMenu_item_export.setDisable(true);
-        contextMenu_item_exportMenu.setDisable(true);
+        contextMenu_item_filter.setDisable(true);
     }
 
+    @Deprecated
     private void setExportMenuVisibility(String selectedConnectionName) {
-        for (MenuItem item : contextMenu_item_exportMenu.getItems()) {
-            item.setDisable(false);
-            if (item.getText().equals(selectedConnectionName)) {
-                item.setDisable(true);
-            }
-        }
+        /* for (MenuItem item : contextMenu_item_filter.getItems()) {
+         item.setDisable(false);
+         if (item.getText().equals(selectedConnectionName)) {
+         item.setDisable(true);
+         }
+         }*/
     }
 
+    /**
+     * Kümmert sich darum, welche Elemente im Kontextmenü angezeigt werden.
+     *
+     * @param event
+     */
     @FXML
     private void contextMenu_onShow(WindowEvent event) {
         setContextMenuToDefault();
         Reldb_TreeItem selectedItem;
         selectedItem = (Reldb_TreeItem) con_treeView.getSelectionModel().getSelectedItem();
-        String selectedConnection;
+        //String selectedConnection;
         if (selectedItem == null) {
             return;
         }
@@ -250,25 +258,28 @@ public class MainController implements Initializable {
         }   // End instanceof Reldb_Connection
 
         if ((element.getValue() instanceof Reldb_Database)) {
-            selectedConnection = ((Reldb_Database) (element.getValue())).getConnection().getConnectionName();
-            setExportMenuVisibility(selectedConnection);
-
-            contextMenu_item_exportMenu.setDisable(false);
+            contextMenu_item_connect.setDisable(false);
+            contextMenu_item_export.setDisable(false);
             return;
         }
 
         if ((element.getValue() instanceof Reldb_Table)) {
-            selectedConnection = ((Reldb_Table) (element.getValue())).getDatabase().getConnection().getConnectionName();
-            setExportMenuVisibility(selectedConnection);
+            //selectedConnection = ((Reldb_Table) (element.getValue())).getDatabase().getConnection().getConnectionName();
             contextMenu_item_export.setDisable(false);
-            contextMenu_item_exportMenu.setDisable(false);
             return;
         }
 
+        if ((element.getValue() instanceof Reldb_Column)) {
+            //selectedConnection = ((Reldb_Column) (element.getValue())).getDatabase().getConnection().getConnectionName();
+            contextMenu_item_export.setDisable(false);
+            contextMenu_item_filter.setDisable(false);
+            return;
+        }
     }
 
+    @Deprecated
     private void updateExportMenu() {
-        contextMenu_item_exportMenu.getItems().clear();
+        //contextMenu_item_filter.getItems().clear();
         for (Reldb_Connection connection : Reldb_Connection.getConnections()) {
             final MenuItem item = new MenuItem(connection.getConnectionName());
 
@@ -289,13 +300,8 @@ public class MainController implements Initializable {
                 }
             });
 
-            contextMenu_item_exportMenu.getItems().add(item);
+            //  contextMenu_item_filter.getItems().add(item);
         }
-    }
-
-    @FXML
-    private void contextMenu_add(ActionEvent event) {
-        Dialogs.newConnectionDialog(parent);
     }
 
     @FXML
@@ -317,16 +323,32 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    @Deprecated
-    private void contextMenu_export(ActionEvent event) {
-       // Reldb_Database db = (Reldb_Database) (con_treeView.getSelectionModel().getSelectedItem().getParent().getParent().getValue().getItem());
-      //  Dialogs.newSQLDialog(parent, db.getConnection(), sql_expr.createTable((Reldb_Table) (con_treeView.getSelectionModel().getSelectedItem().getValue().getItem())));
-    }
-
-    @FXML
     private void on_quit(ActionEvent event) {
         System.exit(0);
     }
 
+    /**
+     * @return the menuBar
+     */
+    public MenuBar getMenuBar() {
+        return menuBar;
+    }
+
+    @FXML
+    private void on_export(ActionEvent event) {
+    }
+
+    /**
+     * Einen neuen FilterDialog für die ausgewähle Spalte aufrufen.
+     *
+     * @param event
+     */
+    @FXML
+    private void make_new_filter(ActionEvent event) {
+        Reldb_TreeItem selectedItem = (Reldb_TreeItem) con_treeView.getSelectionModel().getSelectedItem();
+        if (selectedItem.getValue() instanceof Reldb_Column) {
+            Dialogs.newFilterDialog((Reldb_Column) (selectedItem.getValue()));
+        }
+    }
 
 }
