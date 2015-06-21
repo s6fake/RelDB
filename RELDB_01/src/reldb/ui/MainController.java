@@ -1,7 +1,10 @@
 package reldb.ui;
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -9,14 +12,17 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
 import javafx.stage.WindowEvent;
 import reldb.lib.*;
 import reldb.lib.database.*;
+import reldb.lib.migration.Filter;
+import reldb.lib.sql.sql_expr;
 import reldb.ui.dialogs.Dialogs;
 
 /**
@@ -53,11 +59,14 @@ public class MainController implements Initializable {
     @FXML
     private MenuBar menuBar;
     @FXML
-    private GridPane gridpane_selection;
-    @FXML
     private Button btn_export;
     @FXML
     private MenuItem contextMenu_item_filter;
+    @FXML
+    private TabPane tabPane;
+
+    private Map<Reldb_Column, List<Filter>> filterList = new HashMap<Reldb_Column, List<Filter>>();
+    private Map<Reldb_Column, Filter_displayContainerController> filterContainerList = new HashMap<Reldb_Column, Filter_displayContainerController>();
 
     /**
      * Initializes the controller class.
@@ -65,7 +74,6 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         con_treeView.setRoot(treeConnRoot);
-        //addConstraint().setVisbility(false);
 
         /**
          * Event Handler zur TreeView hinzufügen
@@ -130,6 +138,11 @@ public class MainController implements Initializable {
     public Reldb_TreeItem addTreeItem(Reldb_TreeItem tParent, Object item) {
         Reldb_TreeItem newTreeItem = new Reldb_TreeItem(item);
         ObservableList<Reldb_TreeItem> children = tParent.getChildren();
+
+        // Change Listener hinzufügen
+        newTreeItem.selectedProperty().addListener((ObservableValue<? extends Boolean> ov, Boolean old_val, Boolean new_val) -> {
+            newTreeItem.selectStateChanged(new_val);
+        });
 
         //VERBESSERN:
         for (Reldb_TreeItem iterator : children) {
@@ -324,6 +337,7 @@ public class MainController implements Initializable {
 
     @FXML
     private void on_quit(ActionEvent event) {
+        Reldb_Connection.closeAllConnections();
         System.exit(0);
     }
 
@@ -336,6 +350,15 @@ public class MainController implements Initializable {
 
     @FXML
     private void on_export(ActionEvent event) {
+
+        Dialogs.newExportDialog(parent);
+
+        /*
+         Reldb_TreeItem selectedItem = (Reldb_TreeItem) con_treeView.getSelectionModel().getSelectedItem();
+         if (selectedItem.getValue() instanceof Reldb_Table) {
+         System.out.println(sql_expr.selectFromWConditions((Reldb_Table) selectedItem.getValue()));
+         }
+         */
     }
 
     /**
@@ -347,8 +370,51 @@ public class MainController implements Initializable {
     private void make_new_filter(ActionEvent event) {
         Reldb_TreeItem selectedItem = (Reldb_TreeItem) con_treeView.getSelectionModel().getSelectedItem();
         if (selectedItem.getValue() instanceof Reldb_Column) {
-            Dialogs.newFilterDialog((Reldb_Column) (selectedItem.getValue()));
+            Reldb_Column selectedColumn = (Reldb_Column) (selectedItem.getValue());
+            if (selectedColumn.isFiltered()) {
+                Dialogs.newFilterDialog(selectedColumn, true, this);
+            } else {
+                Dialogs.newFilterDialog(selectedColumn, false, this);
+            }
         }
+    }
+
+    /**
+     * Erzeugt einen neuen Tab, mit leerem DisplayContainer
+     *
+     * @param column Die Spalte, für die der Filter angelegt werden soll.
+     * @return Den neuen Display Container. Nicht verlieren!
+     */
+    private Filter_displayContainerController newFilterTab(Reldb_Column column) {
+        Filter_displayContainerController controller = null;
+        try {
+            FXMLLoader loader = new FXMLLoader(RELDB_01.class.getResource("filter_displayContainer.fxml"));
+            Node node = loader.load();
+            controller = loader.<Filter_displayContainerController>getController();
+            controller.setColumn(column);
+            filterContainerList.put(column, controller);
+            Tab newTab = new Tab(column.getName(), node);
+            tabPane.getTabs().add(newTab);
+
+        } catch (IOException ex) {
+            System.err.println(ex.getMessage());
+        }
+        return controller;
+    }
+
+    public void addNewFilter(Reldb_Column column, Filter filter) {
+        Filter_displayContainerController controller;
+        if (filterContainerList.containsKey(column)) {
+            controller = filterContainerList.get(column);
+        } else {
+            controller = newFilterTab(column);
+        }
+        controller.addFilter(filter);
+        column.addFilter(filter);
+    }
+
+    void remove(Filter_displayElementController aThis) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

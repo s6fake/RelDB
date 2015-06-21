@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 import reldb.lib.Reldb_Connection;
 import reldb.lib.database.Reldb_Column;
 import reldb.lib.migration.Reldb_DataMover;
+import reldb.ui.MainController;
 import reldb.ui.RELDB_01;
 
 /**
@@ -40,7 +41,13 @@ public class Dialogs {
         }
     }
 
-    public static void newConnectionDialog(RELDB_01 parent) {
+    public static void newExportDialog(RELDB_01 parent) {
+        NewConnectionDialogController controller = newConnectionDialog(parent);
+        controller.setIsExportConnection(true);
+    }
+    
+    public static NewConnectionDialogController newConnectionDialog(RELDB_01 parent) {
+        NewConnectionDialogController controller = null;
         try {
             Stage stage = new Stage();
             FXMLLoader loader = new FXMLLoader(Dialogs.class.getResource("NewConnectionDialog.fxml"));
@@ -51,7 +58,7 @@ public class Dialogs {
             stage.setTitle("Neue Verbindung erstellen");
 
             // Controller initialisieren
-            NewConnectionDialogController controller = loader.<NewConnectionDialogController>getController();
+            controller = loader.<NewConnectionDialogController>getController();
             controller.setStage(stage);
             controller.setParent(parent);
 
@@ -61,6 +68,12 @@ public class Dialogs {
             System.out.println(e);
             System.exit(1);
         }
+        return controller;
+    }
+    
+        public static void newEditExportDialog(RELDB_01 parent, Reldb_Connection connection) {
+        NewConnectionDialogController controller = newEditConnectionDialog(parent, connection);
+        controller.setIsExportConnection(true);
     }
 
     /**
@@ -68,8 +81,10 @@ public class Dialogs {
      *
      * @param parent
      * @param connection
+     * @return 
      */
-    public static void newEditConnectionDialog(RELDB_01 parent, Reldb_Connection connection) {
+    public static NewConnectionDialogController newEditConnectionDialog(RELDB_01 parent, Reldb_Connection connection) {
+       NewConnectionDialogController controller = null;
         try {
             Stage stage = new Stage();
             FXMLLoader loader = new FXMLLoader(Dialogs.class.getResource("NewConnectionDialog.fxml"));
@@ -80,7 +95,7 @@ public class Dialogs {
             stage.setTitle("Verbindung bearbeiten");
 
             // Controller initialisieren
-            NewConnectionDialogController controller = loader.<NewConnectionDialogController>getController();
+            controller = loader.<NewConnectionDialogController>getController();
             controller.setStage(stage);
             controller.setParent(parent);
             controller.setConnection(connection);
@@ -90,6 +105,7 @@ public class Dialogs {
             System.out.println(e);
             System.exit(1);
         }
+        return controller;
     }
 
     public static void newSQLDialog(RELDB_01 parent, Reldb_Connection connection) {
@@ -160,7 +176,7 @@ public class Dialogs {
         }
     }
     
-        public static void newFilterDialog(Reldb_Column column) {
+        public static void newFilterDialog(Reldb_Column column, boolean isNotFirstFilter, MainController parent) {
         try {
             Stage stage = new Stage();
             FXMLLoader loader = new FXMLLoader(Dialogs.class.getResource("newFilterDialog.fxml"));
@@ -174,6 +190,8 @@ public class Dialogs {
             NewFilterDialogController controller = loader.<NewFilterDialogController>getController();
             controller.setStage(stage);
             controller.setColumn(column);
+            controller.setFirstElementVisibility(isNotFirstFilter);
+            controller.setParent(parent);
             // Hauptfenster anzeigen
             stage.show();
         } catch (IOException ex) {

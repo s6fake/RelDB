@@ -181,5 +181,15 @@ public class Reldb_Database {
     public List<Reldb_Table> getTables() {
         return tableList;
     }
+    
+    public List<Reldb_Table> getSelectedTables() {
+        List<Reldb_Table> list = new ArrayList<>();
+        for (Reldb_Table table : getTables()) {
+            if (table.isSelected()) {
+                list.add(table);
+            }
+        }
+        return list;
+    }
 
 }

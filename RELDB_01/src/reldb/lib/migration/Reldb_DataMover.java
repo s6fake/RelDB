@@ -36,15 +36,17 @@ public class Reldb_DataMover extends Thread {
     private final List<Reldb_Row> invalidRows = new ArrayList<>();
     private final Reldb_Database destination;
 
+    @Deprecated
     public Reldb_DataMover(Reldb_DatabasePattern source, Reldb_Database destination, ProgressDialogController dialog) {
         this(source, destination);
         dialog.initalizeChangeListener();
 
     }
 
-    public Reldb_DataMover(Reldb_DatabasePattern source, Reldb_Database destination) {
+    @Deprecated
+    public Reldb_DataMover(Reldb_Database source, Reldb_Database destination) {
         this.source = source;
-        this.sourceTables = source.getTables();
+        this.sourceTables = source.getSelectedTables();
         this.destination = destination;
         ThreadID = 0;
     }
@@ -94,7 +96,7 @@ public class Reldb_DataMover extends Thread {
         progress_total.increaseCurrentProgress();
         progress_string = "Kopiere Datensatz ";
         copyAllData2();
-        
+
         createAllForeignKeys();
     }
 
@@ -157,7 +159,7 @@ public class Reldb_DataMover extends Thread {
     }
 
     private void createForeignKeys(Reldb_Table source, Reldb_Database destinationDatabase) {
-        for (Reldb_Column column : source.getColumns()) {
+        for (Reldb_Column column : source.getSelectedColumns()) {
             if (column.isIsForeignKey()) {
                 Reldb_Statement statement = new Reldb_Statement(destinationDatabase.getConnection());
                 String command = "ALTER TABLE " + source.getTableName() + " ADD " + column.getForeignKeyConstructorString(destinationDatabase.getDatabaseType());
@@ -168,6 +170,7 @@ public class Reldb_DataMover extends Thread {
         }
     }
 
+    @Deprecated
     private void copyAllData() {
         sourceTables.stream().forEach((table) -> {
             setRowCounter(table);
@@ -184,6 +187,7 @@ public class Reldb_DataMover extends Thread {
         });
     }
 
+    @Deprecated
     private void copyData(Reldb_Table source, Reldb_Database destinationDatabase) {
         Reldb_Statement statement;
         String valuesCmd, insertIntoCmd = sql_expr.insertIntoTable(source);
@@ -207,11 +211,12 @@ public class Reldb_DataMover extends Thread {
 
         Reldb_Row newRow;
         Reldb_Statement statement = new Reldb_Statement(source.getDatabase().getConnection());
-        ResultSet results = statement.executeQuery(sql_expr.selectAllFrom(source), fetchSize); // Im ResultSet landen die Datensätze
+        ResultSet results = statement.executeQuery(sql_expr.selectFromWConditions(source), fetchSize); // Im ResultSet landen die Datensätze
         try {
             int rowCount = MAX_ROW;
             while ((rowCount > 0 || MAX_ROW == -1) && results.next()) {
                 newRow = new Reldb_Row(source, results);
+                System.out.println("New RoW");
                 if (!insert2(newRow, insertIntoCmd, destinationDatabase)) {
                     invalidRows.add(newRow);
                 }
@@ -220,8 +225,7 @@ public class Reldb_DataMover extends Thread {
             results.close();
         } catch (SQLException ex) {
             log.warning(ex.toString());
-        }
-        finally {
+        } finally {
             try {
                 results.close();
             } catch (SQLException ex) {
@@ -238,12 +242,15 @@ public class Reldb_DataMover extends Thread {
         }
         String valuesCmd = sql_expr.values(data);
         Reldb_Statement statement = new Reldb_Statement(destinationDatabase.getConnection());
-        statement.execute(insertIntoCmd + valuesCmd);
-        progress_current.increaseCurrentProgress();
-        //System.out.println(insertIntoCmd + valuesCmd);
+        boolean result = statement.execute(insertIntoCmd + valuesCmd);
+
+        
+        progress_current.increaseCurrentProgress();        
+        //System.out.println(destinationDatabase.getDatabaseName() + ": "+insertIntoCmd + valuesCmd);
         statement.close();
-        return true;
+        return result;
     }
+
 
     private void dropAll() {
         /*
@@ -263,7 +270,7 @@ public class Reldb_DataMover extends Thread {
     }
 
     private void dropForeignKeys(Reldb_Table source, Reldb_Database destinationDatabase) {
-        for (Reldb_Column column : source.getColumns()) {
+        for (Reldb_Column column : source.getSelectedColumns()) {
             if (column.isIsForeignKey()) {
                 Reldb_Statement statement = new Reldb_Statement(destinationDatabase.getConnection());
                 String command = "ALTER TABLE " + source.getTableName() + " DROP CONSTRAINT " + column.getForeignKeyConstraintName();
@@ -283,7 +290,7 @@ public class Reldb_DataMover extends Thread {
 
     private void createTable(Reldb_Table table) {
         Reldb_Statement statement = new Reldb_Statement(destination.getConnection());
-        String command = sql_expr.createTable(table, destination.getDatabaseType());
+        String command = sql_expr.createTableWConditions(table, destination.getDatabaseType());
         statement.execute(command);
         statement.close();
     }
@@ -294,12 +301,12 @@ public class Reldb_DataMover extends Thread {
      */
     private void setRowCounter(Reldb_Table source) {
         Reldb_Statement statement = new Reldb_Statement(source.getDatabase().getConnection());
-        ResultSet result = statement.executeQuery(sql_expr.selectCount(source));
+        ResultSet result = statement.executeQuery(sql_expr.selectSelectedCount(source));
         int rowCount = 0;
         try {
             result.next();
             rowCount = result.getInt(1);
-            System.out.println("COUNT("+source.getTableName()+"): " + rowCount);
+            System.out.println("COUNT(" + source.getTableName() + "): " + rowCount);
         } catch (SQLException ex) {
             log.warning(ex.getMessage());
         } finally {

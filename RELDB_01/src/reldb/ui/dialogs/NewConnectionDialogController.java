@@ -39,6 +39,7 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
     private ChoiceBox choicebox_type;
 
     private Reldb_Connection connection = null;
+    private boolean isExportConnection = false;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -61,7 +62,7 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
     }
 
     private void disableButtons() {
-        button_login.setDisable(true);       
+        button_login.setDisable(true);
         user_field.setDisable(true);
         password_field.setDisable(true);
     }
@@ -73,7 +74,11 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
         }
         disableButtons();
         stage.close();
-        parent.logIn(user_field.getText(), password_field.getText(), connection);
+        if (isExportConnection) {
+            parent.startExport(user_field.getText(), password_field.getText(), connection);
+        } else {
+            parent.logIn(user_field.getText(), password_field.getText(), connection);
+        }
     }
 
     public void setParent(RELDB_01 parent) {
@@ -92,7 +97,7 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
         } else {
             connection = new Reldb_Connection(createUrl(), database_field.getText(), url_field.getText(), database_field.getText(), Integer.parseInt(port_field.getText()), choicebox_type.getSelectionModel().getSelectedIndex(), user_field.getText());
         }
-        
+
         return true;
     }
 
@@ -112,5 +117,12 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
         }                                                                       //jdbc:oracle:thin:@host:1521:dbvm02
         result = jdbc + url_field.getText() + ":" + port_field.getText() + separator + database_field.getText();    //  jdbc:postgresql://dbvm01.iai.uni-bonn.de:5432/imdb
         return result;
+    }
+
+    /**
+     * @param isExportConnection the isExportConnection to set
+     */
+    public void setIsExportConnection(boolean isExportConnection) {
+        this.isExportConnection = isExportConnection;
     }
 }

@@ -16,14 +16,14 @@ public class Reldb_Row {
 
     public Reldb_Row(Reldb_Table table, ResultSet objects) {
         this.table = table;
-        this.cells = new Reldb_DataContainer[table.getColumns().size()];
+        this.cells = new Reldb_DataContainer[table.getSelectedColumns().size()];
         insertObjects(objects);
     }
     
     private void insertObjects(ResultSet objects) {
         try {
             int c = getCells().length;
-            List<Reldb_Column> columns = table.getColumns();
+            List<Reldb_Column> columns = table.getSelectedColumns();
             for (int i = 0; i < c; i++) {
                 String colName = columns.get(i).COLUMN_NAME;
                 cells[i] = new Reldb_DataContainer(objects.getObject(colName));

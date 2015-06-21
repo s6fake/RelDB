@@ -25,6 +25,7 @@ public class Reldb_Table {
     private List<Reldb_Column> primaryKeys = new ArrayList<>(); // Liste aller Primärschlüssel
 
     private boolean listsFilled = false;
+    private boolean selected = false;       // Wurde die Tabelle für den Export ausgewählt?
 
     /**
      * Erstellt einen neue Tabelle
@@ -47,10 +48,10 @@ public class Reldb_Table {
 
     void initalize() {
         if (!listsFilled) {
-        createColumns();
-        createPrimaryKeys();
-        createForeignKeys();
-        listsFilled = true;
+            createColumns();
+            createPrimaryKeys();
+            createForeignKeys();
+            listsFilled = true;
         }
     }
 
@@ -183,7 +184,6 @@ public class Reldb_Table {
         return null;
     }
 
-    
     public String printInfo() {
         String result = "";
         for (Reldb_Column col : primaryKeys) {
@@ -191,7 +191,7 @@ public class Reldb_Table {
         }
         return "TYPE: " + TABLE_TYPE + " CAT: " + TABLE_CAT + " SCHEM: " + TABLE_SCHEM + " NAME: " + TABLE_NAME + "\nPrimary Keys: " + result;
     }
-    
+
     @Override
     public String toString() {
         return TABLE_NAME;
@@ -227,6 +227,20 @@ public class Reldb_Table {
     }
 
     /**
+     * 
+     * @return Die Spalten, die zuvor ausgewählt wurden
+     */
+    public List<Reldb_Column> getSelectedColumns() {
+        List<Reldb_Column> list = new ArrayList();
+        for (Reldb_Column col : getColumns()) {
+            if (col.isSelected()) {
+                list.add(col);
+            }
+        }
+        return list;
+    }
+
+    /**
      * @return the metaData
      */
     public DatabaseMetaData getMetaData() {
@@ -238,6 +252,20 @@ public class Reldb_Table {
      */
     public Reldb_Database getDatabase() {
         return database;
+    }
+
+    /**
+     * @return the selected
+     */
+    public boolean isSelected() {
+        return selected;
+    }
+
+    /**
+     * @param selected the selected to set
+     */
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
 }

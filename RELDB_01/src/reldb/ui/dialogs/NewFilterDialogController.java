@@ -30,6 +30,7 @@ public class NewFilterDialogController extends CustomDialog implements Initializ
     private GridPane gridpane;
     private Reldb_Column column;
     private final List<Select_elementController> elements = new ArrayList();
+    private MainController parent;
 
     /**
      * Initializes the controller class.
@@ -46,10 +47,16 @@ public class NewFilterDialogController extends CustomDialog implements Initializ
 
     @FXML
     private void on_ok(ActionEvent event) {
-        createString();
+        //createString();
+        List<Filter> list = getFilters();
+        parent.addNewFilter(column, new Filter(list));
         close();
     }
 
+    public void setParent(MainController parent) {
+        this.parent = parent;
+    }
+    
     private void createString() {
         String result = "";
         List<Filter> filters = getFilters();
@@ -60,10 +67,13 @@ public class NewFilterDialogController extends CustomDialog implements Initializ
         result = "(" + result + ")";
         System.out.println(result);
     }
-
+    
+    public void setFirstElementVisibility(boolean visible) {
+        addConstraint().setVisbility(visible);
+    }
+    
     public void setColumn(Reldb_Column column) {
-        this.column = column;
-        addConstraint().setVisbility(false);
+        this.column = column;        
     }
 
     public Select_elementController addConstraint() {

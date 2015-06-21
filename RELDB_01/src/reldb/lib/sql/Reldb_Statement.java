@@ -79,6 +79,7 @@ public class Reldb_Statement {
         try {
             //statement.setFetchSize(fetch);
             result = statement.execute(command);
+           
             //printWarnings();
             //log.info(command);
 

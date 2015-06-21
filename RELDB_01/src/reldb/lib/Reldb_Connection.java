@@ -27,7 +27,7 @@ public class Reldb_Connection {
     private String url = null;
     private String connectionName = "Neue Verbindung";                                  // Name der Verbindung wie sie in der UI angezeigt wird
     private Reldb_Database database;                                       // Die  dieser Verbindung zuzuordnende Datenbank
-    
+
     //  Optionale Felder, damit man die Verbindung im Nachhinein bearbeiten kann
     private String adress = "";
     private String databaseID = "";
@@ -221,6 +221,20 @@ public class Reldb_Connection {
         return connectionName + "\n" + url;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o instanceof Reldb_Connection) {
+            Reldb_Connection other = (Reldb_Connection) o;
+            if (other.url.equals(url)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public String getConnectionName() {
         return connectionName;
     }
@@ -305,6 +319,5 @@ public class Reldb_Connection {
     public void setDatabase(Reldb_Database database) {
         this.database = database;
     }
-
 
 }

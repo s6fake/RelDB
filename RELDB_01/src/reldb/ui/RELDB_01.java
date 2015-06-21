@@ -21,7 +21,9 @@ import reldb.lib.database.Reldb_DataContainer;
 import reldb.lib.database.Reldb_Database;
 import reldb.lib.database.Reldb_Row;
 import reldb.lib.database.Reldb_Table;
+import reldb.lib.migration.Reldb_DataMover;
 import reldb.lib.sql.Reldb_Statement;
+import reldb.ui.dialogs.Dialogs;
 
 /**
  *
@@ -33,7 +35,7 @@ public class RELDB_01 extends Application {
     private static final String url = "jdbc:postgresql://dbvm01.iai.uni-bonn.de:5432/imdb";
     private MetaDataManager mdManager;
     private MainController controller;
-    private Reldb_Connection currentConnection;
+    private Reldb_Connection currentConnection, destinationDatabaseConnection;
 
     private double xOffset = 0;
     private double yOffset = 0;
@@ -121,19 +123,34 @@ public class RELDB_01 extends Application {
             mdManager = new MetaDataManager(connection.getMetadata());
             mdManager.printInfo(controller.textbox);
             controller.label_1.setText(url);
-            updateTableNames(connection);
+            controller.setTreeRoot(new Reldb_Database(connection));
         } else {
             controller.label_1.setText("Verbindung fehlgeschlagen");
         }
         currentConnection = connection;
     }
 
-    //Achtung, wird fehlerhaft. Funktion muss ersetzt werden!!!
-    public void updateTableNames(Reldb_Connection connection) {
-        Reldb_Database db = new Reldb_Database(connection);
-        //controller.addDatabaseToConnectionInTreeView(connection, db);
-        controller.setTreeRoot(db);
-        //testQuery(db);
+    public void startExport(String user, String password, Reldb_Connection connection) {
+        if (connection == null) {
+            return;
+        }
+        
+        if (connection.equals(currentConnection)) {
+            return;
+        }
+        
+        if (destinationDatabaseConnection != null) {
+            destinationDatabaseConnection.CloseConnection();
+        }
+
+        if (connection.connect(user, password)) {
+           Reldb_DataMover izzy = new Reldb_DataMover(currentConnection.getDatabase().getSelectedTables(), new Reldb_Database(connection));
+           izzy.start();
+           Dialogs.newProgressDialog();
+        } else {
+            Dialogs.newEditExportDialog(this, connection);
+        }
+        destinationDatabaseConnection = connection;
     }
 
     /**
@@ -150,7 +167,7 @@ public class RELDB_01 extends Application {
     /**
      * nur zum testen, liest 5 Datensätze aus der Datenbank aus
      *
-     * @param connection
+     * @param db
      */
     public void testQuery(Reldb_Database db) {
         String tableName = "title";

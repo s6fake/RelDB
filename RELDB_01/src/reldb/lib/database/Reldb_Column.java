@@ -1,5 +1,8 @@
 package reldb.lib.database;
 
+import java.util.ArrayList;
+import java.util.List;
+import reldb.lib.migration.Filter;
 import reldb.lib.sql.Reldb_Types;
 
 /**
@@ -14,6 +17,9 @@ public class Reldb_Column extends Reldb_DataContainer {
     private final Reldb_Table parentTable;
     private String refTableName = null, refColumnName = null;
     private int foreignKeySequence = 0;
+
+    private List<Filter> filters = new ArrayList<>();
+    private boolean filtered = false, selected = true;
 
     public Reldb_Column(Reldb_Database database, Reldb_Table table, String name, int type, String typeName, int size, boolean nullable, boolean autoincrement) {
         this.database = database;
@@ -34,7 +40,6 @@ public class Reldb_Column extends Reldb_DataContainer {
         this.refTableName = refTableName;
     }
 
-    
     public String printInfo() {
         String ref = "";
         if (isIsForeignKey()) {
@@ -48,7 +53,7 @@ public class Reldb_Column extends Reldb_DataContainer {
     public String toString() {
         return COLUMN_NAME;
     }
-    
+
     @Override
     public String getConstructorString(Reldb_Database.DATABASETYPE dbModel) {
         String typeStr = super.getConstructorString(dbModel);
@@ -83,11 +88,10 @@ public class Reldb_Column extends Reldb_DataContainer {
         }
         return str;
     }
-    
+
     public String getForeignKeyConstraintName() {
         String constraint = "";
-        if (isForeignKey)
-        {
+        if (isForeignKey) {
             constraint = getTable().getTableName() + "_FK_" + shorten(COLUMN_NAME) + "_" + shorten(refColumnName);
         }
         return constraint;
@@ -102,6 +106,17 @@ public class Reldb_Column extends Reldb_DataContainer {
             }
         }
         return constraints;
+    }
+
+    public String getConditionString(Reldb_Database.DATABASETYPE dbModel) {
+        String condition = "";
+        if (dbModel == Reldb_Database.DATABASETYPE.ORACLE) {
+            for (Filter filter : filters) {
+                condition = condition + filter.toString() + " ";
+            }
+            condition = condition.substring(0, condition.length() - 1);
+        }
+        return condition;
     }
 
     /**
@@ -165,5 +180,36 @@ public class Reldb_Column extends Reldb_DataContainer {
      */
     public Reldb_Table getTable() {
         return parentTable;
+    }
+
+    public void addFilter(Filter filter) {
+        filters.add(filter);
+        System.out.println("Filter hinzugefügt " + filters.get(0).toString());
+        filtered = true;
+    }
+
+    public List<Filter> getFilter() {
+        return filters;
+    }
+
+    /**
+     * @return the filtered
+     */
+    public boolean isFiltered() {
+        return filtered;
+    }
+
+    /**
+     * @return the selected
+     */
+    public boolean isSelected() {
+        return selected;
+    }
+
+    /**
+     * @param selected the selected to set
+     */
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }

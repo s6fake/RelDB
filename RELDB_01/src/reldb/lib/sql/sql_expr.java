@@ -11,6 +11,7 @@ import reldb.lib.database.Reldb_DataContainer;
 import reldb.lib.database.Reldb_Database;
 import reldb.lib.database.Reldb_Row;
 import reldb.lib.database.Reldb_Table;
+import reldb.lib.migration.Filter;
 
 /**
  * SELECT table_name FROM information_schema.tables WHERE table_schema='public'
@@ -29,9 +30,58 @@ public class sql_expr {
         }
         return null;
     }
-    
+
     public static String selectAllFrom(Reldb_Table table) {
         String command = "SELECT * FROM " + table.getTableName();
+        return command;
+    }
+
+    /**
+     * Wählt nur die Spalten, die zuvor ausgewählt wurden, also
+     * Reldb_Column.isSelected() == true
+     *
+     * @param table Tabelle
+     * @return
+     */
+    public static String selectFrom(Reldb_Table table) {
+        String selectList = "";
+        for (Reldb_Column col : table.getSelectedColumns()) {
+            selectList = selectList + col.getName() + ", ";
+        }
+        selectList = selectList + selectList.substring(0, selectList.length() - 2);
+        String command = "SELECT " + selectList + " FROM " + table.getTableName();
+        return command;
+    }
+
+    /**
+     * Wählt nur die Spalten, die zuvor ausgewählt wurden, also
+     * Reldb_Column.isSelected() == true Zudem werden noch die Conditions
+     * erfasst.
+     *
+     * @param table
+     * @return
+     */
+    public static String selectFromWConditions(Reldb_Table table) {
+        String selectList = "";
+        String conditions = "WHERE";
+        for (Reldb_Column col : table.getSelectedColumns()) {
+            selectList = selectList + col.getName() + ", ";
+            if (col.isFiltered()) {
+                conditions = conditions + " " + condition(col.getFilter());
+            }
+        }
+        selectList = selectList.substring(0, selectList.length() - 2);
+        String command = "SELECT " + selectList + " FROM " + table.getTableName() + " " + conditions;
+        
+        return command;
+    }
+
+    private static String condition(List<Filter> conditions) {
+        String command = "";
+        for (Filter filter : conditions) {
+            command = command + filter.toString() + " ";
+        }
+        command = command.substring(0, command.length() - 1);
         return command;
     }
 
@@ -73,7 +123,7 @@ public class sql_expr {
 
     /**
      * Erzeug einen CREATE TABLE Befehl auf Grundlage der übergebenen Tabelle
-     * und passt diese ggf. an ein anderes Format an.
+     * und passt diese ggf. an ein anderes Format an. Die Spalten werden auf
      *
      * @param pattern Die Tabelle die als Vorlage dienen soll.
      * @param dbType Das Datenbankformat, in der die Tabelle eingefügt werden
@@ -92,15 +142,40 @@ public class sql_expr {
         //System.out.println(command);
         return command;
     }
-    
+
     /**
-     * Erzeugt den INSERT INTO TABLE Befehl aber ohne Values
+     * Erzeug einen CREATE TABLE Befehl auf Grundlage der übergebenen Tabelle
+     * und passt diese ggf. an ein anderes Format an. Die Spalten werden auf
+     * Grundlage der SelectedColumns erstellt.
+     *
+     * @param pattern Die Tabelle die als Vorlage dienen soll.
+     * @param dbType Das Datenbankformat, in der die Tabelle eingefügt werden
+     * soll
+     * @return
+     */
+    public static String createTableWConditions(Reldb_Table pattern, Reldb_Database.DATABASETYPE dbType) {
+        String command = "CREATE TABLE " + pattern.getTableName() + " (";
+        for (Reldb_Column column : pattern.getSelectedColumns()) {
+            //String typeStr = convert(column.getTypeName(), column.getType(), column.getSize());
+            //String type = Reldb_Types.typeMappings.get(column.getType());       // Type ins richtige Format kovertieren
+            command = command + "\n" + column.getConstructorString(dbType) + ",";
+        }
+        command = command.substring(0, command.length() - 1);                   // Letztes Komma wieder entfernen
+        command = command + "\n)";
+        //System.out.println(command);
+        return command;
+    }
+
+    /**
+     * Erzeugt den INSERT INTO TABLE Befehl aber ohne Values Die Spalten werden
+     * auf Grundlage der SelectedColumns angesteuert.
+     *
      * @param pattern
-     * @return 
+     * @return
      */
     public static String insertIntoTable(Reldb_Table pattern) {
         String command = "INSERT INTO " + pattern.getTableName() + "\n(";
-        List<Reldb_Column> columns = pattern.getColumns();
+        List<Reldb_Column> columns = pattern.getSelectedColumns();
         for (Reldb_Column column : columns) {
             command = command + column.getName() + ", ";
         }
@@ -108,7 +183,7 @@ public class sql_expr {
         command = command + ")\n";
         return command;
     }
-    
+
     public static String values(Reldb_Row values) {
         String command = "VALUES\n(";
         Reldb_DataContainer[] cells;
@@ -120,16 +195,41 @@ public class sql_expr {
         command = command + ")";
         return command;
     }
-    
+
     /**
-     * Erzeugt einen Befehl um die Anzahl der Elemente in der Tabelle zu erfassen
+     * Erzeugt einen Befehl um die Anzahl der Elemente in der Tabelle zu
+     * erfassen
+     *
      * @param table
-     * @return 
+     * @return
      */
     public static String selectCount(Reldb_Table table) {
         String command = "SELECT COUNT(*) FROM ";
         command = command + table.getTableName();
         return command;
     }
-    
+
+    /**
+     * Erzeugt einen Befehl um die Anzahl der ausgewählten Elemente in der
+     * Tabelle zu erfassen
+     *
+     * @param table
+     * @return
+     */
+    public static String selectSelectedCount(Reldb_Table table) {
+        String command = "SELECT COUNT(*) FROM ";
+        command = command + table.getTableName();
+        String conditions = "";
+        for (Reldb_Column col : table.getSelectedColumns()) {
+            if (col.isFiltered()) {
+                conditions = conditions + " " + condition(col.getFilter());
+            }
+        }
+        if (!conditions.isEmpty()) {
+         command = command + " WHERE " + conditions;   
+        }
+        System.out.println(command);
+        return command;
+    }
+
 }
