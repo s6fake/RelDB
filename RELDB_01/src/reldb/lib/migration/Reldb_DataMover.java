@@ -3,10 +3,13 @@ package reldb.lib.migration;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import reldb.lib.database.Reldb_Column;
+import reldb.lib.database.Reldb_DataContainer;
 import reldb.lib.database.Reldb_Database;
 import reldb.lib.database.Reldb_Row;
 import reldb.lib.database.Reldb_Table;
@@ -28,11 +31,12 @@ public class Reldb_DataMover extends Thread {
     public static Progress progress_current, progress_total;
     public static String progress_string = "Erstelle Tabelle ";
 
-    private static ResultSet fetchedResults;
+    private static Map<String, String[]> foreignKeys = new HashMap<>();
 
     private final int ThreadID;
     private final Reldb_Database source;
     private final List<Reldb_Table> sourceTables;
+    private final List<Reldb_Table> createdTables;  // Referenzwert, welche Tabellen schon angelegt wurden.
     private final List<Reldb_Row> invalidRows = new ArrayList<>();
     private final Reldb_Database destination;
 
@@ -47,6 +51,7 @@ public class Reldb_DataMover extends Thread {
     public Reldb_DataMover(Reldb_Database source, Reldb_Database destination) {
         this.source = source;
         this.sourceTables = source.getSelectedTables();
+        this.createdTables = new ArrayList<>(this.sourceTables.size() * 2);
         this.destination = destination;
         ThreadID = 0;
     }
@@ -57,6 +62,7 @@ public class Reldb_DataMover extends Thread {
         }
         this.source = tables.get(0).getDatabase();
         this.sourceTables = tables;
+        this.createdTables = new ArrayList<>(this.sourceTables.size() * 2);
         this.destination = destination;
         progress_total = new Progress(sourceTables.size() + 1);
         progress_current = new Progress(1);
@@ -66,6 +72,7 @@ public class Reldb_DataMover extends Thread {
     private Reldb_DataMover(Reldb_DataMover parent) {
         this.source = parent.source;
         this.sourceTables = parent.sourceTables;
+        this.createdTables = new ArrayList<>(this.sourceTables.size() * 2);
         this.destination = parent.destination;
         ThreadID = 1;
     }
@@ -92,12 +99,12 @@ public class Reldb_DataMover extends Thread {
     public void copy() {
         dropAll();
         createAllTables();
-        //createAllForeignKeys();
+        createAllForeignKeys();
+
         progress_total.increaseCurrentProgress();
         progress_string = "Kopiere Datensatz ";
         copyAllData2();
 
-        createAllForeignKeys();
     }
 
     @Deprecated
@@ -154,19 +161,28 @@ public class Reldb_DataMover extends Thread {
 
     private void createAllForeignKeys() {
         sourceTables.stream().forEach((table) -> {
-            createForeignKeys(table, destination);
+            createAllForeignKeysForTable(table, destination);
         });
     }
 
-    private void createForeignKeys(Reldb_Table source, Reldb_Database destinationDatabase) {
+    private void createAllForeignKeysForTable(Reldb_Table source, Reldb_Database destinationDatabase) {
         for (Reldb_Column column : source.getSelectedColumns()) {
             if (column.isIsForeignKey()) {
-                Reldb_Statement statement = new Reldb_Statement(destinationDatabase.getConnection());
-                String command = "ALTER TABLE " + source.getTableName() + " ADD " + column.getForeignKeyConstructorString(destinationDatabase.getDatabaseType());
-                statement.execute(command);
-                //System.out.println(command);
-                statement.close();
+                createSingleForeignKey(column, destinationDatabase);
             }
+        }
+    }
+
+    private boolean createSingleForeignKey(Reldb_Column column, Reldb_Database destinationDatabase) {
+        Reldb_Statement statement = new Reldb_Statement(destinationDatabase.getConnection());
+        String command = "ALTER TABLE " + column.getTable().getTableName() + " ADD " + column.getForeignKeyConstructorString(destinationDatabase.getDatabaseType());
+        SQLException warnings = statement.executeUpdate(command);
+        statement.close();
+        if (warnings == null) {
+            addForeignKeyToList(column.getForeignKeyConstraintName(), column.getTable().getTableName(), column.getName(), column.getRefTableName(), column.getRefColumnName());
+            return true;
+        } else {
+            return handleErrorSpalteNichtda(warnings, column, destinationDatabase);
         }
     }
 
@@ -240,24 +256,24 @@ public class Reldb_DataMover extends Thread {
         if (data == null) {
             return false;
         }
+
         String valuesCmd = sql_expr.values(data);
         Reldb_Statement statement = new Reldb_Statement(destinationDatabase.getConnection());
-        boolean result = statement.execute(insertIntoCmd + valuesCmd);
-
-        
-        progress_current.increaseCurrentProgress();        
+        SQLException warnings = statement.executeUpdate(insertIntoCmd + valuesCmd);
+        if (warnings == null) {
+            return handleErrorOderSo(warnings, data, insertIntoCmd, destinationDatabase);
+        }
+        progress_current.increaseCurrentProgress();
         //System.out.println(destinationDatabase.getDatabaseName() + ": "+insertIntoCmd + valuesCmd);
         statement.close();
-        return result;
+        return true;
     }
 
-
     private void dropAll() {
-        /*
-         sourceTables.stream().forEach((table) -> {
-         dropForeignKeys(table, destination);
-         });
-         */
+        sourceTables.stream().forEach((table) -> {
+            dropForeignKeys(table, destination);
+        });
+
         sourceTables.stream().forEach((table) -> {
             dropTable(table);
         });
@@ -284,15 +300,18 @@ public class Reldb_DataMover extends Thread {
     private void createAllTables() {
         sourceTables.stream().forEach((table) -> {
             createTable(table);
+            createdTables.add(table);
             progress_current.increaseCurrentProgress();
         });
     }
 
-    private void createTable(Reldb_Table table) {
+    private boolean createTable(Reldb_Table table) {
+        boolean result = false;
         Reldb_Statement statement = new Reldb_Statement(destination.getConnection());
         String command = sql_expr.createTableWConditions(table, destination.getDatabaseType());
-        statement.execute(command);
+        result = statement.execute(command);
         statement.close();
+        return result;
     }
 
 
@@ -324,5 +343,128 @@ public class Reldb_DataMover extends Thread {
         }
     }
 
+    private void addForeignKeyToList(String keyName, String srcTable, String scrColumn, String refTable, String refColumn) {
+        String[] newValue = {srcTable, scrColumn, refTable, refColumn};
+        if (foreignKeys.put(keyName.toUpperCase(), newValue) != null) {
+            log.log(Level.INFO, "ForeignKey {0} wurde \u00fcberschrieben!", keyName);
+        }
+    }
+
+    /**
+     * ForeignKey aus der HashMap holen. Mit Fehler Info
+     *
+     * @param key
+     * @return
+     */
+    private String[] getForeignKeyFromList(String key) {
+        String[] result = foreignKeys.get(key.toUpperCase());
+        if (result == null) {
+            log.log(Level.WARNING, "ForeignKey {0} wurde nicht gefunden!", key.toUpperCase());
+        }
+        return result;
+    }
+
+    private boolean handleErrorSpalteNichtda(SQLException warnings, Reldb_Column column, Reldb_Database destinationDatabase) {
+        if (warnings.getErrorCode() == 904) { // Ungültiger Bezeichner
+             /*        Alle Daten zusammentragen       */
+            Reldb_Database database = column.getDatabase();
+            // Tabelle mit Fremdschlüssel holen
+            Reldb_Table refTable = database.getTableByName(column.getRefTableName());
+            // Tabelle für den Export markieren
+            refTable.setSelected(true);
+            // Spalte mit dem Fremdschlüssel holen
+            Reldb_Column refColumn = refTable.getColumnByName(column.getRefColumnName());
+            // Spalte für den Export markieren
+            refColumn.setSelected(true);
+            // Prüfen, ob die Tabelle bereits schon angelegt wurde
+            if (createdTables.contains(refTable)) {
+                // Benutzerabfrage muss noch stattfinden!!
+                log.log(Level.WARNING, "Drop Table {0}!", refTable.getTableName());
+                dropTable(refTable);
+            }
+            // Tabelle neu anlegen
+            if (!createTable(refTable)) {
+                // Bei einem Fehler kann man jetzt auch nichts mehr machen...
+                return false;
+            }
+            return createSingleForeignKey(column, destinationDatabase);
+        }
+
+        return false;
+    }
+
+    private boolean handleErrorOderSo(SQLException warnings, Reldb_Row data, String insertIntoCmd, Reldb_Database destinationDatabase) {
+
+        if (warnings.getErrorCode() == 2291) {  // Integritäts-Constraint verletzt
+
+            String constraint = getConstraintString(warnings.getMessage());
+            String[] references = getForeignKeyFromList(constraint.toUpperCase());
+            if (references == null) {
+                return false;
+            }
+            /*        Alle Daten zusammentragen       */
+            Reldb_Database database = data.getDatabase();
+            // Tabelle mit Fremdschlüssel holen
+            Reldb_Table refTable = database.getTableByName(references[2]);
+            // Tabelle für den Export markieren
+            refTable.setSelected(true);
+            // Spalte mit dem Fremdschlüssel holen
+            Reldb_Column refColumn = refTable.getColumnByName(references[3]);
+            // Spalte für den Export markieren
+            refColumn.setSelected(true);
+            // Prüfen, ob die Tabelle bereits schon angelegt wurde
+            if (!createdTables.contains(refTable)) {
+                // Also wenn wir hier landen, dann haben wir echt ein Problem...
+                log.log(Level.SEVERE, "Referenzierte Tabelle ist nicht vorhanden ({0})!", refTable.getTableName());
+                return false;
+            }
+            // Fremdschlüssel Datensatz holen.
+            Reldb_DataContainer cell = data.getCellByColumn(references[1]);
+
+            Reldb_Row newRow;
+            Reldb_Statement statement = new Reldb_Statement(database.getConnection());
+            ResultSet results = statement.executeQuery(sql_expr.selectFrom(refTable, cell), fetchSize); // Im ResultSet landen die Datensätze
+            try {
+               if(results.next()) {
+                    newRow = new Reldb_Row(refTable, results);
+                    results.close();
+                    statement.close();
+                    return insert2(newRow, insertIntoCmd, destinationDatabase);
+                }
+            } catch (SQLException ex) {
+                log.warning(ex.toString());
+            } finally {
+                try {
+                    results.close();
+                    statement.close();
+                } catch (SQLException ex) {
+                    log.warning(ex.getMessage());
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Sehr gewagte Funktion, die einem z.B. den ForeignKey Constraint String
+     * liefert.
+     *
+     * @param errMessage
+     * @return
+     */
+    private String getConstraintString(String errMessage) {
+        String result = "xoxo";
+        try {
+            result = errMessage.split("(")[1];
+            result = result.split(")")[0];
+            if (result.contains(".")) {
+                String results[] = result.split(".");
+                result = results[results.length - 1];
+            }
+        } catch (Exception e) {
+            log.log(Level.SEVERE, e.getMessage());
+        }
+        return result;
+    }
 }
         // 40774215

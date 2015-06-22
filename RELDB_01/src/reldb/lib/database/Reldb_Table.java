@@ -48,10 +48,11 @@ public class Reldb_Table {
 
     void initalize() {
         if (!listsFilled) {
+            listsFilled = true;
             createColumns();
             createPrimaryKeys();
             createForeignKeys();
-            listsFilled = true;
+            
         }
     }
 
@@ -175,8 +176,8 @@ public class Reldb_Table {
     }
 
     public Reldb_Column getColumnByName(String columnName) {
-        for (Reldb_Column colIterator : columns) {
-            if (colIterator.getName().equals(columnName)) {
+        for (Reldb_Column colIterator : getColumns()) {
+            if (colIterator.getName().equalsIgnoreCase(columnName)) {
                 return colIterator;
             }
         }
@@ -221,6 +222,7 @@ public class Reldb_Table {
      */
     public List<Reldb_Column> getColumns() {
         if (!listsFilled) {
+            
             this.initalize();
         }
         return columns;

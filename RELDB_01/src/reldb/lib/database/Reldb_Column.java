@@ -43,15 +43,15 @@ public class Reldb_Column extends Reldb_DataContainer {
     public String printInfo() {
         String ref = "";
         if (isIsForeignKey()) {
-            ref = " ref: " + refTableName + "." + refColumnName;
+            ref = " ref: " + getRefTableName() + "." + getRefColumnName();
         }
 
-        return COLUMN_NAME + "\n(" + TYPE_NAME + ") " + "\njava.sql.Type: " + Reldb_Types.typeMappings.get(DATA_TYPE) + "(" + COLUMN_SIZE + ")" + "\n" + ref + "\nAutoincrement: " + AUTOINCREMENT + " Unique: " + UNIQUE;
+        return getCOLUMN_NAME() + "\n(" + TYPE_NAME + ") " + "\njava.sql.Type: " + Reldb_Types.typeMappings.get(DATA_TYPE) + "(" + COLUMN_SIZE + ")" + "\n" + ref + "\nAutoincrement: " + AUTOINCREMENT + " Unique: " + UNIQUE;
     }
 
     @Override
     public String toString() {
-        return COLUMN_NAME;
+        return getCOLUMN_NAME();
     }
 
     @Override
@@ -62,15 +62,15 @@ public class Reldb_Column extends Reldb_DataContainer {
 
         if (dbModel == Reldb_Database.DATABASETYPE.ORACLE) {
             if (isPrimaryKey) {
-                constraints = constraints + ",\nCONSTRAINT " + getTable().getTableName() + "_PK PRIMARY KEY (" + COLUMN_NAME + ")";
+                constraints = constraints + ",\nCONSTRAINT " + getTable().getTableName() + "_PK PRIMARY KEY (" + getCOLUMN_NAME() + ")";
             }
 
             if (!NULLABLE) {
                 nullable = nullable + " NOT NULL";
             }
-            return COLUMN_NAME + " " + typeStr + nullable + constraints;
+            return getCOLUMN_NAME() + " " + typeStr + nullable + constraints;
         }
-        return COLUMN_NAME + " " + constraints + " " + typeStr;
+        return getCOLUMN_NAME() + " " + constraints + " " + typeStr;
     }
 
     private String shorten(String str) {
@@ -92,7 +92,7 @@ public class Reldb_Column extends Reldb_DataContainer {
     public String getForeignKeyConstraintName() {
         String constraint = "";
         if (isForeignKey) {
-            constraint = getTable().getTableName() + "_FK_" + shorten(COLUMN_NAME) + "_" + shorten(refColumnName);
+            constraint = getTable().getTableName() + "_FK_" + shorten(getCOLUMN_NAME()) + "_" + shorten(getRefColumnName());
         }
         return constraint;
     }
@@ -102,7 +102,7 @@ public class Reldb_Column extends Reldb_DataContainer {
         if (dbModel == Reldb_Database.DATABASETYPE.ORACLE) {
             if (isIsForeignKey()) {
                 constraints = constraints + "CONSTRAINT " + getForeignKeyConstraintName();
-                constraints = constraints + " FOREIGN KEY (" + COLUMN_NAME + ") REFERENCES " + refTableName + "(" + refColumnName + ")";
+                constraints = constraints + " FOREIGN KEY (" + getCOLUMN_NAME() + ") REFERENCES " + getRefTableName() + "(" + getRefColumnName() + ")";
             }
         }
         return constraints;
@@ -123,7 +123,7 @@ public class Reldb_Column extends Reldb_DataContainer {
      * @return the name
      */
     public String getName() {
-        return COLUMN_NAME;
+        return getCOLUMN_NAME();
     }
 
     /**
@@ -211,5 +211,19 @@ public class Reldb_Column extends Reldb_DataContainer {
      */
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    /**
+     * @return the refTableName
+     */
+    public String getRefTableName() {
+        return refTableName;
+    }
+
+    /**
+     * @return the refColumnName
+     */
+    public String getRefColumnName() {
+        return refColumnName;
     }
 }

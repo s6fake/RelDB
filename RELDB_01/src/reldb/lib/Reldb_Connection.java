@@ -3,6 +3,7 @@ package reldb.lib;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -130,9 +131,20 @@ public class Reldb_Connection {
         try {
             result = connection.createStatement();
         } catch (SQLException e) {
-            System.err.println(e);
+            log.warning(e.getMessage());
         }
         return result;
+    }
+    
+    public PreparedStatement newPreparedStatement(String stmt) {
+           PreparedStatement statement = null;
+        try {
+            statement = connection.prepareStatement(stmt);
+        } catch (SQLException e) {
+            log.warning(e.getMessage());
+        }
+        return statement;     
+        
     }
 
     public boolean connect(String user, String pass) {

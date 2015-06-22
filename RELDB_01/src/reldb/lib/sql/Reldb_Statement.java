@@ -5,10 +5,12 @@
  */
 package reldb.lib.sql;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import reldb.lib.Reldb_Connection;
 
@@ -21,19 +23,30 @@ public class Reldb_Statement {
     public static String LastCatalogSeparator = null;
     private static final Logger log = Logger.getLogger(Reldb_Statement.class.getName());
 
-    private Statement statement = null;
-    private Reldb_Connection connection;
+    protected Statement statement = null;
+    protected Reldb_Connection connection;
 
     public Reldb_Statement(Reldb_Connection connection) {
         this.statement = connection.newStatement();
         this.connection = connection;
     }
 
+    /**
+     * Creates a prepared Statement
+     *
+     * @param connection
+     * @param command
+     */
+    public Reldb_Statement(Reldb_Connection connection, String command) {
+        this.connection = connection;
+        this.statement = connection.newPreparedStatement(command);
+    }
+
     public void close() {
         try {
             statement.close();
         } catch (SQLException e) {
-            log.warning(e.getMessage());
+            printError(e);
         }
     }
 
@@ -52,39 +65,29 @@ public class Reldb_Statement {
         ResultSet results = null;
         try {
             results = statement.executeQuery(sql_expr.getTableNames(connection.getDatabaseProductName()));
-            //statement.executeQuery("SELECT * FROM table_schem;");
         } catch (SQLException e) {
-            log.warning(e.getMessage() );
+            printError(e);
         }
         return results;
-    }
-
-    private void printWarnings() {
-        try {
-            SQLWarning warning = statement.getWarnings();
-            while (warning != null) {
-                String errStr = "Message: " + warning.getMessage();
-                errStr = errStr + " SQLState: " + warning.getSQLState();
-                errStr = errStr + " Vendor error code: "+ warning.getErrorCode();
-                log.warning(errStr);
-                warning = warning.getNextWarning();
-            }
-        } catch (SQLException e) {
-            log.warning(e.getMessage());
-        }
     }
 
     public boolean execute(String command) {
         boolean result = false;
         try {
-            //statement.setFetchSize(fetch);
             result = statement.execute(command);
-           
-            //printWarnings();
-            //log.info(command);
-
         } catch (SQLException e) {
-            log.warning(e.getMessage() + "\n" + command);            
+            printError(e);
+        }
+        return result;
+    }
+
+    public SQLException executeUpdate(String command) {
+        SQLException result = null;
+        try {
+            statement.executeUpdate(command);
+        } catch (SQLException e) {
+            result = e;
+            printError(e);
         }
         return result;
     }
@@ -96,8 +99,7 @@ public class Reldb_Statement {
             results = statement.executeQuery(command);
             //printWarnings();            
         } catch (SQLException e) {
-            log.warning(e.getMessage() + "\n" + command);    
-            //printWarnings();
+            printError(e);
         }
         return results;
     }
@@ -105,5 +107,13 @@ public class Reldb_Statement {
     public ResultSet executeQuery(String command) {
         return Reldb_Statement.this.executeQuery(command, 0);
     }
-    
+
+    private void printError(SQLException exception) {
+        if (exception.getErrorCode() == 2291 || exception.getErrorCode() == 904) {
+            log.log(Level.CONFIG, exception.getMessage());
+        } else {
+            log.log(Level.SEVERE, exception.getMessage());
+        }
+    }
+
 }

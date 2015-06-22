@@ -53,6 +53,16 @@ public class sql_expr {
         return command;
     }
 
+        public static String selectFrom(Reldb_Table table, Reldb_DataContainer data) {
+        String selectList = "";
+        for (Reldb_Column col : table.getSelectedColumns()) {
+            selectList = selectList + col.getName() + ", ";
+        }
+        selectList = selectList + selectList.substring(0, selectList.length() - 2);
+        String command = "SELECT " + selectList + " FROM " + table.getTableName() + " WHERE " + data.getCOLUMN_NAME() + " = " + data.toString();
+        return command;
+    }
+    
     /**
      * Wählt nur die Spalten, die zuvor ausgewählt wurden, also
      * Reldb_Column.isSelected() == true Zudem werden noch die Conditions
@@ -75,6 +85,8 @@ public class sql_expr {
         
         return command;
     }
+    
+    
 
     private static String condition(List<Filter> conditions) {
         String command = "";

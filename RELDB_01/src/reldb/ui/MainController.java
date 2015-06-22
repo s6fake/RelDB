@@ -19,6 +19,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.WindowEvent;
+import javax.swing.JOptionPane;
 import reldb.lib.*;
 import reldb.lib.database.*;
 import reldb.lib.migration.Filter;
@@ -351,8 +352,11 @@ public class MainController implements Initializable {
     @FXML
     private void on_export(ActionEvent event) {
 
-        Dialogs.newExportDialog(parent);
+        int dialogResult = JOptionPane.showConfirmDialog(null, "Alle ausgewählten Daten exportieren?", "Warning", JOptionPane.YES_NO_OPTION);
+        if (dialogResult == JOptionPane.YES_OPTION) {
 
+            Dialogs.newExportDialog(parent);
+        }
         /*
          Reldb_TreeItem selectedItem = (Reldb_TreeItem) con_treeView.getSelectionModel().getSelectedItem();
          if (selectedItem.getValue() instanceof Reldb_Table) {

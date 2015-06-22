@@ -26,8 +26,9 @@ public class Reldb_DataContainer {
         this.data = null;
     }
 
-    public Reldb_DataContainer(Object data) {
+    public Reldb_DataContainer(Object data, String COLUMN_NAME) {
         this.data = data;
+        this.COLUMN_NAME = COLUMN_NAME;
     }
 
     public Reldb_DataContainer(Reldb_Database database, String COLUMN_NAME, int DATA_TYPE, String TYPE_NAME, int COLUMN_SIZE, boolean NULLABLE, boolean AUTOINCREMENT) {
@@ -53,7 +54,7 @@ public class Reldb_DataContainer {
 
     @Override
     public Reldb_DataContainer clone() {
-        Reldb_DataContainer newObj = new Reldb_DataContainer(getDatabase(), COLUMN_NAME, DATA_TYPE, TYPE_NAME, COLUMN_SIZE, NULLABLE, data);
+        Reldb_DataContainer newObj = new Reldb_DataContainer(getDatabase(), getCOLUMN_NAME(), DATA_TYPE, TYPE_NAME, COLUMN_SIZE, NULLABLE, data);
         return newObj;
     }
 
@@ -168,6 +169,13 @@ public class Reldb_DataContainer {
      */
     public Reldb_Database getDatabase() {
         return database;
+    }
+
+    /**
+     * @return the COLUMN_NAME
+     */
+    public String getCOLUMN_NAME() {
+        return COLUMN_NAME;
     }
 }
 
