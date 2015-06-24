@@ -1,4 +1,4 @@
-package reldb.ui;
+package reldb02.ui;
 
 import java.net.URL;
 import java.util.ResourceBundle;

@@ -1,4 +1,4 @@
-package reldb.ui;
+package reldb02.ui;
 
 import java.io.IOException;
 import javafx.application.Application;
