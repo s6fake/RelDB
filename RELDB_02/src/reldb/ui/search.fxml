@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="528.0" prefWidth="576.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <GridPane prefHeight="528.0" prefWidth="576.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="40.0" minHeight="40.0" prefHeight="40.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="55.0" minHeight="55.0" prefHeight="55.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="432.0" minHeight="10.0" prefHeight="369.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="432.0" minHeight="10.0" prefHeight="49.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <Label alignment="CENTER" layoutX="274.0" layoutY="50.0" prefHeight="116.0" prefWidth="576.0" text="Suche" textAlignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+               </children>
+            </AnchorPane>
+            <GridPane GridPane.rowIndex="1">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="281.0" minWidth="10.0" prefWidth="117.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="459.0" minWidth="10.0" prefWidth="459.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints maxHeight="25.0" minHeight="25.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <TextField alignment="CENTER" GridPane.columnIndex="1" />
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" layoutX="260.0" layoutY="12.0" prefHeight="40.0" prefWidth="314.0" text="Keywords:" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <padding>
+                              <Insets right="10.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+                  <GridPane GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                           <children>
+                              <RadioButton alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="33.0" layoutY="6.0" mnemonicParsing="false" selected="true" text="match all">
+                                 <toggleGroup>
+                                    <ToggleGroup fx:id="match_group" />
+                                 </toggleGroup>
+                              </RadioButton>
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
+                           <children>
+                              <RadioButton layoutX="30.0" layoutY="6.0" mnemonicParsing="false" text="match any" toggleGroup="$match_group" />
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2">
+                           <children>
+                              <RadioButton layoutX="25.0" layoutY="6.0" mnemonicParsing="false" text="match exact" toggleGroup="$match_group" />
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </GridPane>
+               </children>
+            </GridPane>
+            <Accordion GridPane.rowIndex="2">
+              <panes>
+                <TitledPane animated="false" text="Simple Keyword Search">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <GridPane layoutX="183.0" layoutY="14.0">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="99.0" minWidth="10.0" prefWidth="98.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="114.0" minWidth="10.0" prefWidth="110.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                                       <children>
+                                          <CheckBox layoutX="16.0" layoutY="6.0" mnemonicParsing="false" selected="true" text="Titles" />
+                                       </children>
+                                    </AnchorPane>
+                                    <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
+                                       <children>
+                                          <CheckBox layoutY="6.0" mnemonicParsing="false" selected="true" text="Characters" />
+                                       </children>
+                                    </AnchorPane>
+                                    <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1">
+                                       <children>
+                                          <CheckBox layoutX="16.0" layoutY="6.0" mnemonicParsing="false" selected="true" text="Persons" />
+                                       </children>
+                                    </AnchorPane>
+                                    <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                       <children>
+                                          <CheckBox layoutY="6.0" mnemonicParsing="false" selected="true" text="Companies" />
+                                       </children>
+                                    </AnchorPane>
+                                 </children>
+                              </GridPane>
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </TitledPane>
+                  <TitledPane animated="false" text="Extended Title Search">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <GridPane layoutX="14.0" layoutY="14.0" prefHeight="326.0" prefWidth="574.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints maxHeight="58.00000190734863" minHeight="2.0" prefHeight="58.00000190734863" vgrow="SOMETIMES" />
+                                  <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="268.99999809265137" minHeight="10.0" prefHeight="217.99999809265137" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <GridPane>
+                                      <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="461.99999237060547" minWidth="10.0" prefWidth="240.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="461.99999237060547" minWidth="10.0" prefWidth="214.0" />
+                                      </columnConstraints>
+                                      <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                      </rowConstraints>
+                                       <children>
+                                          <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                                             <children>
+                                                <Label alignment="CENTER_RIGHT" layoutX="125.0" layoutY="43.0" prefHeight="102.0" prefWidth="277.0" text="Search for:" underline="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                   <padding>
+                                                      <Insets right="10.0" />
+                                                   </padding>
+                                                </Label>
+                                             </children>
+                                          </AnchorPane>
+                                          <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
+                                             <children>
+                                                <ComboBox layoutX="21.0" layoutY="19.0" prefWidth="150.0" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="2.0" />
+                                             </children>
+                                          </AnchorPane>
+                                          <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2">
+                                             <children>
+                                                <Button layoutX="33.0" layoutY="4.0" mnemonicParsing="false" text="Select/Deselect all" AnchorPane.bottomAnchor="8.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="2.0" />
+                                             </children>
+                                          </AnchorPane>
+                                       </children>
+                                    </GridPane>
+                                    <GridPane GridPane.rowIndex="3">
+                                      <columnConstraints>
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="451.0" minWidth="10.0" prefWidth="423.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="282.0" minWidth="10.0" prefWidth="131.0" />
+                                      </columnConstraints>
+                                      <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                      </rowConstraints>
+                                       <children>
+                                          <Separator orientation="VERTICAL" GridPane.columnIndex="1" />
+                                          <GridPane>
+                                            <columnConstraints>
+                                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="52.0" minWidth="52.0" prefWidth="52.0" />
+                                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="122.99999237060547" minWidth="10.0" prefWidth="117.99999237060547" />
+                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="80.0" minWidth="80.0" prefWidth="80.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="80.0" minWidth="80.0" prefWidth="80.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                             <children>
+                                                <CheckBox fx:id="cb_filterYear" mnemonicParsing="false" text="filter:" />
+                                                <CheckBox fx:id="cb_filterRating" mnemonicParsing="false" text="filter:" GridPane.rowIndex="1" />
+                                                <CheckBox fx:id="cb_filterVoting" mnemonicParsing="false" text="filter:" GridPane.rowIndex="2" />
+                                                <CheckBox fx:id="cb_filterBudget" mnemonicParsing="false" text="filter:" GridPane.rowIndex="3" />
+												<CheckBox fx:id="cb_filterRuntime" mnemonicParsing="false" text="filter:" GridPane.rowIndex="4" />
+                                                <Label text="Production year after" GridPane.columnIndex="1" />
+                                                <Label text="Rating higher than" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <Label text="Votes more than" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <Label text="Budget higher than" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                <Label text=" and before" GridPane.columnIndex="3">
+                                                   <opaqueInsets>
+                                                      <Insets right="2.0" />
+                                                   </opaqueInsets>
+                                                </Label>
+                                                <Label text=" and lower than" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                                                <Label text=" and less than" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                                                <Label text=" and lower than" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                                                <Label text="Runtime more than" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                <Label text=" and less than" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+                                                <TextField GridPane.columnIndex="2" />
+                                                <TextField GridPane.columnIndex="4" />
+                                                <TextField GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                <TextField GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                                                <TextField GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                <TextField GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                                                <TextField GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                <TextField GridPane.columnIndex="4" GridPane.rowIndex="3" />
+                                                <TextField GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                                <TextField GridPane.columnIndex="4" GridPane.rowIndex="4" />
+                                             </children>
+                                          </GridPane>
+                                       </children>
+                                    </GridPane>
+                                    <Separator prefWidth="200.0" GridPane.rowIndex="2" />
+                                    <GridPane GridPane.rowIndex="1">
+                                       <children>
+                                          <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                                             <children>
+                                                <Label alignment="CENTER_RIGHT" layoutX="125.0" layoutY="43.0" prefHeight="102.0" prefWidth="277.0" text="Genere" underline="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                   <padding>
+                                                      <Insets right="10.0" />
+                                                   </padding>
+                                                </Label>
+                                             </children>
+                                          </AnchorPane>
+                                          <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
+                                             <children>
+                                                <ComboBox layoutX="21.0" layoutY="19.0" prefWidth="150.0" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="2.0" />
+                                             </children>
+                                          </AnchorPane>
+                                          <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2">
+                                             <children>
+                                                <Button layoutX="33.0" layoutY="4.0" mnemonicParsing="false" text="Select/Deselect all" AnchorPane.bottomAnchor="8.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="2.0" />
+                                             </children>
+                                          </AnchorPane>
+                                       </children>
+                                       <columnConstraints>
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="461.99999237060547" minWidth="10.0" prefWidth="241.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="461.99999237060547" minWidth="10.0" prefWidth="213.0" />
+                                       </columnConstraints>
+                                       <rowConstraints>
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                       </rowConstraints>
+                                    </GridPane>
+                                 </children>
+                              </GridPane>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </TitledPane>
+              </panes>
+            </Accordion>
+         </children>
+      </GridPane>
+   </children>
+</AnchorPane>
