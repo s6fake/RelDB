@@ -6,9 +6,11 @@ import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Accordion;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
 import reldb.lib.Reldb_Connection;
 import reldb.lib.database.Reldb_Database;
@@ -47,6 +49,12 @@ public class SearchController implements Initializable {
     private String personCommand = "SELECT n.name FROM #name n";
     
     private Reldb_Connection connection;
+    @FXML
+    private Accordion accordion;
+    @FXML
+    private TitledPane pane_simpleSearch;
+    @FXML
+    private TitledPane pane_extendedSearch;
     
     /**
      * Initializes the controller class.
@@ -61,6 +69,7 @@ public class SearchController implements Initializable {
             titleCommand = titleCommand.replace("#", "");
             personCommand = personCommand.replace("#", "");
         }*/
+            accordion.expandedPaneProperty().set(pane_simpleSearch);
     }
 
     @FXML

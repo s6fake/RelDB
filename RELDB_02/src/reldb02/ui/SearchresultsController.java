@@ -80,16 +80,17 @@ public class SearchresultsController implements Initializable {
         //table_titles.getItems().addAll(titledata);
     }
 
-    void initializeArray(String[] titles, ResultSet resultSet, int size) {
-        String[][] staffArray = convertTo2dArray(titles, resultSet, size);
-        /*        String[][] staffArray = {{"nice to ", "have", "titles"},
-         {"a", "b", "c"},
-         {"d", "e", "f"}};*/
+    void initializeArray(String[] titles, ResultSet resultSet, int titleCount) {
+        if (titleCount == 0) {
+            tab_titles.setDisable(true);
+            return;
+        }
+        String[][] dataArray = convertTo2dArray(titles, resultSet, titleCount);
         ObservableList<String[]> data = FXCollections.observableArrayList();
-        data.addAll(Arrays.asList(staffArray));
+        data.addAll(Arrays.asList(dataArray));
         data.remove(0);//remove titles from data
         for (int i = 0; i < titles.length; i++) {
-            TableColumn tc = new TableColumn(staffArray[0][i]);
+            TableColumn tc = new TableColumn(dataArray[0][i]);
 
             final int colNo = i;
             tc.setCellValueFactory(new Callback<CellDataFeatures<String[], String>, ObservableValue<String>>() {

@@ -84,9 +84,9 @@
                   </GridPane>
                </children>
             </GridPane>
-            <Accordion GridPane.rowIndex="2">
+            <Accordion fx:id="accordion" GridPane.rowIndex="2">
               <panes>
-                <TitledPane animated="false" text="Simple Keyword Search">
+                <TitledPane fx:id="pane_simpleSearch" animated="false" text="Simple Keyword Search">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
@@ -127,7 +127,7 @@
                         </AnchorPane>
                   </content>
                 </TitledPane>
-                  <TitledPane animated="false" text="Extended Title Search">
+                  <TitledPane fx:id="pane_extendedSearch" animated="false" text="Extended Title Search">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
