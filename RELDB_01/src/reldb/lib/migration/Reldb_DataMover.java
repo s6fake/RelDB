@@ -314,6 +314,17 @@ public class Reldb_DataMover extends Thread {
         return result;
     }
 
+    private boolean addColumn(Reldb_Column column, Reldb_Table destinationTable, Reldb_Database destinationDatabase) {
+        Reldb_Statement statement = new Reldb_Statement(destinationDatabase.getConnection());
+        String command = "ALTER TABLE " + destinationTable.getTableName() + " ADD " + column.getConstructorString(destinationDatabase.getDatabaseType());
+        SQLException warnings = statement.executeUpdate(command);
+        statement.close();
+        if (warnings == null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /*
      Funktionen für die Statistik
@@ -377,16 +388,21 @@ public class Reldb_DataMover extends Thread {
             // Spalte für den Export markieren
             refColumn.setSelected(true);
             // Prüfen, ob die Tabelle bereits schon angelegt wurde
-            if (createdTables.contains(refTable)) {
+            if (!createdTables.contains(refTable)) {
+                // Tabelle neu anlegen
+                if (!createTable(refTable)) {
+                    // Bei einem Fehler kann man jetzt auch nichts mehr machen...
+                    return false;
+                }
+            } else {
                 // Benutzerabfrage muss noch stattfinden!!
+                addColumn(refColumn, refTable, destinationDatabase);
+                /*
                 log.log(Level.WARNING, "Drop Table {0}!", refTable.getTableName());
                 dropTable(refTable);
+                */
             }
-            // Tabelle neu anlegen
-            if (!createTable(refTable)) {
-                // Bei einem Fehler kann man jetzt auch nichts mehr machen...
-                return false;
-            }
+
             return createSingleForeignKey(column, destinationDatabase);
         }
 
@@ -425,7 +441,7 @@ public class Reldb_DataMover extends Thread {
             Reldb_Statement statement = new Reldb_Statement(database.getConnection());
             ResultSet results = statement.executeQuery(sql_expr.selectFrom(refTable, cell), fetchSize); // Im ResultSet landen die Datensätze
             try {
-               if(results.next()) {
+                if (results.next()) {
                     newRow = new Reldb_Row(refTable, results);
                     results.close();
                     statement.close();

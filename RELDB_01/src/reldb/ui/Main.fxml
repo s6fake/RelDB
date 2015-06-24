@@ -27,7 +27,7 @@
                 <Menu mnemonicParsing="false" text="Edit">
                     <items>
                         <MenuItem mnemonicParsing="false" onAction="#make_sql_query" text="SQL Query" />
-                        <!--<MenuItem mnemonicParsing="false" onAction="#make_new_filter" text="Filtern" />-->
+                        <!--<MenuItem mnemonicParsing="false" onAction="#make_search" text="Search" />-->
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">

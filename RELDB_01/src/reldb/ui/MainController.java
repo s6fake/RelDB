@@ -23,7 +23,6 @@ import javax.swing.JOptionPane;
 import reldb.lib.*;
 import reldb.lib.database.*;
 import reldb.lib.migration.Filter;
-import reldb.lib.sql.sql_expr;
 import reldb.ui.dialogs.Dialogs;
 
 /**
@@ -420,5 +419,6 @@ public class MainController implements Initializable {
     void remove(Filter_displayElementController aThis) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
 
 }

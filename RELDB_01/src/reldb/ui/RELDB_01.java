@@ -29,7 +29,7 @@ import reldb.ui.dialogs.Dialogs;
  *
  * @author s6fake
  */
-public class RELDB_01 extends Application {
+public class RELDB_01 extends Application implements IMainClass {
 
     private Stage stage;
     private static final String url = "jdbc:postgresql://dbvm01.iai.uni-bonn.de:5432/imdb";
@@ -111,6 +111,7 @@ public class RELDB_01 extends Application {
      return newConnection;
      }
      */
+    @Override
     public void logIn(String user, String password, Reldb_Connection connection) {
         if (connection == null) {
             return;
@@ -205,9 +206,13 @@ public class RELDB_01 extends Application {
 
     public static void main(String[] args) {
         launch(args);
-        Reldb_Connection.closeAllConnections(); //Alle Verbindungen schließen
+        exit(0);
     }
 
+    public static void exit(int i) {
+        Reldb_Connection.closeAllConnections(); //Alle Verbindungen schließen
+        System.exit(i);
+    }
     /*
      ToDo:
 

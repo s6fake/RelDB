@@ -6,7 +6,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import reldb.lib.Reldb_Connection;
 import reldb.lib.database.Reldb_Column;
-import reldb.lib.migration.Reldb_DataMover;
+import reldb.ui.IMainClass;
 import reldb.ui.MainController;
 import reldb.ui.RELDB_01;
 
@@ -16,7 +16,7 @@ import reldb.ui.RELDB_01;
  */
 public class Dialogs {
 
-    public static void loginDialog(RELDB_01 parent, Reldb_Connection connection) {
+    public static void loginDialog(IMainClass parent, Reldb_Connection connection) {
 
         try {
             Stage stage = new Stage();
@@ -45,7 +45,7 @@ public class Dialogs {
         NewConnectionDialogController controller = newConnectionDialog(parent);
         controller.setIsExportConnection(true);
     }
-    
+
     public static NewConnectionDialogController newConnectionDialog(RELDB_01 parent) {
         NewConnectionDialogController controller = null;
         try {
@@ -70,8 +70,8 @@ public class Dialogs {
         }
         return controller;
     }
-    
-        public static void newEditExportDialog(RELDB_01 parent, Reldb_Connection connection) {
+
+    public static void newEditExportDialog(RELDB_01 parent, Reldb_Connection connection) {
         NewConnectionDialogController controller = newEditConnectionDialog(parent, connection);
         controller.setIsExportConnection(true);
     }
@@ -81,10 +81,10 @@ public class Dialogs {
      *
      * @param parent
      * @param connection
-     * @return 
+     * @return
      */
     public static NewConnectionDialogController newEditConnectionDialog(RELDB_01 parent, Reldb_Connection connection) {
-       NewConnectionDialogController controller = null;
+        NewConnectionDialogController controller = null;
         try {
             Stage stage = new Stage();
             FXMLLoader loader = new FXMLLoader(Dialogs.class.getResource("NewConnectionDialog.fxml"));
@@ -175,8 +175,8 @@ public class Dialogs {
 
         }
     }
-    
-        public static void newFilterDialog(Reldb_Column column, boolean isNotFirstFilter, MainController parent) {
+
+    public static void newFilterDialog(Reldb_Column column, boolean isNotFirstFilter, MainController parent) {
         try {
             Stage stage = new Stage();
             FXMLLoader loader = new FXMLLoader(Dialogs.class.getResource("newFilterDialog.fxml"));
@@ -200,5 +200,6 @@ public class Dialogs {
 
         }
     }
-    
+
+
 }
