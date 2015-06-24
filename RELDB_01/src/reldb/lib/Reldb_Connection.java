@@ -307,10 +307,16 @@ public class Reldb_Connection {
     /**
      * @return the databaseType
      */
-    public int getDatabaseType() {
+    public int getDatabaseTypeID() {
         return databaseType;
     }
 
+    public Reldb_Database.DATABASETYPE getDatabaseType() {
+        if (database == null)
+            return Reldb_Database.DATABASETYPE.UNKNOWN;
+        return database.getDatabaseType();
+    }
+    
     /**
      * @return the userName
      */

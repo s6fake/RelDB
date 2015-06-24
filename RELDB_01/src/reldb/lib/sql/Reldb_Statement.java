@@ -108,6 +108,23 @@ public class Reldb_Statement {
         return Reldb_Statement.this.executeQuery(command, 0);
     }
 
+    public int selectCount(String table, String condition) {
+        String command = "SELECT COUNT(*) FROM " + table + " " + condition;
+        System.out.println(command);
+        ResultSet results;
+        int result = 0;
+        try {
+            results = statement.executeQuery(command);
+            while (results.next()) {
+                result = Integer.parseInt(results.getObject(1).toString());
+            }
+            results.close();
+        } catch (SQLException e) {
+            printError(e);
+        }
+        return result;
+    }
+
     private void printError(SQLException exception) {
         if (exception.getErrorCode() == 2291 || exception.getErrorCode() == 904) {
             log.log(Level.CONFIG, exception.getMessage());

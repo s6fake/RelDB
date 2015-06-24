@@ -46,7 +46,7 @@ public class Dialogs {
         controller.setIsExportConnection(true);
     }
 
-    public static NewConnectionDialogController newConnectionDialog(RELDB_01 parent) {
+    public static NewConnectionDialogController newConnectionDialog(IMainClass parent) {
         NewConnectionDialogController controller = null;
         try {
             Stage stage = new Stage();

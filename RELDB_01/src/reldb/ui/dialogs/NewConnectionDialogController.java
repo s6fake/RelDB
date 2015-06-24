@@ -12,6 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javax.swing.JOptionPane;
 import reldb.lib.Reldb_Connection;
+import reldb.ui.IMainClass;
 import reldb.ui.RELDB_01;
 
 /**
@@ -28,7 +29,7 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
     @FXML
     private TextField url_field;
 
-    private RELDB_01 parent;
+    private IMainClass parent;
     @FXML
     private TextField port_field;
     @FXML
@@ -55,7 +56,7 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
     public void setConnection(Reldb_Connection connection) {
         this.connection = connection;
         user_field.setText(connection.getUserName());
-        choicebox_type.getSelectionModel().select(connection.getDatabaseType());
+        choicebox_type.getSelectionModel().select(connection.getDatabaseTypeID());
         url_field.setText(connection.getAdress());
         port_field.setText(Integer.toString(connection.getPort()));
         database_field.setText(connection.getDatabaseID());
@@ -81,7 +82,7 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
         }
     }
 
-    public void setParent(RELDB_01 parent) {
+    public void setParent(IMainClass parent) {
         this.parent = parent;
     }
 
