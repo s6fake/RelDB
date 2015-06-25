@@ -13,7 +13,6 @@ import javafx.scene.input.MouseEvent;
 import javax.swing.JOptionPane;
 import reldb.lib.Reldb_Connection;
 import reldb.ui.IMainClass;
-import reldb.ui.RELDB_01;
 
 /**
  * FXML Controller class
@@ -53,13 +52,20 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
      *
      * @param connection Die Verbindung die geändert werden soll.
      */
-    public void setConnection(Reldb_Connection connection) {
+    public void initializeDialog(Reldb_Connection connection) {
         this.connection = connection;
         user_field.setText(connection.getUserName());
         choicebox_type.getSelectionModel().select(connection.getDatabaseTypeID());
         url_field.setText(connection.getAdress());
         port_field.setText(Integer.toString(connection.getPort()));
         database_field.setText(connection.getDatabaseID());
+    }
+    
+    public void initializeDialog(String url, String dbName, int port, int dbTypeID) {        
+        choicebox_type.getSelectionModel().select(dbTypeID);
+        url_field.setText(url);
+        port_field.setText(Integer.toString(port));
+        database_field.setText(dbName);
     }
 
     private void disableButtons() {
@@ -70,7 +76,7 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
 
     @FXML
     private void doLogin(MouseEvent event) {
-        if (!createNewConnection2()) {
+        if (!createNewConnection()) {
             return;
         }
         disableButtons();
@@ -86,7 +92,7 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
         this.parent = parent;
     }
 
-    private boolean createNewConnection2() {
+    private boolean createNewConnection() {
         if (createUrl() == null) {
             JOptionPane.showMessageDialog(null, "Die Angegebene URL ist ungültig", "Verbindung kann nicht erstellt werden", JOptionPane.ERROR_MESSAGE);
             return false;

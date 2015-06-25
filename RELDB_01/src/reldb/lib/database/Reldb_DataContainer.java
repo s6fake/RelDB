@@ -92,6 +92,13 @@ public class Reldb_DataContainer {
     @Override
     public String toString() {
         if (data == null) {
+            return "";
+        }
+        return data.toString();
+    }
+
+    public String toSaveString() {
+        if (data == null) {
             return "NULL";
         }
         if (data instanceof String) {
@@ -99,16 +106,15 @@ public class Reldb_DataContainer {
             if (str.contains("'")) {
                 String[] elements = str.split("'");
                 str = "";
-                for (int i = 0; i < elements.length; i ++) {
-                    str = str + elements[i]+"''";
+                for (int i = 0; i < elements.length; i++) {
+                    str = str + elements[i] + "''";
                 }
                 str = str.substring(str.length() - 2);
             }
-            return "'"+str+"'";
+            return "'" + str + "'";
         }
         return data.toString();
     }
-    
 
     protected String getConstructorString(DATABASETYPE dbModel) {
         String string = "";

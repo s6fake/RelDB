@@ -19,9 +19,9 @@ public class Reldb_Column extends Reldb_DataContainer {
     private int foreignKeySequence = 0;
 
     private List<Filter> filters = new ArrayList<>();
-    private boolean filtered = false, selected = true;
+    private boolean selected = true;
 
-    public Reldb_Column(Reldb_Database database, Reldb_Table table, String name, int type, String typeName, int size, boolean nullable, boolean autoincrement) {
+    protected Reldb_Column(Reldb_Database database, Reldb_Table table, String name, int type, String typeName, int size, boolean nullable, boolean autoincrement) {
         this.database = database;
         this.parentTable = table;
         this.COLUMN_NAME = name;
@@ -30,7 +30,17 @@ public class Reldb_Column extends Reldb_DataContainer {
         this.COLUMN_SIZE = size;
         this.NULLABLE = nullable;
         this.AUTOINCREMENT = autoincrement;
-//super(database, typeName, size, typeName, size, nullable);
+    }
+
+    public Reldb_Column(Reldb_Table table, String name) {
+        this.database = null;
+        this.parentTable = table;
+        this.COLUMN_NAME = name;
+        this.DATA_TYPE = 12;
+        this.TYPE_NAME = "VARCHAR";
+        this.COLUMN_SIZE = 0;
+        this.NULLABLE = false;
+        this.AUTOINCREMENT = false;
     }
 
     public void addForeignKey(String refTableName, String refColumnName, int foreignKeySequence) {
@@ -184,8 +194,8 @@ public class Reldb_Column extends Reldb_DataContainer {
 
     public void addFilter(Filter filter) {
         filters.add(filter);
+
         System.out.println("Filter hinzugefügt " + filters.get(0).toString());
-        filtered = true;
     }
 
     public List<Filter> getFilter() {
@@ -196,7 +206,10 @@ public class Reldb_Column extends Reldb_DataContainer {
      * @return the filtered
      */
     public boolean isFiltered() {
-        return filtered;
+        if (filters.isEmpty()) {
+            return false;
+        }
+        return true;
     }
 
     /**

@@ -46,6 +46,12 @@ public class Dialogs {
         controller.setIsExportConnection(true);
     }
 
+    public static void newConnectionDialog(IMainClass parent, String url, String dbName, int port, int dbTypeID) {
+        NewConnectionDialogController controller = newConnectionDialog(parent);
+        controller.initializeDialog(url, dbName, port, dbTypeID);        
+        
+    }
+    
     public static NewConnectionDialogController newConnectionDialog(IMainClass parent) {
         NewConnectionDialogController controller = null;
         try {
@@ -98,7 +104,7 @@ public class Dialogs {
             controller = loader.<NewConnectionDialogController>getController();
             controller.setStage(stage);
             controller.setParent(parent);
-            controller.setConnection(connection);
+            controller.initializeDialog(connection);
             // Hauptfenster anzeigen
             stage.show();
         } catch (IOException e) {

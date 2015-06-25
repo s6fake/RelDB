@@ -5,6 +5,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 /**
  *
@@ -40,7 +42,7 @@ public class Reldb_Row {
     public String toString() {
         String result = "";
         for (int i = 0; i < getCells().length; i++) {
-            result = result + getCells()[i] + " ";
+            result = result + getCells()[i].toSaveString() + " ";
         }
         return result;
     }
@@ -74,11 +76,19 @@ public class Reldb_Row {
     public Reldb_Table getTable() {
         return table;
     }
-    
+
     /**
      * @return the database
      */
     public Reldb_Database getDatabase() {
         return table.getDatabase();
     }
+    
+    public StringProperty get(int i) {
+        if (!(i < cells.length)) {
+            return new SimpleStringProperty(this, "");
+        }
+        return new SimpleStringProperty(this, cells[i].toString());
+    }
+
 }

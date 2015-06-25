@@ -4,6 +4,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,7 +24,8 @@ public class Reldb_Table {
     private final Reldb_Database database;
     private List<Reldb_Column> columns = new ArrayList<>(); //Liste aller Spalten
     private List<Reldb_Column> primaryKeys = new ArrayList<>(); // Liste aller Primärschlüssel
-
+    private List<Reldb_Row> rows = new ArrayList<>();       // Für Aufgabe 2
+    
     private boolean listsFilled = false;
     private boolean selected = false;       // Wurde die Tabelle für den Export ausgewählt?
 
@@ -36,7 +38,7 @@ public class Reldb_Table {
      * @param TABLE_SCHEM Schema der Tabelle
      * @param TABLE_NAME Name der Tabelle
      */
-    public Reldb_Table(Reldb_Database database, String TABLE_TYPE, String TABLE_CAT, String TABLE_SCHEM, String TABLE_NAME) {
+    protected Reldb_Table(Reldb_Database database, String TABLE_TYPE, String TABLE_CAT, String TABLE_SCHEM, String TABLE_NAME) {
         this.TABLE_TYPE = TABLE_TYPE;
         this.TABLE_CAT = TABLE_CAT;
         this.TABLE_SCHEM = TABLE_SCHEM;
@@ -46,13 +48,47 @@ public class Reldb_Table {
         //createPrimaryKeys(metaData);
     }
 
+    /**
+     * Erstellt eine neue Tabelle, unabhängig von einer Datenbank
+     *
+     * @param tableName
+     * @param columns
+     */
+    public Reldb_Table(String tableName, Reldb_Column[] columns) {
+        this(tableName);
+        this.columns.addAll(Arrays.asList(columns));
+        listsFilled = true;
+    }
+
+    /**
+     * Erstellt eine neue Tabelle, unabhängig von einer Datenbank
+     *
+     * @param tableName
+     * @param columns
+     */
+    public Reldb_Table(String tableName, String[] columns) {
+        this(tableName);
+        for (int c = 0; c < columns.length; c++) {
+            this.columns.add(new Reldb_Column(this, columns[c]));
+        }
+        listsFilled = true;
+    }
+
+    private Reldb_Table(String tableName) {
+        this.TABLE_TYPE = "TABLE";
+        this.TABLE_NAME = tableName;
+        this.TABLE_CAT = null;
+        this.TABLE_SCHEM = null;
+        this.database = null;
+    }
+
     void initalize() {
         if (!listsFilled) {
             listsFilled = true;
             createColumns();
             createPrimaryKeys();
             createForeignKeys();
-            
+
         }
     }
 
@@ -174,6 +210,17 @@ public class Reldb_Table {
             }
         }
     }
+    
+    public void addRows(ResultSet rowData) {
+        try {
+            while(rowData.next()) {
+                rows.add(new Reldb_Row(this, rowData));
+            }
+        } catch (SQLException ex) {
+            log.log(Level.INFO, ex.getMessage());
+        }
+    }
+    
 
     public Reldb_Column getColumnByName(String columnName) {
         for (Reldb_Column colIterator : getColumns()) {
@@ -222,14 +269,14 @@ public class Reldb_Table {
      */
     public List<Reldb_Column> getColumns() {
         if (!listsFilled) {
-            
+
             this.initalize();
         }
         return columns;
     }
 
     /**
-     * 
+     *
      * @return Die Spalten, die zuvor ausgewählt wurden
      */
     public List<Reldb_Column> getSelectedColumns() {
