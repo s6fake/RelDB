@@ -32,6 +32,16 @@ public class Reldb_Column extends Reldb_DataContainer {
         this.AUTOINCREMENT = autoincrement;
     }
 
+    public Reldb_Column(Reldb_Database database, Reldb_Table table, String name, int type, int size, boolean nullable, boolean autoincrement) {
+        this.database = database;
+        this.parentTable = table;
+        this.COLUMN_NAME = name;
+        this.DATA_TYPE = type;
+        this.COLUMN_SIZE = size;
+        this.NULLABLE = nullable;
+        this.AUTOINCREMENT = autoincrement;
+    }
+
     public Reldb_Column(Reldb_Table table, String name) {
         this.database = null;
         this.parentTable = table;

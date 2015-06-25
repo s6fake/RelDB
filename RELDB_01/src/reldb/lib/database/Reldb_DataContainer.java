@@ -119,7 +119,7 @@ public class Reldb_DataContainer {
     protected String getConstructorString(DATABASETYPE dbModel) {
         String string = "";
         if (dbModel == DATABASETYPE.ORACLE) {
-            if (DATA_TYPE != 12) {          // Nur VARCHAR muss bearbeitet werden
+            if (DATA_TYPE != 12 && DATA_TYPE != 1) {          // Nur VARCHAR und CHAR müssen bearbeitet werden
                 string = Reldb_Types.typeMappings.get(DATA_TYPE);
                 return string;
             }

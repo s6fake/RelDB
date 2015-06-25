@@ -30,7 +30,7 @@ public class Reldb_Table {
     private Map<String, Reldb_Column> columns = new HashMap<>(); //Liste aller Spalten
     private List<Reldb_Column> primaryKeys = new ArrayList<>(); // Liste aller Primärschlüssel
     private ObservableList<Reldb_Row> rows = FXCollections.observableArrayList();       // Für Aufgabe 2
-    
+
     private boolean listsFilled = false;
     private boolean selected = false;       // Wurde die Tabelle für den Export ausgewählt?
 
@@ -71,22 +71,31 @@ public class Reldb_Table {
      * @param tableName
      * @param columns
      */
-    public Reldb_Table(String tableName, String[] columns) {
-        this(tableName);
+    public Reldb_Table(String TABLE_NAME, String[] columns) {
+        this(TABLE_NAME);
         for (int c = 0; c < columns.length; c++) {
             addColumn(new Reldb_Column(this, columns[c]));
         }
         listsFilled = true;
     }
 
-    private Reldb_Table(String tableName) {
+    @Deprecated
+    public Reldb_Table(Reldb_Database database, String TABLE_NAME) {
         this.TABLE_TYPE = "TABLE";
-        this.TABLE_NAME = tableName;
+        this.TABLE_NAME = TABLE_NAME;
+        this.TABLE_CAT = null;
+        this.TABLE_SCHEM = null;
+        this.database = database;
+    }
+
+    public Reldb_Table(String TABLE_NAME) {
+        this.TABLE_TYPE = "TABLE";
+        this.TABLE_NAME = TABLE_NAME;
         this.TABLE_CAT = null;
         this.TABLE_SCHEM = null;
         this.database = null;
+        listsFilled = true;
     }
-    
 
     void initalize() {
         if (!listsFilled) {
@@ -215,18 +224,17 @@ public class Reldb_Table {
             }
         }
     }
-    
+
     public void addRows(ResultSet rowData) {
         try {
-            while(rowData.next()) {
-                
+            while (rowData.next()) {
+
                 getRows().add(new Reldb_Row(this, rowData));
             }
         } catch (SQLException ex) {
             log.log(Level.INFO, ex.getMessage());
         }
     }
-    
 
     public Reldb_Column getColumnByName(String columnName) {
         for (Reldb_Column colIterator : getColumns()) {
@@ -329,6 +337,11 @@ public class Reldb_Table {
         return rows;
     }
 
+    /**
+     * Fügt eine Spalte zur Tabelle hinzu
+     *
+     * @param column
+     */
     public final void addColumn(Reldb_Column column) {
         if (columns.containsKey(column.getCOLUMN_NAME())) {
             log.log(Level.WARNING, "Spalte {0} ist bereits in der Tabelle " + getTableName() + " enthalten!", column.getCOLUMN_NAME());;
@@ -336,10 +349,20 @@ public class Reldb_Table {
         }
         columns.put(column.getCOLUMN_NAME(), column);
     }
-    
+
+    /**
+     * Fügt mehrere Spalten zur Tabelle hinzu
+     *
+     * @param columns
+     */
     public final void addColumns(List<Reldb_Column> columns) {
         for (Reldb_Column column : columns) {
             addColumn(column);
         }
+    }
+    
+    public void addPrimaryKeyColumn(Reldb_Column column) {
+        primaryKeys.add(column);
+        addColumn(column);
     }
 }
