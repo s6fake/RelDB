@@ -79,10 +79,9 @@ public class SearchController implements Initializable {
             String titleCondition = convertInput("t.title");
             String nameCondition = convertInput("n.name");
             Reldb_Statement statement = new Reldb_Statement(RELDB_02.getConnection());
-            int titleCount = statement.selectCount("IMDB.title t", titleCondition);
-            System.out.println("Count: " + titleCount);
+            
             ResultSet titleResults = statement.executeQuery(titleCommand + " " + titleCondition);
-            parent.newResultTab(titleResults, titleCount);
+            parent.newResultTab(textField_keywords.getText(), titleResults);
             statement.close();
             //System.out.println(titleCondition);
         }

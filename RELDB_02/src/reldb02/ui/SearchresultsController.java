@@ -11,12 +11,14 @@ import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 import reldb.lib.database.Reldb_Row;
 import reldb.lib.database.Reldb_Table;
+import reldb02.library.LendMovieCell;
 
 /**
  * FXML Controller class
@@ -35,7 +37,7 @@ public class SearchresultsController implements Initializable {
     TableColumn<Reldb_Row, String> titleCol = new TableColumn<>("Title");
     TableColumn<Reldb_Row, String> yearCol = new TableColumn<>("Year");
     TableColumn<Reldb_Row, String> kindCol = new TableColumn<>("Kind");
-    TableColumn<Reldb_Row, Boolean> actionCol = new TableColumn<>("Action");
+    TableColumn<Reldb_Row, Boolean> actionCol = new TableColumn<>("");
 
     Reldb_Table titleTable;
 
@@ -58,19 +60,18 @@ public class SearchresultsController implements Initializable {
                         return new SimpleBooleanProperty(features.getValue() != null);
                     }
                 });
-        /*
-         // create a cell value factory with an add button for each row in the table.
-         actionCol.setCellFactory ( 
-         new Callback<TableColumn<Reldb_Row, Boolean>, TableCell<Reldb_Row, Boolean>>() {
-         @Override
-         public TableCell<Reldb_Row, Boolean> call
-         (TableColumn<Reldb_Row, Boolean> personBooleanTableColumn
-        
-         ) {
-         return new AddPersonCell(stage, table);
-         }    }    );*/
 
-        String[] titleCols = {"Title", "Year", "Kind", ""};
+        // create a cell value factory with an add button for each row in the table.
+        actionCol.setCellFactory(
+                new Callback<TableColumn<Reldb_Row, Boolean>, TableCell<Reldb_Row, Boolean>>() {
+                    @Override
+                    public TableCell<Reldb_Row, Boolean> call(TableColumn<Reldb_Row, Boolean> personBooleanTableColumn
+                    ) {
+                        return new LendMovieCell(table_titles);
+                    }
+                });
+
+        String[] titleCols = {"title", "production_year", "kind"};
         titleTable = new Reldb_Table("Title", titleCols);
 
         table_titles.getColumns().setAll(titleCol, yearCol, kindCol, actionCol);
@@ -79,6 +80,7 @@ public class SearchresultsController implements Initializable {
 
     void initialize(ResultSet resultsTitle) {
         titleTable.addRows(resultsTitle);
+        table_titles.getItems().addAll(titleTable.getRows());
     }
 
     @Deprecated

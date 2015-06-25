@@ -46,6 +46,7 @@ public class Search_mainController implements Initializable {
         Dialogs.newConnectionDialog(parent, "dbvm02.iai.uni-bonn.de", "dbvm02", 1521, 1);
     }
 
+    @FXML
     public void newSearchTab() {
         try {
             FXMLLoader loader = new FXMLLoader(RELDB_02.class.getResource("search.fxml"));
@@ -60,18 +61,17 @@ public class Search_mainController implements Initializable {
         }
     }
 
-    public void newResultTab(ResultSet results, int rowCount) {
+    public void newResultTab(String keywords, ResultSet results) {
         try {
             FXMLLoader loader = new FXMLLoader(RELDB_02.class.getResource("searchresults.fxml"));
             Node node = loader.load();
             SearchresultsController controller = loader.<SearchresultsController>getController();
-            String[] titles = {"Title", "Year", "Kind"};
-            //controller.initializeArray(titles, results, rowCount);
-            //controller.initialize(results);
             
-            Tab newTab = new Tab("Results", node);
+            controller.initialize(results);
+            
+            Tab newTab = new Tab("Results for: \"" + keywords + "\"", node);
             tabPane.getTabs().add(newTab);
-
+            tabPane.getSelectionModel().select(newTab);
         } catch (IOException ex) {
             log.log(Level.WARNING, ex.getMessage());
         }

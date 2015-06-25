@@ -9,14 +9,9 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import reldb.lib.Reldb_Connection;
-import reldb.lib.database.Reldb_Database;
-import reldb.lib.sql.Reldb_Statement;
 import reldb.ui.IMainClass;
-import reldb.ui.RELDB_01;
 
 /**
  *
