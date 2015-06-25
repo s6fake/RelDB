@@ -43,7 +43,7 @@ public class Search_mainController implements Initializable {
 
     @FXML
     private void login(ActionEvent event) {
-        Dialogs.newConnectionDialog(parent);
+        Dialogs.newConnectionDialog(parent, "dbvm02.iai.uni-bonn.de", "dbvm02", 1521, 1);
     }
 
     public void newSearchTab() {
@@ -66,7 +66,8 @@ public class Search_mainController implements Initializable {
             Node node = loader.load();
             SearchresultsController controller = loader.<SearchresultsController>getController();
             String[] titles = {"Title", "Year", "Kind"};
-            controller.initializeArray(titles, results, rowCount);
+            //controller.initializeArray(titles, results, rowCount);
+            //controller.initialize(results);
             
             Tab newTab = new Tab("Results", node);
             tabPane.getTabs().add(newTab);

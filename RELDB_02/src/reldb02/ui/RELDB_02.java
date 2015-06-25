@@ -9,6 +9,9 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import reldb.lib.Reldb_Connection;
 import reldb.lib.database.Reldb_Database;
 import reldb.lib.sql.Reldb_Statement;
@@ -67,27 +70,16 @@ public class RELDB_02 extends Application implements IMainClass {
         }
 
         if (newConnection.connect(user, password)) {
+
+            if (newConnection.getDatabaseTypeID() != 1) {
+               
+                JOptionPane.showMessageDialog(null, "Only Oracle Databases are supported yet!",
+                        "Inane warning",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
             connection = newConnection;
             searchController.newSearchTab();
-            /*     TEST      */
-            //Reldb_Statement st = new Reldb_Statement(newConnection);
-            //ResultSet results = st.executeQuery("SELECT t.title, t.production_year, k.kind FROM title t JOIN kind_type k ON t.kind_id = k.id WHERE t.id < 15;");
-            /*
-             try {
-             int columnCount = 3;
-             while (results.next()) {
-
-             System.out.println("SELECT * FROM title:" + results.getObject(1));
-
-             }
-             results.close();
-             } catch (SQLException ex) {
-             Logger.getLogger(RELDB_01.class.getName()).log(Level.SEVERE, null, ex);
-             }
-             */
-            //searchController.newResultTab(results, 14);    //(title, production_year, kind_id)
-            //st.close();
-            /*   TEST-Ende   */
 
         } else {
             log.log(Level.WARNING, "Verbindung konnte nicht hergestellt werden!");

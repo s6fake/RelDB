@@ -1,26 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package reldb02.ui;
 
-import com.sun.javafx.collections.ElementObservableListDecorator;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Observable;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableArray;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Tab;
@@ -28,7 +15,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
-import reldb.StringClass;
+import reldb.lib.database.Reldb_Row;
+import reldb.lib.database.Reldb_Table;
 
 /**
  * FXML Controller class
@@ -42,69 +30,84 @@ public class SearchresultsController implements Initializable {
     @FXML
     private Tab tab_titles;
     @FXML
-    private TableView table_titles;
+    private TableView<Reldb_Row> table_titles;
+
+    TableColumn<Reldb_Row, String> titleCol = new TableColumn<>("Title");
+    TableColumn<Reldb_Row, String> yearCol = new TableColumn<>("Year");
+    TableColumn<Reldb_Row, String> kindCol = new TableColumn<>("Kind");
+    TableColumn<Reldb_Row, Boolean> actionCol = new TableColumn<>("Action");
+
+    Reldb_Table titleTable;
 
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        titleCol.setCellValueFactory((CellDataFeatures<Reldb_Row, String> p) -> p.getValue().get(0));
+        yearCol.setCellValueFactory((CellDataFeatures<Reldb_Row, String> p) -> p.getValue().get(1));
+        kindCol.setCellValueFactory((CellDataFeatures<Reldb_Row, String> p) -> p.getValue().get(2));
+
+        actionCol.setSortable(false);
+
+        // define a simple boolean cell value for the action column so that the column will only be shown for non-empty rows.
+        actionCol.setCellValueFactory(
+                new Callback<TableColumn.CellDataFeatures<Reldb_Row, Boolean>, ObservableValue<Boolean>>() {
+                    @Override
+                    public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Reldb_Row, Boolean> features) {
+                        return new SimpleBooleanProperty(features.getValue() != null);
+                    }
+                });
+        /*
+         // create a cell value factory with an add button for each row in the table.
+         actionCol.setCellFactory ( 
+         new Callback<TableColumn<Reldb_Row, Boolean>, TableCell<Reldb_Row, Boolean>>() {
+         @Override
+         public TableCell<Reldb_Row, Boolean> call
+         (TableColumn<Reldb_Row, Boolean> personBooleanTableColumn
+        
+         ) {
+         return new AddPersonCell(stage, table);
+         }    }    );*/
+
+        String[] titleCols = {"Title", "Year", "Kind", ""};
+        titleTable = new Reldb_Table("Title", titleCols);
+
+        table_titles.getColumns().setAll(titleCol, yearCol, kindCol, actionCol);
 
     }
 
     void initialize(ResultSet resultsTitle) {
-
-        List<String> rows = new ArrayList();
-        try {
-            while (resultsTitle.next()) {
-                for (int i = 1; i <= 3; i++) {
-                    rows.add(resultsTitle.getString(i));
-                    System.out.print(resultsTitle.getString(i) + " ");
-                }
-                System.out.println();
-                //row.add(resultsTitle.getString("year"));
-                //row.add(resultsTitle.getString("kind_id"));
-
-            }
-        } catch (SQLException ex) {
-            log.log(Level.WARNING, ex.getMessage());
-        } finally {
-            try {
-                resultsTitle.close();
-            } catch (SQLException ex) {
-                log.log(Level.WARNING, ex.getMessage());
-            }
-        }
-
-        //table_titles.setItems(FXCollections.observableList(rows));
-        //table_titles.getItems().addAll(titledata);
+        titleTable.addRows(resultsTitle);
     }
 
+    @Deprecated
     void initializeArray(String[] titles, ResultSet resultSet, int titleCount) {
-        if (titleCount == 0) {
-            tab_titles.setDisable(true);
-            return;
-        }
-        String[][] dataArray = convertTo2dArray(titles, resultSet, titleCount);
-        ObservableList<String[]> data = FXCollections.observableArrayList();
-        data.addAll(Arrays.asList(dataArray));
-        data.remove(0);//remove titles from data
-        for (int i = 0; i < titles.length; i++) {
-            TableColumn tc = new TableColumn(dataArray[0][i]);
+        /* if (titleCount == 0) {
+         tab_titles.setDisable(true);
+         return;
+         }
+         String[][] dataArray = convertTo2dArray(titles, resultSet, titleCount);
+         ObservableList<String[]> data = FXCollections.observableArrayList();
+         data.addAll(Arrays.asList(dataArray));
+         data.remove(0);//remove titles from data
+         for (int i = 0; i < titles.length; i++) {
+         TableColumn tc = new TableColumn(dataArray[0][i]);
 
-            final int colNo = i;
-            tc.setCellValueFactory(new Callback<CellDataFeatures<String[], String>, ObservableValue<String>>() {
-                @Override
-                public ObservableValue<String> call(CellDataFeatures<String[], String> p) {
-                    return new SimpleStringProperty((p.getValue()[colNo]));
-                }
-            });
-            //tc.setPrefWidth(90);
-            table_titles.getColumns().add(tc);
-        }
-        table_titles.setItems(data);
+         final int colNo = i;
+         tc.setCellValueFactory(new Callback<CellDataFeatures<String[], String>, ObservableValue<String>>() {
+         @Override
+         public ObservableValue<String> call(CellDataFeatures<String[], String> p) {
+         return new SimpleStringProperty((p.getValue()[colNo]));
+         }
+         });
+         //tc.setPrefWidth(90);
+         table_titles.getColumns().add(tc);
+         }
+         table_titles.setItems(data);*/
     }
 
+    @Deprecated
     private String[][] convertTo2dArray(String[] titles, ResultSet results, int size) {
         String[][] rows;
         rows = new String[size + 1][titles.length];
@@ -122,9 +125,6 @@ public class SearchresultsController implements Initializable {
                 rows[rowCount] = row;
                 rowCount++;
                 System.out.println();
-                //row.add(resultsTitle.getString("year"));
-                //row.add(resultsTitle.getString("kind_id"));
-
             }
         } catch (SQLException ex) {
             log.log(Level.WARNING, ex.getMessage());
@@ -135,14 +135,14 @@ public class SearchresultsController implements Initializable {
                 log.log(Level.WARNING, ex.getMessage());
             }
         }
-        /*
-         String[][] array = new String[colCount][rows.size()];
-         for (int i = 0; i < colCount - 1; i++) {
-         for (int j = 0; j < rows.size() - 1 ; j++) {
-         array[j][i] = rows.get(j)[i];
-         }
-         }
-         */
         return rows;
+
+    }
+
+    private static class Reldb_TableImpl extends Reldb_Table {
+
+        public Reldb_TableImpl(String tableName, String[] columns) {
+            super(tableName, columns);
+        }
     }
 }
