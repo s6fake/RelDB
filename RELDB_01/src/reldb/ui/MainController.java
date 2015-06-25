@@ -2,6 +2,7 @@ package reldb.ui;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,7 +90,7 @@ public class MainController implements Initializable {
                 if (!selectedItem.discovered) {                  // Prüfen ob das Element schon einmal besucht wurde
 
                     con_treeView.setDisable(true);                          // TreeView deaktivieren, damit nicht mit unfertigen Daten gearbeitet wird
-                    List<?> items = selectedItem.discover();     // Gegebenenfalls neue Kind-Elemente hinzufügen
+                    Collection<?> items = selectedItem.discover();     // Gegebenenfalls neue Kind-Elemente hinzufügen
                     if (items != null) {
                         addTreeItems(selectedItem, items);
                     }
@@ -129,7 +130,7 @@ public class MainController implements Initializable {
         return addTreeItem(treeConnRoot, item);
     }
 
-    public void addTreeItems(Reldb_TreeItem tParent, List<?> items) {
+    public void addTreeItems(Reldb_TreeItem tParent, Collection<?> items) {
         items.stream().forEach((item) -> {
             addTreeItem(tParent, item);
         });

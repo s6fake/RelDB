@@ -5,9 +5,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  *
@@ -22,9 +27,9 @@ public class Reldb_Table {
     private final String TABLE_SCHEM;
     private final String TABLE_NAME; //Name der Tabelle
     private final Reldb_Database database;
-    private List<Reldb_Column> columns = new ArrayList<>(); //Liste aller Spalten
+    private Map<String, Reldb_Column> columns = new HashMap<>(); //Liste aller Spalten
     private List<Reldb_Column> primaryKeys = new ArrayList<>(); // Liste aller Primärschlüssel
-    private List<Reldb_Row> rows = new ArrayList<>();       // Für Aufgabe 2
+    private ObservableList<Reldb_Row> rows = FXCollections.observableArrayList();       // Für Aufgabe 2
     
     private boolean listsFilled = false;
     private boolean selected = false;       // Wurde die Tabelle für den Export ausgewählt?
@@ -56,7 +61,7 @@ public class Reldb_Table {
      */
     public Reldb_Table(String tableName, Reldb_Column[] columns) {
         this(tableName);
-        this.columns.addAll(Arrays.asList(columns));
+        addColumns(Arrays.asList(columns));
         listsFilled = true;
     }
 
@@ -69,7 +74,7 @@ public class Reldb_Table {
     public Reldb_Table(String tableName, String[] columns) {
         this(tableName);
         for (int c = 0; c < columns.length; c++) {
-            this.columns.add(new Reldb_Column(this, columns[c]));
+            addColumn(new Reldb_Column(this, columns[c]));
         }
         listsFilled = true;
     }
@@ -81,6 +86,7 @@ public class Reldb_Table {
         this.TABLE_SCHEM = null;
         this.database = null;
     }
+    
 
     void initalize() {
         if (!listsFilled) {
@@ -88,7 +94,6 @@ public class Reldb_Table {
             createColumns();
             createPrimaryKeys();
             createForeignKeys();
-
         }
     }
 
@@ -116,7 +121,7 @@ public class Reldb_Table {
                     autoincrement = true;
                 }
                 Reldb_Column newCol = new Reldb_Column(getDatabase(), this, columnName, columnType, columnTypeName, columSize, nullable, autoincrement); // Neue Reldb_Column erstellen
-                columns.add(newCol);    //Spalte in die Spaltenliste hinzufügen
+                addColumn(newCol);    //Spalte in die Spaltenliste hinzufügen
                 //log.info(TABLE_NAME + "." + columnName + " erstellt.");
             }
         } catch (SQLException ex) {
@@ -214,7 +219,8 @@ public class Reldb_Table {
     public void addRows(ResultSet rowData) {
         try {
             while(rowData.next()) {
-                rows.add(new Reldb_Row(this, rowData));
+                
+                getRows().add(new Reldb_Row(this, rowData));
             }
         } catch (SQLException ex) {
             log.log(Level.INFO, ex.getMessage());
@@ -267,12 +273,11 @@ public class Reldb_Table {
     /**
      * @return the columns
      */
-    public List<Reldb_Column> getColumns() {
+    public Collection<Reldb_Column> getColumns() {
         if (!listsFilled) {
-
             this.initalize();
         }
-        return columns;
+        return columns.values();
     }
 
     /**
@@ -317,4 +322,24 @@ public class Reldb_Table {
         this.selected = selected;
     }
 
+    /**
+     * @return the rows
+     */
+    public ObservableList<Reldb_Row> getRows() {
+        return rows;
+    }
+
+    public final void addColumn(Reldb_Column column) {
+        if (columns.containsKey(column.getCOLUMN_NAME())) {
+            log.log(Level.WARNING, "Spalte {0} ist bereits in der Tabelle " + getTableName() + " enthalten!", column.getCOLUMN_NAME());;
+            return;
+        }
+        columns.put(column.getCOLUMN_NAME(), column);
+    }
+    
+    public final void addColumns(List<Reldb_Column> columns) {
+        for (Reldb_Column column : columns) {
+            addColumn(column);
+        }
+    }
 }

@@ -19,6 +19,11 @@ public class Reldb_Row {
     private Reldb_Table table;
     private Reldb_DataContainer[] cells;
 
+    /**
+     * 
+     * @param table
+     * @param objects Enthält genau eine Reihe an Daten
+     */
     public Reldb_Row(Reldb_Table table, ResultSet objects) {
         this.table = table;
         this.cells = new Reldb_DataContainer[table.getSelectedColumns().size()];
@@ -26,15 +31,21 @@ public class Reldb_Row {
     }
 
     private void insertObjects(ResultSet objects) {
+        String colName = "";
+        Object object = null;
+        int i = 0;
         try {
             int c = getCells().length;
             List<Reldb_Column> columns = getTable().getSelectedColumns();
-            for (int i = 0; i < c; i++) {
-                String colName = columns.get(i).getCOLUMN_NAME();
-                cells[i] = new Reldb_DataContainer(objects.getObject(colName), colName);
+            
+            for (i = 0; i < c; i++) {
+                colName = columns.get(i).getCOLUMN_NAME();
+                object = objects.getObject(colName);
+                cells[i] = new Reldb_DataContainer(object, colName);
+                //System.out.println("Cells[" + i + "] = " + objects.getObject(colName) + " " + colName);
             }
         } catch (SQLException e) {
-            System.err.print(e.toString());
+            System.err.println(e.toString() + " " + "Cells[" + i + "] = " + object + " " + colName);
         }
     }
 
@@ -86,9 +97,9 @@ public class Reldb_Row {
     
     public StringProperty get(int i) {
         if (!(i < cells.length)) {
-            return new SimpleStringProperty(this, "");
+            return new SimpleStringProperty("");
         }
-        return new SimpleStringProperty(this, cells[i].toString());
+        return new SimpleStringProperty(cells[i].toString());
     }
 
 }

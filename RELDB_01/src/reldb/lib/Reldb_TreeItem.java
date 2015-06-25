@@ -1,5 +1,6 @@
 package reldb.lib;
 
+import java.util.Collection;
 import java.util.List;
 import javafx.scene.control.CheckBoxTreeItem;
 import reldb.lib.database.Reldb_Column;
@@ -50,7 +51,7 @@ public class Reldb_TreeItem extends CheckBoxTreeItem {
         }
     }
 
-    public List<?> discover() {
+    public Collection<?> discover() {
         if (!discovered) {
             discovered = true;
             if (getValue() instanceof Reldb_Database) {
