@@ -27,10 +27,10 @@ public class LendMovieCell extends TableCell<Reldb_Row, Boolean> {
         addButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                JOptionPane.showMessageDialog(null, "Du kannst diesen Film noch nicht ausleihen!\n Die Bibliothek wird aber erstellt.",
+                /*JOptionPane.showMessageDialog(null, "Du kannst diesen Film noch nicht ausleihen!\n Die Bibliothek wird aber erstellt.",
                         "Inane warning",
-                        JOptionPane.WARNING_MESSAGE);
-                Library.getInstance();
+                        JOptionPane.WARNING_MESSAGE);*/
+                Library.getInstance().showInterface();
             }
         });
 
