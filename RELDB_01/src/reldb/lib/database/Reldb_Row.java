@@ -101,5 +101,10 @@ public class Reldb_Row {
         }
         return new SimpleStringProperty(cells[i].toString());
     }
+    
+        public StringProperty get(String name) {
+         
+            return new SimpleStringProperty("Not supported yet");
+    }
 
 }

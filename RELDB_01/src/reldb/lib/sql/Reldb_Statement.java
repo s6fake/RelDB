@@ -5,10 +5,8 @@
  */
 package reldb.lib.sql;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,7 +44,7 @@ public class Reldb_Statement {
         try {
             statement.close();
         } catch (SQLException e) {
-            printError(e);
+            log.log(Level.WARNING, e.getMessage());
         }
     }
 
@@ -66,7 +64,7 @@ public class Reldb_Statement {
         try {
             results = statement.executeQuery(sql_expr.getTableNames(connection.getDatabaseProductName()));
         } catch (SQLException e) {
-            printError(e);
+            printError(e,sql_expr.getTableNames(connection.getDatabaseProductName()) );
         }
         return results;
     }
@@ -76,7 +74,7 @@ public class Reldb_Statement {
         try {
             result = statement.execute(command);
         } catch (SQLException e) {
-            printError(e);
+            printError(e, command);
         }
         return result;
     }
@@ -87,7 +85,7 @@ public class Reldb_Statement {
             statement.executeUpdate(command);
         } catch (SQLException e) {
             result = e;
-            printError(e);
+            printError(e, command);
         }
         return result;
     }
@@ -99,7 +97,7 @@ public class Reldb_Statement {
             results = statement.executeQuery(command);
             //printWarnings();            
         } catch (SQLException e) {
-            printError(e);
+            printError(e, command);
         }
         return results;
     }
@@ -120,16 +118,16 @@ public class Reldb_Statement {
             }
             results.close();
         } catch (SQLException e) {
-            printError(e);
+            printError(e, command);
         }
         return result;
     }
 
-    private void printError(SQLException exception) {
+    private void printError(SQLException exception, String command) {
         if (exception.getErrorCode() == 2291 || exception.getErrorCode() == 904) {
             log.log(Level.CONFIG, exception.getMessage());
         } else {
-            log.log(Level.SEVERE, exception.getMessage());
+            log.log(Level.SEVERE, exception.getMessage() + command + "\n");
         }
     }
 

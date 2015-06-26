@@ -225,14 +225,32 @@ public class Reldb_Table {
         }
     }
 
+    /**
+     * Mehrere Datensätze zur Tabelle hinzufügen
+     *
+     * @param rowData
+     */
     public void addRows(ResultSet rowData) {
+        if (rowData == null) {
+            return;
+        }
         try {
             while (rowData.next()) {
-
-                getRows().add(new Reldb_Row(this, rowData));
+                addRow(new Reldb_Row(this, rowData));
             }
         } catch (SQLException ex) {
             log.log(Level.INFO, ex.getMessage());
+        }
+    }
+
+    /**
+     * Einen einzelnen Datensatz zur Tabelle hinzufügen
+     *
+     * @param row
+     */
+    public void addRow(Reldb_Row row) {
+        if (row != null) {
+            getRows().add(row);
         }
     }
 
@@ -360,9 +378,10 @@ public class Reldb_Table {
             addColumn(column);
         }
     }
-    
+
     public void addPrimaryKeyColumn(Reldb_Column column) {
         primaryKeys.add(column);
         addColumn(column);
+        column.setIsPrimaryKey(true);
     }
 }

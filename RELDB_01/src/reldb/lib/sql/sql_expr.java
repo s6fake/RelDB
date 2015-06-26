@@ -101,6 +101,7 @@ public class sql_expr {
      * Nur zum testen
      *
      */
+    @Deprecated
     private static String convert(String typeName, int type, int size) {
         String dataString = "";
         if (type != 12) {   //Varchar
