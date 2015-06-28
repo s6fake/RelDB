@@ -3,12 +3,15 @@ package reldb.ui.dialogs;
 import java.net.URL;
 import java.util.ResourceBundle;
 import static javafx.collections.FXCollections.observableArrayList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javax.swing.JOptionPane;
 import reldb.lib.Reldb_Connection;
@@ -60,8 +63,8 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
         port_field.setText(Integer.toString(connection.getPort()));
         database_field.setText(connection.getDatabaseID());
     }
-    
-    public void initializeDialog(String url, String dbName, int port, int dbTypeID) {        
+
+    public void initializeDialog(String url, String dbName, int port, int dbTypeID) {
         choicebox_type.getSelectionModel().select(dbTypeID);
         url_field.setText(url);
         port_field.setText(Integer.toString(port));
@@ -131,5 +134,12 @@ public class NewConnectionDialogController extends CustomDialog implements Initi
      */
     public void setIsExportConnection(boolean isExportConnection) {
         this.isExportConnection = isExportConnection;
+    }
+
+    @FXML
+    private void on_keyReleased(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            doLogin(null);
+        }
     }
 }
