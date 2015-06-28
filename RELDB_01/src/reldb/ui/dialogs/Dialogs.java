@@ -4,6 +4,7 @@ import java.io.IOException;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import reldb.lib.Reldb_Connection;
 import reldb.lib.database.Reldb_Column;
 import reldb.ui.IMainClass;
@@ -48,10 +49,10 @@ public class Dialogs {
 
     public static void newConnectionDialog(IMainClass parent, String url, String dbName, int port, int dbTypeID) {
         NewConnectionDialogController controller = newConnectionDialog(parent);
-        controller.initializeDialog(url, dbName, port, dbTypeID);        
-        
+        controller.initializeDialog(url, dbName, port, dbTypeID);
+
     }
-    
+
     public static NewConnectionDialogController newConnectionDialog(IMainClass parent) {
         NewConnectionDialogController controller = null;
         try {
@@ -206,6 +207,5 @@ public class Dialogs {
 
         }
     }
-
 
 }

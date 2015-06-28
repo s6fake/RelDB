@@ -5,9 +5,11 @@
  */
 package reldb.lib.sql;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import reldb.lib.Reldb_Connection;
@@ -64,9 +66,38 @@ public class Reldb_Statement {
         try {
             results = statement.executeQuery(sql_expr.getTableNames(connection.getDatabaseProductName()));
         } catch (SQLException e) {
-            printError(e,sql_expr.getTableNames(connection.getDatabaseProductName()) );
+            printError(e, sql_expr.getTableNames(connection.getDatabaseProductName()));
         }
         return results;
+    }
+
+    public void set(Object[] args) {
+        PreparedStatement st = (PreparedStatement) statement;
+        for (int i = 0; i < args.length; i++) {
+            try {
+                if (args[i] instanceof String) {
+                    st.setString(i + 1, args[i].toString());
+                } else if (args[i] instanceof Integer) {
+                    st.setInt(i + 1, (Integer) args[i]);
+                } else {
+                    st.setObject(i + 1, args[i]);
+                }
+            } catch (SQLException ex) {
+                log.warning(ex.getMessage());
+            }
+        }
+        statement = st;
+    }
+
+    public boolean execute() {
+        boolean result = false;
+        PreparedStatement st = (PreparedStatement) statement;
+        try {
+            result = st.execute();
+        } catch (SQLException ex) {
+            printError(ex, st.toString());
+        }
+        return result;
     }
 
     public boolean execute(String command) {

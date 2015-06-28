@@ -20,7 +20,7 @@ public class Reldb_DataContainer {
     protected boolean AUTOINCREMENT = false;
     protected boolean UNIQUE = false;
     protected Reldb_Database database = null;
-    private final Object data;
+    private Object data;
 
     public Reldb_DataContainer() {
         this.data = null;
@@ -182,6 +182,13 @@ public class Reldb_DataContainer {
      */
     public String getCOLUMN_NAME() {
         return COLUMN_NAME;
+    }
+
+    /**
+     * @param data the data to set
+     */
+    public void setData(Object data) {
+        this.data = data;
     }
 }
 
