@@ -53,17 +53,16 @@ public class SearchresultsController implements Initializable {
         kindCol.setCellValueFactory((CellDataFeatures<Reldb_Row, String> p) -> p.getValue().get("kind"));
         episodeOfCol.setCellValueFactory((CellDataFeatures<Reldb_Row, String> p) -> p.getValue().get("episode_of"));
         actionCol.setCellValueFactory((CellDataFeatures<Reldb_Row, Boolean> p) -> new SimpleBooleanProperty(p.getValue().get("available").getValueSafe().equalsIgnoreCase("true")));
-       
+
         actionCol.setSortable(false);
 
         // define a simple boolean cell value for the action column so that the column will only be shown for non-empty rows.
         /*actionCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Reldb_Row, Boolean>, ObservableValue<Boolean>>() {
-            @Override
-            public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Reldb_Row, Boolean> features) {
-                return new SimpleBooleanProperty(features.getValue() != null);
-            }
-        });*/
-
+         @Override
+         public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Reldb_Row, Boolean> features) {
+         return new SimpleBooleanProperty(features.getValue() != null);
+         }
+         });*/
         // create a cell value factory with an add button for each row in the table.
         actionCol.setCellFactory(new Callback<TableColumn<Reldb_Row, Boolean>, TableCell<Reldb_Row, Boolean>>() {
             @Override
@@ -73,12 +72,13 @@ public class SearchresultsController implements Initializable {
         });
 
         // Tabelle für die Ergebnisse erstellen
-        String[] titleCols = {"id", "title", "production_year", "kind", "episode_of" ,"available"};
+        String[] titleCols = {"id", "title", "production_year", "kind", "episode_of", "available"};
         titleTable = new Reldb_Table("Title", titleCols);
 
         table_titles.getColumns().setAll(titleCol, yearCol, kindCol, episodeOfCol, actionCol);
 
     }
+
 
     void initialize(ResultSet resultsTitle) {
         titleTable.addRows(resultsTitle);

@@ -25,7 +25,7 @@ public class Library {
     private final Reldb_Connection connection;
     private final Reldb_Table customer, title_rating, title_rent;
 
-    private CustomerInterfaceController controller;
+    private CustomerInterfaceController interfaceController;
     private Reldb_Row selectedMovie = null;
     
     private Library() {
@@ -125,9 +125,9 @@ public class Library {
             stage.setTitle("Interface");
 
             // Controller initialisieren
-            controller = loader.<CustomerInterfaceController>getController();
-            controller.setStage(stage);
-            controller.initialize(customer, title_rent, title_rating);
+            interfaceController = loader.<CustomerInterfaceController>getController();
+            interfaceController.setStage(stage);
+            interfaceController.initialize(customer, title_rent, title_rating);
 
         } catch (IOException ex) {
             System.err.println("Fehler beim Starten des Login-Dialogs." + ex.getMessage());
@@ -142,8 +142,8 @@ public class Library {
      */
     public void showInterface(Reldb_Row selectedMovie) {
         this.selectedMovie = selectedMovie;
-        controller.setSelectedMovie(selectedMovie);
-        controller.show();
+        interfaceController.setSelectedMovie(selectedMovie);
+        interfaceController.show();
     }
 
     /**
@@ -153,7 +153,7 @@ public class Library {
     public void giveMovieTo(Reldb_Row person) {
         String title = selectedMovie.get("title").getValueSafe();
         String name = person.get("name").getValueSafe();
-        int dialogResult = JOptionPane.showConfirmDialog(null, "Den Film " + title + " an " + name + " verleihen?", "Question", JOptionPane.YES_NO_OPTION);
+        int dialogResult = JOptionPane.showConfirmDialog(null, "Give " + title + " to " + name + "?", "Question", JOptionPane.YES_NO_OPTION);
         if (dialogResult == JOptionPane.YES_OPTION) {
             System.out.println("MEEP");
             String customer_id = person.get("id").getValueSafe();
@@ -161,7 +161,8 @@ public class Library {
             Reldb_Statement statement = new Reldb_Statement(connection);
             statement.execute("INSERT INTO title_rent (customer_id, movie_id, rent_date) VALUES (" + customer_id + ", " + movie_id + ", SYSDATE)");
             statement.close();
-            controller.pause();
+            interfaceController.pause();
+            selectedMovie.getCellByColumn("available").setData("FALSE");
         }
 
     }
@@ -183,6 +184,13 @@ public class Library {
         library = null;
     }
 
+    public void addCustomer(Object[] data) {
+        Reldb_Statement statement = new Reldb_Statement(RELDB_02.getConnection(),"INSERT INTO customer (name, birthdate, street, city, postcode) VALUES (?, ?, ?, ?, ?)" );
+        statement.set(data);
+        statement.execute();
+        statement.close();
+    }
+    
     /**
      * @return the customers
      */

@@ -3,6 +3,8 @@ package reldb02.ui;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.ResultSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,6 +30,8 @@ public class Search_mainController implements Initializable {
     @FXML
     private TabPane tabPane;
     private IMainClass parent;
+
+    private List<SearchresultsController> resultControllers = new LinkedList<>();
 
     /**
      * Initializes the controller class.
@@ -66,9 +70,10 @@ public class Search_mainController implements Initializable {
             FXMLLoader loader = new FXMLLoader(RELDB_02.class.getResource("searchresults.fxml"));
             Node node = loader.load();
             SearchresultsController controller = loader.<SearchresultsController>getController();
-            
+
             controller.initialize(results);
-            
+            resultControllers.add(controller);
+
             Tab newTab = new Tab("Results for: \"" + keywords + "\"", node);
             tabPane.getTabs().add(newTab);
             tabPane.getSelectionModel().select(newTab);
@@ -76,5 +81,4 @@ public class Search_mainController implements Initializable {
             log.log(Level.WARNING, ex.getMessage());
         }
     }
-
 }

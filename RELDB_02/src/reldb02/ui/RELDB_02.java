@@ -29,7 +29,7 @@ public class RELDB_02 extends Application implements IMainClass {
     public static Reldb_Connection getConnection() {
         return connection;
     }
-    Search_mainController searchController;
+    private static Search_mainController searchController;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -46,7 +46,7 @@ public class RELDB_02 extends Application implements IMainClass {
             // Controller initialisieren
             controller = loader.<Search_mainController>getController();
             controller.setParent(this);
-            this.searchController = controller;
+            searchController = controller;
             // Hauptfenster anzeigen
             stage.show();
         } catch (IOException ex) {
@@ -74,7 +74,7 @@ public class RELDB_02 extends Application implements IMainClass {
                 return;
             }
             connection = newConnection;
-            searchController.newSearchTab();
+            getSearchController().newSearchTab();
 
         } else {
             log.log(Level.WARNING, "Verbindung konnte nicht hergestellt werden!");
@@ -103,5 +103,12 @@ public class RELDB_02 extends Application implements IMainClass {
     public static void exit(int i) {
         Reldb_Connection.closeAllConnections();
         System.exit(i);
+    }
+
+    /**
+     * @return the searchController
+     */
+    public static Search_mainController getSearchController() {
+        return searchController;
     }
 }

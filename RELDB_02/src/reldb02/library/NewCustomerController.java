@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package reldb02.library;
 
 import java.net.URL;
@@ -12,13 +7,15 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import reldb.ui.dialogs.CustomDialog;
 
 /**
  * FXML Controller class
  *
  * @author Fabo
  */
-public class NewCustomerController implements Initializable {
+public class NewCustomerController extends CustomDialog implements Initializable {
+
     @FXML
     private TextField txt_name;
     @FXML
@@ -31,15 +28,19 @@ public class NewCustomerController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
+        btn_ok.disableProperty().bind(txt_name.textProperty().isEqualTo(""));
+    }
 
     @FXML
     private void on_ok(ActionEvent event) {
+        Object[] data = {txt_name.getText(), txt_birth.getText(), null, null, null};
+        Library.getInstance().addCustomer(data);
+        stage.close();
     }
 
     @FXML
     private void on_cancel(ActionEvent event) {
+        stage.close();
     }
-    
+
 }
