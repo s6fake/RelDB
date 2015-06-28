@@ -41,7 +41,7 @@
                 <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <TextField fx:id="textField_keywords" GridPane.columnIndex="1" />
+                  <TextField fx:id="textField_keywords" onKeyReleased="#text_on_keyReleased" GridPane.columnIndex="1" />
                   <AnchorPane prefHeight="200.0" prefWidth="200.0">
                      <children>
                         <Label alignment="CENTER_RIGHT" layoutX="260.0" layoutY="12.0" prefHeight="40.0" prefWidth="314.0" text="Keywords:" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">

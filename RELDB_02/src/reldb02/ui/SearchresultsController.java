@@ -7,7 +7,6 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Tab;
@@ -37,8 +36,11 @@ public class SearchresultsController implements Initializable {
     TableColumn<Reldb_Row, String> titleCol = new TableColumn<>("Title");
     TableColumn<Reldb_Row, String> yearCol = new TableColumn<>("Year");
     TableColumn<Reldb_Row, String> kindCol = new TableColumn<>("Kind");
+    TableColumn<Reldb_Row, String> episodeOfCol = new TableColumn<>("Epidsode of");
     TableColumn<Reldb_Row, Boolean> actionCol = new TableColumn<>("");
 
+    //TableColumn<Reldb_Row, Boolean> availableCol = new TableColumn<>("available");
+    //TableColumn<Reldb_Row, String> availableValCol = new TableColumn<>("available(VALUE)");
     Reldb_Table titleTable;
 
     /**
@@ -46,35 +48,35 @@ public class SearchresultsController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        titleCol.setCellValueFactory((CellDataFeatures<Reldb_Row, String> p) -> p.getValue().get(0));
-        yearCol.setCellValueFactory((CellDataFeatures<Reldb_Row, String> p) -> p.getValue().get(1));
-        kindCol.setCellValueFactory((CellDataFeatures<Reldb_Row, String> p) -> p.getValue().get(2));
-
+        titleCol.setCellValueFactory((CellDataFeatures<Reldb_Row, String> p) -> p.getValue().get("title"));
+        yearCol.setCellValueFactory((CellDataFeatures<Reldb_Row, String> p) -> p.getValue().get("production_year"));
+        kindCol.setCellValueFactory((CellDataFeatures<Reldb_Row, String> p) -> p.getValue().get("kind"));
+        episodeOfCol.setCellValueFactory((CellDataFeatures<Reldb_Row, String> p) -> p.getValue().get("episode_of"));
+        actionCol.setCellValueFactory((CellDataFeatures<Reldb_Row, Boolean> p) -> new SimpleBooleanProperty(p.getValue().get("available").getValueSafe().equalsIgnoreCase("true")));
+       
         actionCol.setSortable(false);
 
         // define a simple boolean cell value for the action column so that the column will only be shown for non-empty rows.
-        actionCol.setCellValueFactory(
-                new Callback<TableColumn.CellDataFeatures<Reldb_Row, Boolean>, ObservableValue<Boolean>>() {
-                    @Override
-                    public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Reldb_Row, Boolean> features) {
-                        return new SimpleBooleanProperty(features.getValue() != null);
-                    }
-                });
+        /*actionCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Reldb_Row, Boolean>, ObservableValue<Boolean>>() {
+            @Override
+            public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Reldb_Row, Boolean> features) {
+                return new SimpleBooleanProperty(features.getValue() != null);
+            }
+        });*/
 
         // create a cell value factory with an add button for each row in the table.
-        actionCol.setCellFactory(
-                new Callback<TableColumn<Reldb_Row, Boolean>, TableCell<Reldb_Row, Boolean>>() {
-                    @Override
-                    public TableCell<Reldb_Row, Boolean> call(TableColumn<Reldb_Row, Boolean> personBooleanTableColumn
-                    ) {
-                        return new LendMovieCell(table_titles);
-                    }
-                });
+        actionCol.setCellFactory(new Callback<TableColumn<Reldb_Row, Boolean>, TableCell<Reldb_Row, Boolean>>() {
+            @Override
+            public TableCell<Reldb_Row, Boolean> call(TableColumn<Reldb_Row, Boolean> p) {
+                return new LendMovieCell(table_titles, "Lend");
+            }
+        });
 
-        String[] titleCols = {"title", "production_year", "kind"};
+        // Tabelle für die Ergebnisse erstellen
+        String[] titleCols = {"id", "title", "production_year", "kind", "episode_of" ,"available"};
         titleTable = new Reldb_Table("Title", titleCols);
 
-        table_titles.getColumns().setAll(titleCol, yearCol, kindCol, actionCol);
+        table_titles.getColumns().setAll(titleCol, yearCol, kindCol, episodeOfCol, actionCol);
 
     }
 

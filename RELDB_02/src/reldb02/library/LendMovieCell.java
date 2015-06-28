@@ -2,53 +2,46 @@ package reldb02.library;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableView;
-import javafx.scene.layout.StackPane;
-import javax.swing.JOptionPane;
+import javafx.scene.control.Tooltip;
 import reldb.lib.database.Reldb_Row;
 
 /**
  *
  * @author Fabo
  */
-public class LendMovieCell extends TableCell<Reldb_Row, Boolean> {
+public class LendMovieCell extends ButtonCell {
 
-    final Button addButton = new Button("Lend");
-    final StackPane paddedButton = new StackPane();
+    private final Tooltip notAvailable = new Tooltip("This movie is currently not available");
 
-    public LendMovieCell(final TableView table) {
-        paddedButton.setPadding(new Insets(3));
-        paddedButton.getChildren().add(addButton);
+    public LendMovieCell(TableView<Reldb_Row> table, String text) {
+        super(table, text);
 
-        addButton.setOnAction(new EventHandler<ActionEvent>() {
+        //button.visibleProperty().bind(new SimpleBooleanProperty(getItem() != null ? getItem() : false));
+        hackTooltipStartTiming(notAvailable);
+        button.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                /*JOptionPane.showMessageDialog(null, "Du kannst diesen Film noch nicht ausleihen!\n Die Bibliothek wird aber erstellt.",
-                        "Inane warning",
-                        JOptionPane.WARNING_MESSAGE);*/
-                Library.getInstance().showInterface();
+                table.getSelectionModel().select(getIndex());
+                Reldb_Row selectedMovie = table.getSelectionModel().getSelectedItem();
+                Library.getInstance().showInterface(selectedMovie);
             }
         });
-
     }
-    /**
-     * Button in der Tabelle anzeigen
-     * @param item
-     * @param empty 
-     */
+
     @Override
     protected void updateItem(Boolean item, boolean empty) {
         super.updateItem(item, empty);
         if (!empty) {
+            button.setDisable(!(getItem() != null ? getItem() : false));
+            if (button.isDisable()) {
+                this.setTooltip(notAvailable);
+            }
             setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
             setGraphic(paddedButton);
         } else {
             setGraphic(null);
         }
     }
-
 }
