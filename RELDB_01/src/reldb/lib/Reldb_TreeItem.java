@@ -51,7 +51,7 @@ public class Reldb_TreeItem extends CheckBoxTreeItem {
         }
     }
 
-    public Collection<?> discover() {
+    public List<?> discover() {
         if (!discovered) {
             discovered = true;
             if (getValue() instanceof Reldb_Database) {

@@ -20,7 +20,7 @@ public class Reldb_Row {
     private Reldb_DataContainer[] cells;
 
     /**
-     * 
+     *
      * @param table
      * @param objects Enthält genau eine Reihe an Daten
      */
@@ -37,7 +37,7 @@ public class Reldb_Row {
         try {
             int c = getCells().length;
             List<Reldb_Column> columns = getTable().getSelectedColumns();
-            
+
             for (i = 0; i < c; i++) {
                 colName = columns.get(i).getCOLUMN_NAME();
                 object = objects.getObject(colName);
@@ -94,17 +94,17 @@ public class Reldb_Row {
     public Reldb_Database getDatabase() {
         return table.getDatabase();
     }
-    
+
     public StringProperty get(int i) {
         if (!(i < cells.length)) {
             return new SimpleStringProperty("");
         }
         return new SimpleStringProperty(cells[i].toString());
     }
-    
-        public StringProperty get(String name) {
-         
-            return new SimpleStringProperty("Not supported yet");
+
+    public StringProperty get(String name) {
+        int index = table.getColumnIndex(name);
+        return new SimpleStringProperty(cells[index].toString());
     }
 
 }

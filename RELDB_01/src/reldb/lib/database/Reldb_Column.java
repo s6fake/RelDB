@@ -18,6 +18,8 @@ public class Reldb_Column extends Reldb_DataContainer {
     private String refTableName = null, refColumnName = null;
     private int foreignKeySequence = 0;
 
+
+    
     private List<Filter> filters = new ArrayList<>();
     private boolean selected = true;
 

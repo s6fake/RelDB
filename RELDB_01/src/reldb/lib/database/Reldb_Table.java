@@ -27,7 +27,9 @@ public class Reldb_Table {
     private final String TABLE_SCHEM;
     private final String TABLE_NAME; //Name der Tabelle
     private final Reldb_Database database;
-    private Map<String, Reldb_Column> columns = new HashMap<>(); //Liste aller Spalten
+    private Map<String, Reldb_Column> tableMapping = new HashMap<>();   //Mapping aller Spalten
+    private final List<Reldb_Column> columns = new ArrayList<>();             // Sortierte Liste aller Spalten
+
     private List<Reldb_Column> primaryKeys = new ArrayList<>(); // Liste aller Primärschlüssel
     private ObservableList<Reldb_Row> rows = FXCollections.observableArrayList();       // Für Aufgabe 2
 
@@ -44,6 +46,7 @@ public class Reldb_Table {
      * @param TABLE_NAME Name der Tabelle
      */
     protected Reldb_Table(Reldb_Database database, String TABLE_TYPE, String TABLE_CAT, String TABLE_SCHEM, String TABLE_NAME) {
+        this.tableMapping = new HashMap<>();
         this.TABLE_TYPE = TABLE_TYPE;
         this.TABLE_CAT = TABLE_CAT;
         this.TABLE_SCHEM = TABLE_SCHEM;
@@ -61,6 +64,7 @@ public class Reldb_Table {
      */
     public Reldb_Table(String tableName, Reldb_Column[] columns) {
         this(tableName);
+        this.tableMapping = new HashMap<>();
         addColumns(Arrays.asList(columns));
         listsFilled = true;
     }
@@ -68,11 +72,12 @@ public class Reldb_Table {
     /**
      * Erstellt eine neue Tabelle, unabhängig von einer Datenbank
      *
-     * @param tableName
+     * @param TABLE_NAME
      * @param columns
      */
     public Reldb_Table(String TABLE_NAME, String[] columns) {
         this(TABLE_NAME);
+        this.tableMapping = new HashMap<>();
         for (int c = 0; c < columns.length; c++) {
             addColumn(new Reldb_Column(this, columns[c]));
         }
@@ -81,6 +86,7 @@ public class Reldb_Table {
 
     @Deprecated
     public Reldb_Table(Reldb_Database database, String TABLE_NAME) {
+        this.tableMapping = new HashMap<>();
         this.TABLE_TYPE = "TABLE";
         this.TABLE_NAME = TABLE_NAME;
         this.TABLE_CAT = null;
@@ -89,6 +95,7 @@ public class Reldb_Table {
     }
 
     public Reldb_Table(String TABLE_NAME) {
+        this.tableMapping = new HashMap<>();
         this.TABLE_TYPE = "TABLE";
         this.TABLE_NAME = TABLE_NAME;
         this.TABLE_CAT = null;
@@ -110,7 +117,7 @@ public class Reldb_Table {
      * Überträgt alle Spalten aus den Metadaten in die interne Spaltenliste
      */
     public void createColumns() {
-        if (!columns.isEmpty()) {
+        if (!tableMapping.isEmpty()) {
             return;
         }
         ResultSet result = null;
@@ -299,11 +306,21 @@ public class Reldb_Table {
     /**
      * @return the columns
      */
-    public Collection<Reldb_Column> getColumns() {
+    public List<Reldb_Column> getColumns() {
         if (!listsFilled) {
             this.initalize();
         }
-        return columns.values();
+        return columns;
+    }
+    
+    public int getColumnIndex(String colName) {
+        int index;
+        for (index = 0; index < columns.size(); index++) {
+            if (columns.get(index).getCOLUMN_NAME().equalsIgnoreCase(colName)) {
+                return index;
+            }
+        }
+        return 0;
     }
 
     /**
@@ -361,11 +378,12 @@ public class Reldb_Table {
      * @param column
      */
     public final void addColumn(Reldb_Column column) {
-        if (columns.containsKey(column.getCOLUMN_NAME())) {
+        if (tableMapping.containsKey(column.getCOLUMN_NAME())) {
             log.log(Level.WARNING, "Spalte {0} ist bereits in der Tabelle " + getTableName() + " enthalten!", column.getCOLUMN_NAME());;
             return;
         }
-        columns.put(column.getCOLUMN_NAME(), column);
+        tableMapping.put(column.getCOLUMN_NAME(), column);
+        columns.add(column);
     }
 
     /**
@@ -379,6 +397,11 @@ public class Reldb_Table {
         }
     }
 
+    /**
+     * Fügt eine Spalte als Primärschlüssel zur Tabelle hinzu
+     *
+     * @param column
+     */
     public void addPrimaryKeyColumn(Reldb_Column column) {
         primaryKeys.add(column);
         addColumn(column);

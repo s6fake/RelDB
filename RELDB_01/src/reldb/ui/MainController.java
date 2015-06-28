@@ -90,7 +90,7 @@ public class MainController implements Initializable {
                 if (!selectedItem.discovered) {                  // Prüfen ob das Element schon einmal besucht wurde
 
                     con_treeView.setDisable(true);                          // TreeView deaktivieren, damit nicht mit unfertigen Daten gearbeitet wird
-                    Collection<?> items = selectedItem.discover();     // Gegebenenfalls neue Kind-Elemente hinzufügen
+                    List<?> items = selectedItem.discover();     // Gegebenenfalls neue Kind-Elemente hinzufügen
                     if (items != null) {
                         addTreeItems(selectedItem, items);
                     }
