@@ -232,7 +232,7 @@ public class Reldb_DataMover extends Thread {
             int rowCount = MAX_ROW;
             while ((rowCount > 0 || MAX_ROW == -1) && results.next()) {
                 newRow = new Reldb_Row(source, results);
-                System.out.println("New RoW");
+                //System.out.println("New RoW");
                 if (!insert2(newRow, insertIntoCmd, destinationDatabase)) {
                     invalidRows.add(newRow);
                 }
@@ -260,7 +260,7 @@ public class Reldb_DataMover extends Thread {
         String valuesCmd = sql_expr.values(data);
         Reldb_Statement statement = new Reldb_Statement(destinationDatabase.getConnection());
         SQLException warnings = statement.executeUpdate(insertIntoCmd + valuesCmd);
-        if (warnings == null) {
+        if (warnings != null) {
             return handleErrorOderSo(warnings, data, insertIntoCmd, destinationDatabase);
         }
         progress_current.increaseCurrentProgress();
