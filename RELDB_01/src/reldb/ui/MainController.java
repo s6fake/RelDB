@@ -66,9 +66,13 @@ public class MainController implements Initializable {
     @FXML
     private TabPane tabPane;
 
-    private Map<Reldb_Column, List<Filter>> filterList = new HashMap<Reldb_Column, List<Filter>>();
-    private Map<Reldb_Column, Filter_displayContainerController> filterContainerList = new HashMap<Reldb_Column, Filter_displayContainerController>();
-
+    //Für neue Struktur
+    ///-------------------///
+    private Map<Reldb_Table, FilterTab> filterTabs = new HashMap<>();      // Jede Tabelle bekommt seinen eigenen Filter Tab
+    
+    ///-------------------///
+    
+    
     /**
      * Initializes the controller class.
      */
@@ -383,38 +387,17 @@ public class MainController implements Initializable {
         }
     }
 
-    /**
-     * Erzeugt einen neuen Tab, mit leerem DisplayContainer
-     *
-     * @param column Die Spalte, für die der Filter angelegt werden soll.
-     * @return Den neuen Display Container. Nicht verlieren!
-     */
-    private Filter_displayContainerController newFilterTab(Reldb_Column column) {
-        Filter_displayContainerController controller = null;
-        try {
-            FXMLLoader loader = new FXMLLoader(RELDB_01.class.getResource("filter_displayContainer.fxml"));
-            Node node = loader.load();
-            controller = loader.<Filter_displayContainerController>getController();
-            controller.setColumn(column);
-            filterContainerList.put(column, controller);
-            Tab newTab = new Tab(column.getName(), node);
-            tabPane.getTabs().add(newTab);
 
-        } catch (IOException ex) {
-            System.err.println(ex.getMessage());
-        }
-        return controller;
-    }
 
     public void addNewFilter(Reldb_Column column, Filter filter) {
-        Filter_displayContainerController controller;
-        if (filterContainerList.containsKey(column)) {
-            controller = filterContainerList.get(column);
-        } else {
-            controller = newFilterTab(column);
+        if (!filterTabs.containsKey(column.getTable())) {
+            FilterTab fTab = new FilterTab(column.getTable());
+            tabPane.getTabs().add(fTab);
+            filterTabs.put(column.getTable(), fTab);
         }
-        controller.addFilter(filter);
-        column.addFilter(filter);
+        filterTabs.get(column.getTable()).addFilter(column, filter);
+        
+
     }
 
     void remove(Filter_displayElementController aThis) {

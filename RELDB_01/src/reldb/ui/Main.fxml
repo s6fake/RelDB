@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
 <?import java.lang.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="reldb.ui.MainController">
+<VBox prefHeight="566.0" prefWidth="723.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="reldb.ui.MainController">
     <children>
         <MenuBar fx:id="menuBar" VBox.vgrow="NEVER">
             <menus>
@@ -50,7 +50,7 @@
                                     <items>
                                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" SplitPane.resizableWithParent="false">
                                             <children>
-                                                <SplitPane dividerPositions="0.7638483965014577" orientation="VERTICAL" prefHeight="345.0" prefWidth="187.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                <SplitPane dividerPositions="0.7638483965014577" orientation="VERTICAL" prefHeight="502.0" prefWidth="221.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-11.0" AnchorPane.topAnchor="0.0">
                                                     <items>
                                                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                                                             <children>
@@ -97,15 +97,7 @@
                                              <GridPane.margin>
                                                 <Insets left="350.0" />
                                              </GridPane.margin></Button>
-                                          <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0">
-                                            <tabs>
-                                              <Tab text="Untitled Tab 1">
-                                                <content>
-                                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                                                </content>
-                                              </Tab>
-                                            </tabs>
-                                          </TabPane>
+                                          <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" />
                                                     </children>
                                                 </GridPane>
                                             </children>
@@ -116,7 +108,7 @@
                         </AnchorPane>
                         <AnchorPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="20.0" minWidth="0.0" prefHeight="20.0" prefWidth="160.0" SplitPane.resizableWithParent="false">
                             <children>
-                                <Pane maxWidth="1.7976931348623157E308" prefHeight="20.0" prefWidth="640.0" style="-fx-background-color: #CCFF99;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                <Pane maxWidth="1.7976931348623157E308" prefHeight="20.0" prefWidth="640.0" style="-fx-background-color: #CCCCCC;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                     <children>
                                         <AnchorPane maxWidth="1.7976931348623157E308" prefHeight="20.0" prefWidth="640.0">
                                             <children>
@@ -135,7 +127,6 @@
                         <Cursor fx:constant="DEFAULT" />
                     </cursor>
                 </SplitPane>
-                <ProgressBar maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="200.0" progress="0.0" AnchorPane.bottomAnchor="1.0" AnchorPane.rightAnchor="1.0" />
             </children>
         </AnchorPane>
     </children>
