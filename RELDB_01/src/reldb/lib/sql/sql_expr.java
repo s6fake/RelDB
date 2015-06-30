@@ -59,7 +59,7 @@ public class sql_expr {
             selectList = selectList + col.getName() + ", ";
         }
         selectList = selectList + selectList.substring(0, selectList.length() - 2);
-        String command = "SELECT " + selectList + " FROM " + table.getTableName() + " WHERE " + data.getCOLUMN_NAME() + " = " + data.toString();
+        String command = "SELECT " + selectList + " FROM " + table.getTableName() + " WHERE " + data.getCOLUMN_NAME() + " = " + data.toSaveString();
         return command;
     }
     
@@ -197,12 +197,17 @@ public class sql_expr {
         return command;
     }
 
+    /**
+     * Erzeugt einen Befehl, um Daten in Spalten einzufügen
+     * @param values
+     * @return "VALUES " + values[].toSaveString
+     */
     public static String values(Reldb_Row values) {
         String command = "VALUES\n(";
         Reldb_DataContainer[] cells;
         cells = values.getCells();
         for (int i = 0; i < cells.length; i++) {
-            command = command + cells[i].toString() + ", ";
+            command = command + cells[i].toSaveString() + ", ";
         }
         command = command.substring(0, command.length() - 2);
         command = command + ")";

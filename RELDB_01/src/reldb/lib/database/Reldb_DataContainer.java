@@ -97,6 +97,10 @@ public class Reldb_DataContainer {
         return data.toString();
     }
 
+    /**
+     * Erzeugt einen String für das Einfügen der Daten in eine Datenbank
+     * @return 
+     */
     public String toSaveString() {
         if (data == null) {
             return "NULL";
