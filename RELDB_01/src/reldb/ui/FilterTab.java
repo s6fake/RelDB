@@ -19,7 +19,7 @@ import reldb.lib.migration.Filter;
 public class FilterTab extends Tab {
 
     // Das TabPane, in dem die Filter eingefügt werden
-    private TabPane tabPane = new TabPane();
+    private final TabPane tabPane = new TabPane();
     private Map<Reldb_Column, List<Filter>> filterList = new HashMap<Reldb_Column, List<Filter>>();
     private Map<Reldb_Column, Filter_displayContainerController> filterContainerList = new HashMap<Reldb_Column, Filter_displayContainerController>();
     
@@ -31,6 +31,7 @@ public class FilterTab extends Tab {
      */
     public FilterTab(Reldb_Table table) {
         super(table.getTableName());
+        this.setContent(tabPane);
     }
 
     /**
