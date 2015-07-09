@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -73,17 +74,20 @@ public class Reldb_Statement {
 
     public void set(Object[] args) {
         PreparedStatement st = (PreparedStatement) statement;
-        for (int i = 0; i < args.length; i++) {
+        int i;
+        for (i = 0; i < args.length; i++) {
             try {
                 if (args[i] instanceof String) {
                     st.setString(i + 1, args[i].toString());
                 } else if (args[i] instanceof Integer) {
                     st.setInt(i + 1, (Integer) args[i]);
+                } else if (args[i] instanceof java.sql.Date) {
+                    st.setDate(i + 1, (java.sql.Date) args[i]);
                 } else {
                     st.setObject(i + 1, args[i]);
                 }
             } catch (SQLException ex) {
-                log.warning(ex.getMessage());
+                log.warning(ex.getMessage() + st.toString() + "\n" + args[i]);
             }
         }
         statement = st;
@@ -135,6 +139,17 @@ public class Reldb_Statement {
 
     public ResultSet executeQuery(String command) {
         return Reldb_Statement.this.executeQuery(command, 0);
+    }
+
+    public ResultSet executeQuery() {
+        ResultSet results = null;
+        PreparedStatement st = (PreparedStatement) statement;
+        try {
+            results = st.executeQuery();
+        } catch (SQLException ex) {
+            printError(ex, st.toString());
+        }
+        return results;
     }
 
     public int selectCount(String table, String condition) {

@@ -1,5 +1,7 @@
 package reldb.lib.database;
 
+import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import reldb.lib.database.Reldb_Database.DATABASETYPE;
 import reldb.lib.sql.Reldb_Types;
@@ -94,12 +96,21 @@ public class Reldb_DataContainer {
         if (data == null) {
             return "";
         }
+        //if (database != null && database.databaseType == DATABASETYPE.ORACLE) {
+            try {
+                // Zeichensatz umwandeln
+                return new String(data.toString().getBytes("UTF-8"), "UTF-8");      //ISO-8859-1
+            } catch (UnsupportedEncodingException ex) {
+                log.log(Level.WARNING, ex.getMessage());
+            }
+        //}
         return data.toString();
     }
 
     /**
      * Erzeugt einen String für das Einfügen der Daten in eine Datenbank
-     * @return 
+     *
+     * @return
      */
     public String toSaveString() {
         if (data == null) {

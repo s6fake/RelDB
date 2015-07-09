@@ -251,6 +251,21 @@ public class Reldb_Table {
     }
 
     /**
+     * Mehrere Datensätze zur Tabelle hinzufügen. ResultSet wird anschließend
+     * geschlossen
+     *
+     * @param rowData
+     */
+    public void addRowsAndClose(ResultSet rowData) {
+        addRows(rowData);
+        try {
+            rowData.close();
+        } catch (SQLException ex) {
+            log.log(Level.INFO, ex.getMessage());
+        }
+    }
+
+    /**
      * Einen einzelnen Datensatz zur Tabelle hinzufügen
      *
      * @param row
@@ -312,7 +327,7 @@ public class Reldb_Table {
         }
         return columns;
     }
-    
+
     public int getColumnIndex(String colName) {
         int index;
         for (index = 0; index < columns.size(); index++) {
