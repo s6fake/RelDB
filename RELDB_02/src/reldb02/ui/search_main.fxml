@@ -15,35 +15,22 @@
                     <items>
                         <MenuItem mnemonicParsing="false" onAction="#login" text="Login" />
                         <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem mnemonicParsing="false" onAction="#newSearchTab" text="New Search" disable="true"  />
-                        <MenuItem mnemonicParsing="false" text="Extended Search" disable="true" />
+                        <MenuItem disable="true" mnemonicParsing="false" onAction="#newSearchTab" text="New Search" />
                         <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem mnemonicParsing="false" text="Save" disable="true"/>
+                        <MenuItem disable="true" mnemonicParsing="false" text="Save" />
                         <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem mnemonicParsing="false" text="Preferences…" disable="true" />
+                        <MenuItem disable="true" mnemonicParsing="false" text="Preferences…" />
                         <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem mnemonicParsing="false" text="Quit" disable="true" />
+                        <MenuItem mnemonicParsing="false" onAction="#on_quit" text="Quit" />
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Edit">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="Undo" />
-                        <MenuItem mnemonicParsing="false" text="Redo" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem mnemonicParsing="false" text="Cut" />
-                        <MenuItem mnemonicParsing="false" text="Copy" />
-                        <MenuItem mnemonicParsing="false" text="Paste" />
-                        <MenuItem mnemonicParsing="false" text="Delete" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem mnemonicParsing="false" text="Select All" />
-                        <MenuItem mnemonicParsing="false" text="Unselect All" />
+                  <MenuItem fx:id="menuItem_show_customers" mnemonicParsing="false" onAction="#on_show_customers" text="Show Customers" />
+                        <MenuItem fx:id="menuItem_new_customer" disable="true" mnemonicParsing="false" onAction="#on_new_customer" text="New Customer" />
                     </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Help">
-                    <items>
-                        <MenuItem mnemonicParsing="false" text="About MyHelloApp" />
-                    </items>
-                </Menu>
+                <Menu disable="true" mnemonicParsing="false" text="Help" />
             </menus>
         </MenuBar>
         <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="603.0" prefWidth="587.0" VBox.vgrow="ALWAYS">

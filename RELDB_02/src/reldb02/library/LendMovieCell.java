@@ -6,6 +6,8 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import reldb.lib.database.Reldb_Row;
+import reldb.lib.sql.Reldb_Statement;
+import reldb02.ui.RELDB_02;
 
 /**
  *
@@ -18,8 +20,8 @@ public class LendMovieCell extends ButtonCell {
     public LendMovieCell(TableView<Reldb_Row> table, String text) {
         super(table, text);
 
-        //button.visibleProperty().bind(new SimpleBooleanProperty(getItem() != null ? getItem() : false));
         hackTooltipStartTiming(notAvailable);
+        
         button.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -43,5 +45,11 @@ public class LendMovieCell extends ButtonCell {
         } else {
             setGraphic(null);
         }
+    }
+    
+    private void checkAvailability(Reldb_Row selectedMovie) {
+        Reldb_Statement statement = new Reldb_Statement(RELDB_02.getConnection());
+        
+        statement.close();
     }
 }

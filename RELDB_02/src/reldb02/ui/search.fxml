@@ -102,22 +102,22 @@
                                  <children>
                                     <AnchorPane prefHeight="200.0" prefWidth="200.0">
                                        <children>
-                                          <CheckBox layoutX="16.0" layoutY="6.0" mnemonicParsing="false" selected="true" text="Titles" />
+                                          <CheckBox fx:id="cb_titles" layoutX="16.0" layoutY="6.0" mnemonicParsing="false" selected="true" text="Titles" />
                                        </children>
                                     </AnchorPane>
                                     <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
                                        <children>
-                                          <CheckBox layoutY="6.0" mnemonicParsing="false" selected="true" text="Characters" />
+                                          <CheckBox fx:id="cb_characters" layoutY="6.0" mnemonicParsing="false" selected="true" text="Characters" />
                                        </children>
                                     </AnchorPane>
                                     <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1">
                                        <children>
-                                          <CheckBox layoutX="16.0" layoutY="6.0" mnemonicParsing="false" selected="true" text="Persons" />
+                                          <CheckBox fx:id="cb_persons" layoutX="16.0" layoutY="6.0" mnemonicParsing="false" selected="true" text="Persons" />
                                        </children>
                                     </AnchorPane>
                                     <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                        <children>
-                                          <CheckBox layoutY="6.0" mnemonicParsing="false" selected="true" text="Companies" />
+                                          <CheckBox fx:id="cb_companies" layoutY="6.0" mnemonicParsing="false" selected="true" text="Companies" />
                                        </children>
                                     </AnchorPane>
                                  </children>

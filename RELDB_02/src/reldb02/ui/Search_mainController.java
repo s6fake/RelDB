@@ -13,10 +13,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import reldb.ui.IMainClass;
 import reldb.ui.dialogs.Dialogs;
+import reldb02.library.Library;
 
 /**
  * FXML Controller class
@@ -32,6 +34,10 @@ public class Search_mainController implements Initializable {
     private IMainClass parent;
 
     private List<SearchresultsController> resultControllers = new LinkedList<>();
+    @FXML
+    private MenuItem menuItem_new_customer;
+    @FXML
+    private MenuItem menuItem_show_customers;
 
     /**
      * Initializes the controller class.
@@ -65,13 +71,13 @@ public class Search_mainController implements Initializable {
         }
     }
 
-    public void newResultTab(String keywords, ResultSet results) {
+    public void newResultTab(String keywords, ResultSet titleResults, ResultSet personResults) {
         try {
             FXMLLoader loader = new FXMLLoader(RELDB_02.class.getResource("searchresults.fxml"));
             Node node = loader.load();
             SearchresultsController controller = loader.<SearchresultsController>getController();
 
-            controller.initialize(results);
+            controller.initialize(titleResults, personResults);
             resultControllers.add(controller);
 
             Tab newTab = new Tab("Results for: \"" + keywords + "\"", node);
@@ -80,5 +86,19 @@ public class Search_mainController implements Initializable {
         } catch (IOException ex) {
             log.log(Level.WARNING, ex.getMessage());
         }
+    }
+
+    @FXML
+    private void on_quit(ActionEvent event) {
+        RELDB_02.exit(0);
+    }
+
+    @FXML
+    private void on_new_customer(ActionEvent event) {
+    }
+
+    @FXML
+    private void on_show_customers(ActionEvent event) {
+        Library.getInstance().showInterface();
     }
 }
