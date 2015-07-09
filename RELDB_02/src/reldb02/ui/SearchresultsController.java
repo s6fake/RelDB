@@ -74,12 +74,7 @@ public class SearchresultsController implements Initializable {
          }
          });*/
         // create a cell value factory with an add button for each row in the table.
-        actionCol.setCellFactory(new Callback<TableColumn<Reldb_Row, Boolean>, TableCell<Reldb_Row, Boolean>>() {
-            @Override
-            public TableCell<Reldb_Row, Boolean> call(TableColumn<Reldb_Row, Boolean> p) {
-                return new LendMovieCell(table_titles, "Lend");
-            }
-        });
+        actionCol.setCellFactory((TableColumn<Reldb_Row, Boolean> p) -> new LendMovieCell(table_titles, "Lend"));
 
         // Tabelle für die Ergebnisse erstellen
         String[] titleCols = {"id", "title", "production_year", "kind", "episode_of", "available"};

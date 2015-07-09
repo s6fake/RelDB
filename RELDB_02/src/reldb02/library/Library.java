@@ -165,8 +165,9 @@ public class Library {
      * Einen Film an eine Person ausleihen
      *
      * @param person
+     * @return True, wenn der Film ausgeliehen wurde, false sonst.
      */
-    public void giveMovieTo(Reldb_Row person) {
+    public boolean giveMovieTo(Reldb_Row person) {
         String title = selectedMovie.get("title").getValueSafe();
         String name = person.get("name").getValueSafe();
         int dialogResult = JOptionPane.showConfirmDialog(null, "Give " + title + " to " + name + "?", "Question", JOptionPane.YES_NO_OPTION);
@@ -179,8 +180,25 @@ public class Library {
             interfaceController.pause();
             selectedMovie.getCellByColumn("available").setData("FALSE");
             close();
+            return true;
         }
-
+        return false;
+    }
+    
+    public boolean returnMovie(Reldb_Row movie) {
+        String rent_id = movie.get("id").getValueSafe();
+        String title = movie.get("movie_name").getValueSafe();
+        int dialogResult = JOptionPane.showConfirmDialog(null, "Return " + title + " ?", "Question", JOptionPane.YES_NO_OPTION);
+        if (dialogResult == JOptionPane.YES_OPTION) {
+            Reldb_Statement statement = new Reldb_Statement(RELDB_02.getConnection());
+            String command = "UPDATE title_rent SET return_date = SYSDATE WHERE id = " + rent_id;
+            System.out.println(command);
+            System.out.println(movie.toString());
+            statement.executeUpdate(command);
+            statement.close();
+            return true;
+        } 
+        return false;
     }
 
     /**

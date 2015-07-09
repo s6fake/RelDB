@@ -53,9 +53,8 @@ public class CustomerInterfaceController implements Initializable {
     private TableView<Reldb_Row> tableView_rating;
     private Stage stage;
 
-    private ObservableList<Reldb_Row> rentData = FXCollections.observableArrayList();
+    private ObservableList<Reldb_Row> rentData;
     private SortedList<Reldb_Row> sortedData;
-
 
     /**
      * Initializes the controller class.
@@ -63,10 +62,14 @@ public class CustomerInterfaceController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         col_btn.setCellValueFactory((TableColumn.CellDataFeatures<Reldb_Row, Boolean> features) -> new SimpleBooleanProperty(features.getValue() != null));
-
-        col_btn.setCellFactory((TableColumn<Reldb_Row, Boolean> personBooleanTableColumn) -> new GiveMovieCell(tableView_users, "Give"));
-        col_rent_btn.setCellFactory((TableColumn<Reldb_Row, Boolean> personBooleanTableColumn) -> new GiveMovieCell(tableView_users, "Return"));
-
+        col_btn.setCellFactory((TableColumn<Reldb_Row, Boolean> p) -> new GiveMovieCell(tableView_users, "Give"));
+        col_btn.setSortable(false);
+        
+        
+        col_rent_btn.setCellFactory((TableColumn<Reldb_Row, Boolean> p) -> new ReturnMovieCell(tableView_rent, "Return"));
+        col_rent_btn.setCellValueFactory((TableColumn.CellDataFeatures<Reldb_Row, Boolean> p) -> new SimpleBooleanProperty(!p.getValue().get("return_date").getValueSafe().equals("")));
+        //col_rent_btn.setSortable(false);
+        
         tableView_rent.setPlaceholder(new Text("Currently no movies rented"));
         tableView_rating.setPlaceholder(new Text("Currently no ratings given"));
     }
@@ -81,14 +84,14 @@ public class CustomerInterfaceController implements Initializable {
         col_rent_rentDate.setCellValueFactory((TableColumn.CellDataFeatures<Reldb_Row, String> p) -> p.getValue().get("rent_date"));
         col_rent_returnDate.setCellValueFactory((TableColumn.CellDataFeatures<Reldb_Row, String> p) -> p.getValue().get("return_date"));
         //tableView_rent.getColumns().setAll(col_rent_CID, col_rent_MID, col_rent_rentDate, col_rent_returnDate, col_rent_btn);
-        String[] rentColumns = {"id", "customer_name", "movie_name", "rent_date", "return_date"};
+        String[] rentColumns = {"customer_id", "id", "customer_name", "movie_name", "rent_date", "return_date"};
         table_rent = new Reldb_Table("title_rent", rentColumns);
-        String command = "SELECT c.id, c.name AS customer_name, t.title AS movie_name, TO_CHAR(r.rent_date, 'DD.MM.YY') AS rent_date, TO_CHAR(r.return_date, 'DD.MM.YY') AS return_date FROM title_rent r JOIN IMDB.title t ON r.movie_id = t.id JOIN customer c ON r.customer_id = c.id";
+        String command = "SELECT r.customer_id, r.id, c.name AS customer_name, t.title AS movie_name, TO_CHAR(r.rent_date, 'DD.MM.YY') AS rent_date, TO_CHAR(r.return_date, 'DD.MM.YY') AS return_date FROM title_rent r JOIN IMDB.title t ON r.movie_id = t.id JOIN customer c ON r.customer_id = c.id";
         Reldb_Statement statement = new Reldb_Statement(RELDB_02.getConnection());
         ResultSet results = statement.executeQuery(command);
 
         table_rent.addRows(results);
-
+        statement.close();
         FilteredList<Reldb_Row> filteredData = new FilteredList<>(rentData, p -> true);
 
         tableView_users.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
@@ -96,7 +99,7 @@ public class CustomerInterfaceController implements Initializable {
                 if (newVal == null) {
                     return true;
                 }
-                return row.get("ID").toString().equalsIgnoreCase(newVal.get("ID").toString());
+                return row.get("customer_id").toString().equalsIgnoreCase(newVal.get("customer_id").toString());
             });
 
         });
@@ -107,8 +110,6 @@ public class CustomerInterfaceController implements Initializable {
         rentData.addAll(table_rent.getRows());
 
         //table_rent = rentTable;
-        
-        
     }
 
     @FXML
@@ -158,8 +159,8 @@ public class CustomerInterfaceController implements Initializable {
         statement.execute("DELETE FROM title_rent WHERE customer_id = " + customer_id);
         statement.execute("DELETE FROM customer WHERE id = " + customer_id);
         statement.close();
-        
+
         tableView_users.getItems().remove(user);
-        
+
     }
 }
