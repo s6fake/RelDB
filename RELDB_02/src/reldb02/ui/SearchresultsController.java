@@ -10,11 +10,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.util.Callback;
 import reldb.lib.database.Reldb_Row;
 import reldb.lib.database.Reldb_Table;
 import reldb02.library.LendMovieCell;
@@ -66,14 +65,6 @@ public class SearchresultsController implements Initializable {
 
         actionCol.setSortable(false);
 
-        // define a simple boolean cell value for the action column so that the column will only be shown for non-empty rows.
-        /*actionCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Reldb_Row, Boolean>, ObservableValue<Boolean>>() {
-         @Override
-         public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Reldb_Row, Boolean> features) {
-         return new SimpleBooleanProperty(features.getValue() != null);
-         }
-         });*/
-        // create a cell value factory with an add button for each row in the table.
         actionCol.setCellFactory((TableColumn<Reldb_Row, Boolean> p) -> new LendMovieCell(table_titles, "Lend"));
 
         // Tabelle für die Ergebnisse erstellen
@@ -81,6 +72,16 @@ public class SearchresultsController implements Initializable {
         titleTable = new Reldb_Table("Title", titleCols);
 
         table_titles.getColumns().setAll(actionCol, titleCol, yearCol, kindCol, episodeOfCol);
+
+        table_titles.setRowFactory(p -> {
+            TableRow<Reldb_Row> row = new TableRow();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    TitleDetailsController.makeController().initialize(Integer.parseInt(row.getItem().get("ID").getValueSafe()), row.getItem().get("title").getValueSafe());
+                }
+            });
+            return row;
+        });
     }
 
     private void initializePersonTable() {
@@ -99,8 +100,8 @@ public class SearchresultsController implements Initializable {
         titleTable.addRows(resultsTitle);
         table_titles.getItems().addAll(titleTable.getRows());
         if (resultsPerson != null) {
-        personTable.addRows(resultsPerson);
-        table_persons.getItems().addAll(personTable.getRows());
+            personTable.addRows(resultsPerson);
+            table_persons.getItems().addAll(personTable.getRows());
         } else {
             tab_persons.setDisable(true);
         }
