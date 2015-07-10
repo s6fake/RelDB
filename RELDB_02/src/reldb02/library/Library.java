@@ -49,17 +49,17 @@ public class Library {
      * Erzeugt alle Tabellen für die Videothek
      */
     private void initializeTables() {
-        Reldb_Column c_id = new Reldb_Column(connection.getDatabase(), customer, "id", 4, 0, false, true);
+        Reldb_Column c_id = new Reldb_Column(connection.getDatabase(), customer, "id", 4, "", 0, false, true);
         customer.addPrimaryKeyColumn(c_id);
-        Reldb_Column c_name = new Reldb_Column(connection.getDatabase(), customer, "name", 12, 45, false, false);
+        Reldb_Column c_name = new Reldb_Column(connection.getDatabase(), customer, "name", 12, "", 45, false, false);
         customer.addColumn(c_name);
-        Reldb_Column c_birthdate = new Reldb_Column(connection.getDatabase(), customer, "birthdate", 91, 0, true, false);
+        Reldb_Column c_birthdate = new Reldb_Column(connection.getDatabase(), customer, "birthdate", 91, "", 0, true, false);
         customer.addColumn(c_birthdate);
-        Reldb_Column c_street = new Reldb_Column(connection.getDatabase(), customer, "street", 12, 50, true, false);
+        Reldb_Column c_street = new Reldb_Column(connection.getDatabase(), customer, "street", 12, "", 50, true, false);
         customer.addColumn(c_street);
-        Reldb_Column c_city = new Reldb_Column(connection.getDatabase(), customer, "city", 12, 50, true, false);
+        Reldb_Column c_city = new Reldb_Column(connection.getDatabase(), customer, "city", 12, "", 50, true, false);
         customer.addColumn(c_city);
-        Reldb_Column c_postcode = new Reldb_Column(connection.getDatabase(), customer, "postcode", 1, 5, true, false);
+        Reldb_Column c_postcode = new Reldb_Column(connection.getDatabase(), customer, "postcode", 1, "", 5, true, false);
         customer.addColumn(c_postcode);
 
         Reldb_Statement statement = new Reldb_Statement(connection);
@@ -70,18 +70,18 @@ public class Library {
         statement = new Reldb_Statement(connection);
         statement.execute(sql_expr.createTable(customer, Reldb_Database.DATABASETYPE.ORACLE));
 
-        Reldb_Column re_id = new Reldb_Column(connection.getDatabase(), getTitle_rent(), "id", 4, 0, false, true);
+        Reldb_Column re_id = new Reldb_Column(connection.getDatabase(), getTitle_rent(), "id", 4, "", 0, false, true);
         getTitle_rent().addPrimaryKeyColumn(re_id);
-        Reldb_Column re_customer_id = new Reldb_Column(connection.getDatabase(), getTitle_rent(), "customer_id", 4, 0, false, false);
+        Reldb_Column re_customer_id = new Reldb_Column(connection.getDatabase(), getTitle_rent(), "customer_id", 4, "", 0, false, false);
         re_customer_id.addForeignKey("customer", "id", 0);
         getTitle_rent().addColumn(re_customer_id);
-        Reldb_Column re_movie_id = new Reldb_Column(connection.getDatabase(), getTitle_rent(), "movie_id", 4, 0, false, false);
+        Reldb_Column re_movie_id = new Reldb_Column(connection.getDatabase(), getTitle_rent(), "movie_id", 4, "", 0, false, false);
         getTitle_rent().addColumn(re_movie_id);
-        Reldb_Column re_rent_date = new Reldb_Column(connection.getDatabase(), getTitle_rent(), "rent_date", 91, 0, false, false);
+        Reldb_Column re_rent_date = new Reldb_Column(connection.getDatabase(), getTitle_rent(), "rent_date", 91, "", 0, false, false);
         getTitle_rent().addColumn(re_rent_date);
-        Reldb_Column re_return_date = new Reldb_Column(connection.getDatabase(), getTitle_rent(), "return_date", 91, 0, true, false);
+        Reldb_Column re_return_date = new Reldb_Column(connection.getDatabase(), getTitle_rent(), "return_date", 91, "", 0, true, false);
         getTitle_rent().addColumn(re_return_date);
-        Reldb_Column re_note = new Reldb_Column(connection.getDatabase(), getTitle_rent(), "note", 12, 255, true, false);
+        Reldb_Column re_note = new Reldb_Column(connection.getDatabase(), getTitle_rent(), "note", 12, "", 255, true, false);
         getTitle_rent().addColumn(re_note);
 
         // statement.execute("DROP TABLE title_rent");
@@ -90,16 +90,16 @@ public class Library {
         statement.execute(sql_expr.createTable(getTitle_rent(), Reldb_Database.DATABASETYPE.ORACLE));
         statement.execute("ALTER TABLE title_rent ADD " + re_customer_id.getForeignKeyConstructorString(Reldb_Database.DATABASETYPE.ORACLE));
 
-        Reldb_Column ra_id = new Reldb_Column(connection.getDatabase(), getTitle_rating(), "id", 4, 0, false, true);
+        Reldb_Column ra_id = new Reldb_Column(connection.getDatabase(), getTitle_rating(), "id", 4, "", 0, false, true);
         getTitle_rating().addPrimaryKeyColumn(ra_id);
-        Reldb_Column ra_customer_id = new Reldb_Column(connection.getDatabase(), getTitle_rating(), "customer_id", 4, 0, false, false);
+        Reldb_Column ra_customer_id = new Reldb_Column(connection.getDatabase(), getTitle_rating(), "customer_id", 4, "", 0, false, false);
         ra_customer_id.addForeignKey("customer", "id", 0);
         getTitle_rating().addColumn(ra_customer_id);
-        Reldb_Column ra_movie_id = new Reldb_Column(connection.getDatabase(), getTitle_rating(), "movie_id", 4, 0, false, false);
+        Reldb_Column ra_movie_id = new Reldb_Column(connection.getDatabase(), getTitle_rating(), "movie_id", 4, "", 0, false, false);
         getTitle_rating().addColumn(ra_movie_id);
-        Reldb_Column ra_rating = new Reldb_Column(connection.getDatabase(), getTitle_rating(), "rating", 4, 0, false, false);
+        Reldb_Column ra_rating = new Reldb_Column(connection.getDatabase(), getTitle_rating(), "rating", 4, "", 0, false, false);
         getTitle_rating().addColumn(ra_rating);
-        Reldb_Column ra_note = new Reldb_Column(connection.getDatabase(), getTitle_rating(), "note", 12, 255, true, false);
+        Reldb_Column ra_note = new Reldb_Column(connection.getDatabase(), getTitle_rating(), "note", 12, "", 255, true, false);
         getTitle_rating().addColumn(ra_note);
 
         //statement.execute("DROP TABLE title_rating");
@@ -184,7 +184,7 @@ public class Library {
         }
         return false;
     }
-    
+
     public boolean returnMovie(Reldb_Row movie) {
         String rent_id = movie.get("id").getValueSafe();
         String title = movie.get("movie_name").getValueSafe();
@@ -197,7 +197,7 @@ public class Library {
             statement.executeUpdate(command);
             statement.close();
             return true;
-        } 
+        }
         return false;
     }
 

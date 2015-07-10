@@ -133,8 +133,8 @@ public class TitleDetailsController implements Initializable {
         tableView_linked_movies.setPlaceholder(new Label("No Linked Movies"));
         tableView_cast.setPlaceholder(new Label("Nobody have ever been seen in this movie..."));
 
-        column_tableView_books.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getString()));
-        column_tableView_runtime.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getString()));
+        column_tableView_books.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().toString()));
+        column_tableView_runtime.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().toString()));
 
         col_charName.setCellValueFactory((TableColumn.CellDataFeatures<Reldb_Row, String> p) -> p.getValue().get("CHARACTER_NAME"));
         col_person.setCellValueFactory((TableColumn.CellDataFeatures<Reldb_Row, String> p) -> p.getValue().get("PERSON"));
