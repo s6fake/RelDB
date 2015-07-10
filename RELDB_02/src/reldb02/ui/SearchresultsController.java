@@ -14,6 +14,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import static javafx.scene.control.TableView.UNCONSTRAINED_RESIZE_POLICY;
 import reldb.lib.database.Reldb_Row;
 import reldb.lib.database.Reldb_Table;
 import reldb02.library.LendMovieCell;
@@ -47,6 +48,21 @@ public class SearchresultsController implements Initializable {
     TableColumn<Reldb_Row, String> genderCol = new TableColumn<>("Gender");
     Reldb_Table personTable;
 
+    @FXML
+    private Tab tab_characters;
+    @FXML
+    private TableView<Reldb_Row> table_characters;
+     TableColumn<Reldb_Row, String> charNameCol = new TableColumn<>("Character Name");
+    TableColumn<Reldb_Row, String> personCol = new TableColumn<>("Person");
+    TableColumn<Reldb_Row, String> movieCol = new TableColumn<>("Title");   
+    TableColumn<Reldb_Row, String> yearCol_character = new TableColumn<>("Year");
+    Reldb_Table characterTable;
+    @FXML
+    private Tab tab_companies;
+
+    @FXML
+    private TableView<?> table_companies;
+
     /**
      * Initializes the controller class.
      */
@@ -72,7 +88,6 @@ public class SearchresultsController implements Initializable {
         titleTable = new Reldb_Table("Title", titleCols);
 
         table_titles.getColumns().setAll(actionCol, titleCol, yearCol, kindCol, episodeOfCol);
-
         // Zum öffnen der Detailansicht
         table_titles.setRowFactory(p -> {
             TableRow<Reldb_Row> row = new TableRow();
@@ -101,20 +116,41 @@ public class SearchresultsController implements Initializable {
         table_persons.getColumns().setAll(nameCol, birthCol, genderCol);
     }
 
-    void initialize(ResultSet resultsTitle, ResultSet resultsPerson) {
+    private void initializeCharacterTable() {
+        charNameCol.setCellValueFactory((CellDataFeatures<Reldb_Row, String> p) -> p.getValue().get("char_name"));
+        personCol.setCellValueFactory((CellDataFeatures<Reldb_Row, String> p) -> p.getValue().get("name"));
+        movieCol.setCellValueFactory((CellDataFeatures<Reldb_Row, String> p) -> p.getValue().get("title"));
+        yearCol_character.setCellValueFactory((CellDataFeatures<Reldb_Row, String> p) -> p.getValue().get("year"));
+        
+        // Tabelle für die Ergebnisse erstellen
+        String[] characterCols = {"id", "char_name", "name", "title", "year"};
+        characterTable = new Reldb_Table("Characters", characterCols);
+        table_characters.getColumns().setAll(charNameCol, personCol, movieCol, yearCol_character);
+    }
+    
+    void initialize(ResultSet resultsTitle, ResultSet resultsPerson, ResultSet resultsCharacters) {
         if (resultsTitle != null) {
-            titleTable.addRows(resultsTitle);
+            titleTable.addRowsAndClose(resultsTitle);
             table_titles.getItems().addAll(titleTable.getRows());
         }
         if (resultsTitle == null || titleTable.getRows().isEmpty()) {
             tab_titles.setDisable(true);
         }
+        
         if (resultsPerson != null) {
-            personTable.addRows(resultsPerson);
+            personTable.addRowsAndClose(resultsPerson);
             table_persons.getItems().addAll(personTable.getRows());
         }
         if (resultsPerson == null || personTable.getRows().isEmpty()) {
             tab_persons.setDisable(true);
+        }
+        
+        if (resultsCharacters != null) {
+            characterTable.addRowsAndClose(resultsCharacters);
+            table_characters.getItems().addAll(characterTable.getRows());
+        }
+        if (resultsCharacters == null || characterTable.getRows().isEmpty()) {
+            tab_characters.setDisable(true);
         }
     }
 }

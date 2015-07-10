@@ -1,11 +1,12 @@
 package reldb02.ui;
 
 import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -22,14 +23,22 @@ public class RELDB_02 extends Application implements IMainClass {
     private static final Logger log = Logger.getLogger(RELDB_02.class.getName());
 
     private static Reldb_Connection connection;
-
+    private static SimpleBooleanProperty connected = new SimpleBooleanProperty(false);
+    
     /**
      * @return the connection
      */
-    public static Reldb_Connection getConnection() {
+    public static Reldb_Connection getConnection() {        
         return connection;
     }
     private static Search_mainController searchController;
+
+    /**
+     * @return the connected
+     */
+    public static SimpleBooleanProperty isConnected() {
+        return connected;
+    }
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -74,6 +83,7 @@ public class RELDB_02 extends Application implements IMainClass {
                 return;
             }
             connection = newConnection;
+            connected = new SimpleBooleanProperty(true);
             getSearchController().newSearchTab();
 
         } else {

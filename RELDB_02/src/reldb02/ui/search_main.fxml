@@ -15,7 +15,7 @@
                     <items>
                         <MenuItem mnemonicParsing="false" onAction="#login" text="Login" />
                         <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem disable="true" mnemonicParsing="false" onAction="#newSearchTab" text="New Search" />
+                        <MenuItem fx:id="menuItem_new_search" disable="true" mnemonicParsing="false" onAction="#newSearchTab" text="New Search" />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem disable="true" mnemonicParsing="false" text="Save" />
                         <SeparatorMenuItem mnemonicParsing="false" />

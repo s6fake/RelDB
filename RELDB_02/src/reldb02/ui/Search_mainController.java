@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.property.BooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -38,13 +39,17 @@ public class Search_mainController implements Initializable {
     private MenuItem menuItem_new_customer;
     @FXML
     private MenuItem menuItem_show_customers;
+    @FXML
+    private MenuItem menuItem_new_search;
 
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
+        menuItem_new_customer.disableProperty().bind(RELDB_02.isConnected());
+        menuItem_show_customers.disableProperty().bind(RELDB_02.isConnected());
+        menuItem_new_search.disableProperty().bind(RELDB_02.isConnected().not());
     }
 
     public void setParent(IMainClass parent) {
@@ -71,13 +76,13 @@ public class Search_mainController implements Initializable {
         }
     }
 
-    public void newResultTab(String keywords, ResultSet titleResults, ResultSet personResults) {
+    public void newResultTab(String keywords, ResultSet titleResults, ResultSet personResults, ResultSet characterResults) {
         try {
             FXMLLoader loader = new FXMLLoader(RELDB_02.class.getResource("searchresults.fxml"));
             Node node = loader.load();
             SearchresultsController controller = loader.<SearchresultsController>getController();
 
-            controller.initialize(titleResults, personResults);
+            controller.initialize(titleResults, personResults, characterResults);
             resultControllers.add(controller);
 
             Tab newTab = new Tab("Results for: \"" + keywords + "\"", node);
@@ -86,6 +91,11 @@ public class Search_mainController implements Initializable {
         } catch (IOException ex) {
             log.log(Level.WARNING, ex.getMessage());
         }
+    }
+    
+    public void loggedIn() {
+        menuItem_new_customer.setDisable(false);
+        menuItem_show_customers.setDisable(false);
     }
 
     @FXML
