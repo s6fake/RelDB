@@ -13,6 +13,9 @@ import java.util.logging.Logger;
 import reldb.lib.database.Reldb_Database;
 
 /**
+ * Diese Klasse kapselt eine java.sql.Connection, verwaltet diese und kümmert
+ * sich um die Fehlerbehandlung. Zudem werden alle geöffneten Verbindungen in
+ * einer Liste verwaltet.
  *
  * @author s6fake
  */
@@ -20,14 +23,18 @@ public class Reldb_Connection {
 
     private static final Logger log = Logger.getLogger(Reldb_Connection.class.getName());
 
-    private static List<Reldb_Connection> connections = new ArrayList<>();      // Liste aller erstellten Verbindungen
+    // Liste aller erstellten Verbindungen
+    private static List<Reldb_Connection> connections = new ArrayList<>();
 
     private Connection connection = null;
     private DatabaseMetaData metaData;
-    private String databaseProductName, version, catalogSeparator;                    // Name der Datenbank, ausgelesen aus den MetaDaten
+    // Name der Datenbank, ausgelesen aus den MetaDaten
+    private String databaseProductName, version, catalogSeparator;
     private String url = null;
-    private String connectionName = "Neue Verbindung";                                  // Name der Verbindung wie sie in der UI angezeigt wird
-    private Reldb_Database database;                                       // Die  dieser Verbindung zuzuordnende Datenbank
+    // Name der Verbindung wie sie in der UI angezeigt wird
+    private String connectionName = "Neue Verbindung";
+    // Die  dieser Verbindung zuzuordnende Datenbank
+    private Reldb_Database database;
 
     //  Optionale Felder, damit man die Verbindung im Nachhinein bearbeiten kann
     private String adress = "";
@@ -37,9 +44,13 @@ public class Reldb_Connection {
     private int databaseType = 0;   // 0: Postgresql, 1: Oracle
 
     /**
-     * @param url Die url zur Datenbank, not null
-     * @param connectionName Ein Anzeigename für die Verbindung
+     * Erzeugt eine neue Verbindung
+     *
+     * @param url Die url zur Datenbank. Muss die Informationen zum jdbc
+     * Treiber, etc. enthalten. not null
+     * @param connectionName Ein Name für die Verbindung
      */
+    @Deprecated
     public Reldb_Connection(String url, String connectionName) {
         if (url == null) {
             throw new NullPointerException("url must not be null!");
@@ -51,7 +62,25 @@ public class Reldb_Connection {
         addConnection(this, 0);
     }
 
-    public Reldb_Connection(String url, String connectionName, String adress, String databaseID, int port, int databaseType, String userName) {
+    /**
+     * Erzeugt eine neue Verbdingung
+     *
+     * @param url URL zur Datenbank. Es müssen bereits alle Informationen über
+     * den JDBC Treiber, Datenbanknamen, Port, etc. enthalten sein
+     * @param connectionName Ein Optionaler Name für die Verbindung
+     * @param adress Die reine Adresse. Wird benötigt um die Verbindung evtl.
+     * später nochmals zu bearbeiten
+     * @param databaseID Der Name der Datenbank. Wird benötigt um die Verbindung
+     * evtl. später nochmals zu bearbeiten
+     * @param port Der Port der Datenbankverbindung. Wird benötigt um die
+     * Verbindung evtl. später nochmals zu bearbeiten
+     * @param databaseType Der Typ der Datenbank (ORACLE oder POSTGRES). Wird
+     * benötigt um die Verbindung evtl. später nochmals zu bearbeiten
+     * @param userName Der Benutzername. Wird benötigt um die Verbindung evtl.
+     * später nochmals zu bearbeiten
+     */
+    public Reldb_Connection(String url, String connectionName, String adress,
+            String databaseID, int port, int databaseType, String userName) {
         if (url == null) {
             throw new NullPointerException("url must not be null!");
         }
@@ -67,6 +96,12 @@ public class Reldb_Connection {
         addConnection(this, 0);
     }
 
+    /**
+     * Liest die Informationen der Datenbank aus den Metadaten aus. Wird
+     * aufgerufen, sobald sich mit der Datenbank verbunden wird.
+     *
+     * @param metaData Die MetaDaten
+     */
     private void setInformation(DatabaseMetaData metaData) {
         try {
             databaseProductName = metaData.getDatabaseProductName();
@@ -77,7 +112,10 @@ public class Reldb_Connection {
         }
     }
 
-    public void changeSettings(String url, String connectionName, String adress, String databaseID, int port, int databaseType, String userName) {
+    @Deprecated
+    //Rausschmeißen
+    public void changeSettings(String url, String connectionName, String adress, 
+            String databaseID, int port, int databaseType, String userName) {
         if (url == null) {
             throw new NullPointerException("url must not be null!");
         }
@@ -99,7 +137,7 @@ public class Reldb_Connection {
      * Verbindung umbenannt.
      *
      * @param newConn Die Verbindung die hinzugefügt werden soll
-     * @param counter Zählt die Funktionsaufrufe, default 0
+     * @param counter Zählt die rekursiven Funktionsaufrufe, default 0
      *
      * @return Gibt zurück ob die Verbindung erfolgreich in die Liste eingefügt
      * werden konnte.
@@ -114,7 +152,6 @@ public class Reldb_Connection {
             } else if (iterator.connectionName.equals(newConn.connectionName + "(" + counter + ")")) {
                 return addConnection(newConn, counter + 1);
             }
-
         }
         if (counter != 0) {
             newConn.connectionName = newConn.connectionName.concat("(" + counter + ")");
@@ -122,10 +159,20 @@ public class Reldb_Connection {
         return getConnections().add(newConn);
     }
 
+    /**
+     * Getter für die Metadaten
+     *
+     * @return
+     */
     public DatabaseMetaData getMetadata() {
         return metaData;
     }
 
+    /**
+     * Erzeugt ein neues java.sql.Statement auf der Verbindung
+     *
+     * @return Das neue Statement. Bei Misserfolg null
+     */
     public Statement newStatement() {
         Statement result = null;
         try {
@@ -135,18 +182,30 @@ public class Reldb_Connection {
         }
         return result;
     }
-    
+
+    /**
+     * Erzeugt ein neues java.sql.PreparedStatement auf der Verbindung
+     *
+     * @return Das neue Statement. Bei Misserfolg null
+     */
     public PreparedStatement newPreparedStatement(String stmt) {
-           PreparedStatement statement = null;
+        PreparedStatement statement = null;
         try {
             statement = connection.prepareStatement(stmt);
         } catch (SQLException e) {
             log.warning(e.getMessage());
         }
-        return statement;     
-        
+        return statement;
     }
 
+    /**
+     * Stellt die Verbindung zur Datenbank her. Anschließend werden die
+     * Metadaten ausgelesen. Zudem wird autocommit auf false gesetzt
+     *
+     * @param user Der Benutzername
+     * @param pass Das Password
+     * @return True bei Erfolg, False bei Misserfolg
+     */
     public boolean connect(String user, String pass) {
         if (connection != null) {
             System.err.println("Connection not null!");
@@ -170,22 +229,12 @@ public class Reldb_Connection {
         return true;
     }
 
-    public static boolean checkIfConnectionExists(String url, String name) {
-        for (Reldb_Connection iterator : getConnections()) {
-            /*
-             if (iterator.getConnectionName().equals(name)) {
-             JOptionPane.showMessageDialog(null, "Es existiert bereits eine Verbindung mit dem Namen " + name, "Verbindung kann nicht erstellt werden", JOptionPane.ERROR_MESSAGE);
-             return false;
-             } */
-            if (iterator.getUrl().equalsIgnoreCase(url)) {
-                //JOptionPane.showMessageDialog(null, "Es existiert bereits eine Verbindung zu " + url, "Verbindung kann nicht erstellt werden", JOptionPane.ERROR_MESSAGE);
-                return true;
-            }
-        }
-
-        return false;
-    }
-
+    /**
+     * Ändert den Wert von Autocommit auf der Verbindung Die Verbindung muss
+     * bereits hergestellt sein
+     *
+     * @param autoCommit
+     */
     private void setAutoCommit(boolean autoCommit) {
         try {
             connection.setAutoCommit(autoCommit);
@@ -194,6 +243,9 @@ public class Reldb_Connection {
         }
     }
 
+    /**
+     * Versucht die Verbindung zu schließen
+     */
     public void CloseConnection() {
         connections.remove(this);
         if (connection != null) {
@@ -209,6 +261,9 @@ public class Reldb_Connection {
         log.warning("Verbindung mit " + connectionName + "konnte nicht geschlossen werden!");
     }
 
+    /**
+     * Schließt alle Verbindungen
+     */
     public static void closeAllConnections() {
         for (Reldb_Connection iterator : connections) {
             try {
@@ -224,6 +279,11 @@ public class Reldb_Connection {
         connections.clear();
     }
 
+    /**
+     * Prüft ob die Verbindung eingerichtet wurde
+     *
+     * @return true if connection != null
+     */
     public boolean isConnected() {
         return connection != null;
     }
@@ -247,6 +307,10 @@ public class Reldb_Connection {
         return false;
     }
 
+    /**
+     *
+     * @return Den Namen der Verbindung
+     */
     public String getConnectionName() {
         return connectionName;
     }
@@ -258,22 +322,13 @@ public class Reldb_Connection {
         return databaseProductName;
     }
 
-    public static List<Reldb_Connection> getConnections() {
-        return connections;
-    }
-
     /**
-     * To Do: Implementieren!
+     * Gibt eine Liste aller Verbindungen zurück
      *
      * @return
      */
-    public static Reldb_Connection getConnectionByName(String name) {
-        for (Reldb_Connection connection : connections) {
-            if (connection.connectionName.equals(name)) {
-                return connection;
-            }
-        }
-        return null;
+    public static List<Reldb_Connection> getConnections() {
+        return connections;
     }
 
     /**
@@ -311,12 +366,18 @@ public class Reldb_Connection {
         return databaseType;
     }
 
+    /**
+     * Gibt den Datenbanktyp als Reldb_Database.DATABASETYPE zurück
+     *
+     * @return
+     */
     public Reldb_Database.DATABASETYPE getDatabaseType() {
-        if (database == null)
+        if (database == null) {
             return Reldb_Database.DATABASETYPE.UNKNOWN;
+        }
         return database.getDatabaseType();
     }
-    
+
     /**
      * @return the userName
      */

@@ -16,7 +16,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import reldb.lib.Reldb_Connection;
-import reldb.lib.MetaDataManager;
 import reldb.lib.database.Reldb_DataContainer;
 import reldb.lib.database.Reldb_Database;
 import reldb.lib.database.Reldb_Row;
@@ -33,7 +32,6 @@ public class RELDB_01 extends Application implements IMainClass {
 
     private Stage stage;
     private static final String url = "jdbc:postgresql://dbvm01.iai.uni-bonn.de:5432/imdb";
-    private MetaDataManager mdManager;
     private MainController controller;
     private Reldb_Connection currentConnection, destinationDatabaseConnection;
 
@@ -87,30 +85,6 @@ public class RELDB_01 extends Application implements IMainClass {
         }
     }
 
-    public void callSQLDialog() {
-        // Einen SQL Dialog öffnen, mit der aktuell betracteten Connection
-        //Funktioniert im moment nicht
-        //Dialogs.executeDialog(this, selectetConnection);
-    }
-
-    /*
-     public Reldb_Connection createConnection(String url, String name) {
-     for (Reldb_Connection iterator : Reldb_Connection.getConnections()) {
-     if (iterator.getConnectionName().equals(name)) {
-     JOptionPane.showMessageDialog(null, "Es existiert bereits eine Verbindung mit dem Namen " + name, "Verbindung kann nicht erstellt werden", JOptionPane.ERROR_MESSAGE);
-     return null;
-     }
-     if (iterator.getUrl().equalsIgnoreCase(url)) {
-     JOptionPane.showMessageDialog(null, "Es existiert bereits eine Verbindung zu " + url, "Verbindung kann nicht erstellt werden", JOptionPane.ERROR_MESSAGE);
-     return null;
-     }
-     }
-     Reldb_Connection newConnection = new Reldb_Connection(url, name);
-     controller.addTreeItem(new Reldb_TreeViewElement(newConnection, name));    //Verbindung wird zur TreeView hinzugefügt
-
-     return newConnection;
-     }
-     */
     @Override
     public void logIn(String user, String password, Reldb_Connection connection) {
         if (connection == null) {
@@ -121,8 +95,6 @@ public class RELDB_01 extends Application implements IMainClass {
         }
         controller.label_1.setText("Verbinde mit " + connection.getConnectionName());
         if (connection.connect(user, password)) {
-            mdManager = new MetaDataManager(connection.getMetadata());
-            mdManager.printInfo(controller.textbox);
             controller.label_1.setText(url);
             controller.setTreeRoot(new Reldb_Database(connection));
         } else {

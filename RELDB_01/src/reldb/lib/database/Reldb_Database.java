@@ -45,7 +45,7 @@ public class Reldb_Database {
             this.connection = reference.getConnection();
         }
     }
-    
+
     public Reldb_Database(Reldb_Connection connection) {
         if (connection == null) {
             throw new NullPointerException("Connection must not be null");
@@ -65,8 +65,7 @@ public class Reldb_Database {
         createTableList(metaData);
     }
 
-    
-        private void createTableList(DatabaseMetaData metaData) {
+    private void createTableList(DatabaseMetaData metaData) {
         if (!tableList.isEmpty()) {
             return;
         }
@@ -76,8 +75,12 @@ public class Reldb_Database {
             String SCHEMA_NAME = "public";
             resultSet = metaData.getTables(null, SCHEMA_NAME, null, tables);
             while (resultSet.next()) {
-                Reldb_Table newTable = new Reldb_Table(this, resultSet.getString("TABLE_TYPE"), resultSet.getString("TABLE_CAT"), SCHEMA_NAME, resultSet.getString("TABLE_NAME"));
-                tableList.add(newTable);                
+                Reldb_Table newTable = new Reldb_Table(this,
+                        resultSet.getString("TABLE_TYPE"),
+                        resultSet.getString("TABLE_CAT"),
+                        SCHEMA_NAME,
+                        resultSet.getString("TABLE_NAME"));
+                tableList.add(newTable);
             }
         } catch (SQLException ex) {
             log.warning(ex.getMessage());
@@ -90,8 +93,7 @@ public class Reldb_Database {
         }
         tableListFilled = true;
     }
-    
-    
+
     /**
      * Setzt die Datenbankinformationen
      *
@@ -105,8 +107,8 @@ public class Reldb_Database {
         } catch (SQLException e) {
             log.warning(e.getMessage());
         }
-    }  
-    
+    }
+
     /**
      * Gibt die Datenbank und alle Tabellen aus
      */
@@ -117,7 +119,6 @@ public class Reldb_Database {
         }
     }
 
-    
     /**
      * @param tableList the tableList to set
      */
@@ -125,22 +126,25 @@ public class Reldb_Database {
         tableListFilled = true;
         this.tableList = tableList;
     }
-    
+
     /**
      * @return the connection
      */
     public Reldb_Connection getConnection() {
         return connection;
     }
-    
+
     public String printInfo() {
-        return "Product: " + databaseName + "\n" + "Version: " + version + "\n" + "CatalogSeparator: " + catalogSeparator + "\n dbm: " + getDatabaseType().name();
+        return "Product: " + databaseName + "\n" + "Version: " + version + "\n"
+                + "CatalogSeparator: " + catalogSeparator + "\n dbm: "
+                + getDatabaseType().name();
     }
 
     @Override
     public String toString() {
         return databaseName;
     }
+
     /**
      * @return the databaseName
      */
@@ -181,7 +185,7 @@ public class Reldb_Database {
     public List<Reldb_Table> getTables() {
         return tableList;
     }
-    
+
     public List<Reldb_Table> getSelectedTables() {
         List<Reldb_Table> list = new ArrayList<>();
         for (Reldb_Table table : getTables()) {

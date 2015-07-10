@@ -1,6 +1,5 @@
 package reldb.lib;
 
-import java.util.Collection;
 import java.util.List;
 import javafx.scene.control.CheckBoxTreeItem;
 import reldb.lib.database.Reldb_Column;
@@ -8,6 +7,7 @@ import reldb.lib.database.Reldb_Database;
 import reldb.lib.database.Reldb_Table;
 
 /**
+ * Eine Klasse, die die Klasse CheckBoxTreeItem um Funktionen erweitert
  *
  * @author s6fake
  */
@@ -33,11 +33,15 @@ public class Reldb_TreeItem extends CheckBoxTreeItem {
      */
     public Reldb_TreeItem(Object value, boolean selected) {
         super(value, null, selected);
-    }    
-    
+    }
+
     /**
-     * Funktion für den ChangeListener. Setzt das im Element befindliche Objekt.
-     * @param newValue 
+     * Funktion für den ChangeListener. Setzt die CheckBox. Ist das in der Zelle
+     * befindliche Objekt zudem eine Instanz der Klasse Reldb_Table oder
+     * Reldb_Column, wird zudem in diesen vermerkt, ob man diese Exportieren
+     * möchte oder nicht.
+     *
+     * @param newValue
      */
     public void selectStateChanged(boolean newValue) {
         if (getValue() instanceof Reldb_Table) {
@@ -51,6 +55,13 @@ public class Reldb_TreeItem extends CheckBoxTreeItem {
         }
     }
 
+    /**
+     * Wurde discover() noch nicht ausgeführt und handelt es sich bei dem Object
+     * in der Zelle um eine Instanz von Reldb_Database oder Reldb_Table, werden
+     * alle Tabellen, bzw. alle Spalten des Objects erfasst und zurückgegeben
+     *
+     * @return Eine Liste aller "Kind" Elemente
+     */
     public List<?> discover() {
         if (!discovered) {
             discovered = true;
@@ -60,23 +71,29 @@ public class Reldb_TreeItem extends CheckBoxTreeItem {
             }
             if (getValue() instanceof Reldb_Table) {
                 Reldb_Table table_item = (Reldb_Table) getValue();
-                //table_item.createColumns();
-                //table_item.createPrimaryKeys();
-                //table_item.createForeignKeys();
+                //<table_item.createColumns();>
+                //<table_item.createPrimaryKeys();>
+                //<table_item.createForeignKeys();>
                 return table_item.getColumns();
             }
         }
         return null;
     }
 
+    /**
+     * Fügt dem Knoten ein neues Kind-Element hinzu. Ist zudem die CheckBox
+     * gesetzt, dann ist auch die CheckBox des Kind-Elements gesetzt.
+     *
+     * @param item
+     */
     public void add(Reldb_TreeItem item) {
         if (isSelected()) {
             item.setSelected(true);
         }
         getChildren().add(item);
-
     }
 
+    @Deprecated
     public String printInfo() {
         Object item = getValue();
         if (item instanceof Reldb_Database) {

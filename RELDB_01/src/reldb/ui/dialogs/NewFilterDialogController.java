@@ -49,14 +49,16 @@ public class NewFilterDialogController extends CustomDialog implements Initializ
     private void on_ok(ActionEvent event) {
         //createString();
         List<Filter> list = getFilters();
-        parent.addNewFilter(column, new Filter(list));
+        if (!list.isEmpty()) {
+            parent.addNewFilter(column, new Filter(list));
+        }
         close();
     }
 
     public void setParent(MainController parent) {
         this.parent = parent;
     }
-    
+
     private void createString() {
         String result = "";
         List<Filter> filters = getFilters();
@@ -67,13 +69,13 @@ public class NewFilterDialogController extends CustomDialog implements Initializ
         result = "(" + result + ")";
         System.out.println(result);
     }
-    
+
     public void setFirstElementVisibility(boolean visible) {
         addConstraint().setVisbility(visible);
     }
-    
+
     public void setColumn(Reldb_Column column) {
-        this.column = column;        
+        this.column = column;
     }
 
     public Select_elementController addConstraint() {

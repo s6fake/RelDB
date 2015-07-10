@@ -41,7 +41,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Button mnemonicParsing="false" onAction="#on_cancel" prefHeight="53.0" prefWidth="209.0" text="Abbrechen" GridPane.columnIndex="1" />
+                  <Button mnemonicParsing="false" onAction="#on_cancel" prefHeight="53.0" prefWidth="209.0" text="Abbrechen" visible="false" GridPane.columnIndex="1" />
                </children>
             </GridPane>
          </children>

@@ -7,6 +7,7 @@ import reldb.lib.database.Reldb_Database.DATABASETYPE;
 import reldb.lib.sql.Reldb_Types;
 
 /**
+ * Diese Klasse fungiert wie eine einzelne Zelle in einer Tabelle
  *
  * @author s6fake
  */
@@ -33,7 +34,8 @@ public class Reldb_DataContainer {
         this.COLUMN_NAME = COLUMN_NAME;
     }
 
-    public Reldb_DataContainer(Reldb_Database database, String COLUMN_NAME, int DATA_TYPE, String TYPE_NAME, int COLUMN_SIZE, boolean NULLABLE, boolean AUTOINCREMENT) {
+    public Reldb_DataContainer(Reldb_Database database, String COLUMN_NAME, int DATA_TYPE,
+            String TYPE_NAME, int COLUMN_SIZE, boolean NULLABLE, boolean AUTOINCREMENT) {
         this.database = database;
         this.COLUMN_NAME = COLUMN_NAME;
         this.DATA_TYPE = DATA_TYPE;
@@ -44,7 +46,8 @@ public class Reldb_DataContainer {
         this.data = null;
     }
 
-    public Reldb_DataContainer(Reldb_Database database, String COLUMN_NAME, int DATA_TYPE, String TYPE_NAME, int COLUMN_SIZE, boolean NULLABLE, Object data) {
+    public Reldb_DataContainer(Reldb_Database database, String COLUMN_NAME, int DATA_TYPE,
+            String TYPE_NAME, int COLUMN_SIZE, boolean NULLABLE, Object data) {
         this.database = database;
         this.COLUMN_NAME = COLUMN_NAME;
         this.DATA_TYPE = DATA_TYPE;
@@ -55,57 +58,10 @@ public class Reldb_DataContainer {
     }
 
     @Override
-    public Reldb_DataContainer clone() {
-        Reldb_DataContainer newObj = new Reldb_DataContainer(getDatabase(), getCOLUMN_NAME(), DATA_TYPE, TYPE_NAME, COLUMN_SIZE, NULLABLE, data);
-        return newObj;
-    }
-
-    @Deprecated
-    public Object convertTo(DATABASETYPE dbm) {
-        if (getDatabase().getDatabaseType() == dbm) {
-            return this;
-        }
-        switch (dbm) {
-            case POSTGRESQL:
-                //ToDo
-                break;
-            case ORACLE:
-                return convertToOracle();
-            default:
-                return null;
-
-        }
-        return this;
-    }
-
-    @Deprecated
-    private Object convertToOracle() {
-        switch (DATA_TYPE) {
-            case (-7):     //BIT
-                //ToDo
-                break;
-            case (-6):      //TINYINT
-                //ToDo
-                break;
-            default:
-                return null;
-        }
-        return this;
-    }
-
-    @Override
     public String toString() {
         if (data == null) {
             return "";
         }
-        //if (database != null && database.databaseType == DATABASETYPE.ORACLE) {
-        try {
-            // Zeichensatz umwandeln
-            return new String(data.toString().getBytes("UTF-8"), "UTF-8");      //ISO-8859-1
-        } catch (UnsupportedEncodingException ex) {
-            log.log(Level.WARNING, ex.getMessage());
-        }
-        //}
         return data.toString();
     }
 
@@ -136,7 +92,8 @@ public class Reldb_DataContainer {
     protected String getConstructorString(DATABASETYPE dbModel) {
         String string = "";
         if (dbModel == DATABASETYPE.ORACLE) {
-            if (DATA_TYPE != 12 && DATA_TYPE != 1) {          // Nur VARCHAR und CHAR müssen bearbeitet werden
+            // Nur VARCHAR und CHAR müssen bearbeitet werden
+            if (DATA_TYPE != 12 && DATA_TYPE != 1) {          
                 string = Reldb_Types.typeMappings.get(DATA_TYPE);
                 return string;
             }
