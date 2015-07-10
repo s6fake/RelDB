@@ -73,11 +73,16 @@ public class SearchresultsController implements Initializable {
 
         table_titles.getColumns().setAll(actionCol, titleCol, yearCol, kindCol, episodeOfCol);
 
+        // Zum öffnen der Detailansicht
         table_titles.setRowFactory(p -> {
             TableRow<Reldb_Row> row = new TableRow();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
-                    TitleDetailsController.makeController().initialize(Integer.parseInt(row.getItem().get("ID").getValueSafe()), row.getItem().get("title").getValueSafe());
+                    try {
+                        TitleDetailsController.makeController().initialize(Integer.parseInt(row.getItem().get("ID").getValueSafe()), row.getItem().get("title").getValueSafe());
+                    } catch (NullPointerException ex) {
+                        log.log(Level.SEVERE, ex.getMessage());
+                    }
                 }
             });
             return row;
@@ -97,78 +102,19 @@ public class SearchresultsController implements Initializable {
     }
 
     void initialize(ResultSet resultsTitle, ResultSet resultsPerson) {
-        titleTable.addRows(resultsTitle);
-        table_titles.getItems().addAll(titleTable.getRows());
+        if (resultsTitle != null) {
+            titleTable.addRows(resultsTitle);
+            table_titles.getItems().addAll(titleTable.getRows());
+        }
+        if (resultsTitle == null || titleTable.getRows().isEmpty()) {
+            tab_titles.setDisable(true);
+        }
         if (resultsPerson != null) {
             personTable.addRows(resultsPerson);
             table_persons.getItems().addAll(personTable.getRows());
-        } else {
+        }
+        if (resultsPerson == null || personTable.getRows().isEmpty()) {
             tab_persons.setDisable(true);
-        }
-    }
-
-    @Deprecated
-    void initializeArray(String[] titles, ResultSet resultSet, int titleCount) {
-        /* if (titleCount == 0) {
-         tab_titles.setDisable(true);
-         return;
-         }
-         String[][] dataArray = convertTo2dArray(titles, resultSet, titleCount);
-         ObservableList<String[]> data = FXCollections.observableArrayList();
-         data.addAll(Arrays.asList(dataArray));
-         data.remove(0);//remove titles from data
-         for (int i = 0; i < titles.length; i++) {
-         TableColumn tc = new TableColumn(dataArray[0][i]);
-
-         final int colNo = i;
-         tc.setCellValueFactory(new Callback<CellDataFeatures<String[], String>, ObservableValue<String>>() {
-         @Override
-         public ObservableValue<String> call(CellDataFeatures<String[], String> p) {
-         return new SimpleStringProperty((p.getValue()[colNo]));
-         }
-         });
-         //tc.setPrefWidth(90);
-         table_titles.getColumns().add(tc);
-         }
-         table_titles.setItems(data);*/
-    }
-
-    @Deprecated
-    private String[][] convertTo2dArray(String[] titles, ResultSet results, int size) {
-        String[][] rows;
-        rows = new String[size + 1][titles.length];
-        int colCount = titles.length;
-        rows[0] = titles;
-
-        int rowCount = 1;
-        try {
-            while (results.next()) {
-                String[] row = new String[colCount];
-                for (int i = 0; i < colCount; i++) {
-                    row[i] = (results.getString(i + 1));
-                    System.out.print(results.getString(i + 1) + " ");
-                }
-                rows[rowCount] = row;
-                rowCount++;
-                System.out.println();
-            }
-        } catch (SQLException ex) {
-            log.log(Level.WARNING, ex.getMessage());
-        } finally {
-            try {
-                results.close();
-            } catch (SQLException ex) {
-                log.log(Level.WARNING, ex.getMessage());
-            }
-        }
-        return rows;
-
-    }
-
-    private static class Reldb_TableImpl extends Reldb_Table {
-
-        public Reldb_TableImpl(String tableName, String[] columns) {
-            super(tableName, columns);
         }
     }
 }
