@@ -1,29 +1,28 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package reldb;
 
 /**
- *
+ * Eine Hilfsklasse, um z.B. eine TableView mit einfachen Strings zu füllen
  * @author s6fake
  */
 public class StringClass {
     
     private String string;
     
+    /**
+     * Erzeugt ein neues StringClass Object. Der String wird Kopiert.
+     * @param str 
+     */
     public StringClass(String str)
     {
-        string = str;
-    }
-
-    /**
-     * @return the string
-     */
-    public String getString() {
-        return string;
+        string = new String(str);
     }
     
-  
+    /**
+     * Gibt den String aus
+     * @return the string
+     */
+    @Override
+    public String toString() {
+        return string;
+    }  
 }
