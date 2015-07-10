@@ -97,7 +97,7 @@ public class Reldb_DataMover extends Thread {
     }
 
     public void copy() {
-        dropAll();
+        dropAllEvilDamnnation();
         createAllTables();
         createAllForeignKeys();
 
@@ -279,6 +279,18 @@ public class Reldb_DataMover extends Thread {
         });
     }
 
+        @Deprecated
+    private void dropAllEvilDamnnation() {
+        List<Reldb_Table> tables = sourceTables.get(0).getDatabase().getTables();
+        tables.stream().forEach((table) -> {
+            dropForeignKeys(table, destination);
+        });
+
+        tables.stream().forEach((table) -> {
+            dropTable(table);
+        });
+    }
+
     private void dropTable(Reldb_Table table) {
         Reldb_Statement statement = new Reldb_Statement(destination.getConnection());
         statement.execute("DROP TABLE " + table.getTableName());
@@ -300,18 +312,20 @@ public class Reldb_DataMover extends Thread {
     private void createAllTables() {
         sourceTables.stream().forEach((table) -> {
             createTable(table);
-            createdTables.add(table);
+
             progress_current.increaseCurrentProgress();
         });
     }
 
     private boolean createTable(Reldb_Table table) {
-        boolean result = false;
         Reldb_Statement statement = new Reldb_Statement(destination.getConnection());
         String command = sql_expr.createTableWConditions(table, destination.getDatabaseType());
-        result = statement.execute(command);
+        SQLException warnings = statement.executeUpdate(command);
         statement.close();
-        return result;
+        if (warnings != null) {
+            return handleErrorOderSo(warnings, table);
+        }
+        return true;
     }
 
     private boolean addColumn(Reldb_Column column, Reldb_Table destinationTable, Reldb_Database destinationDatabase) {
@@ -398,14 +412,22 @@ public class Reldb_DataMover extends Thread {
                 // Benutzerabfrage muss noch stattfinden!!
                 addColumn(refColumn, refTable, destinationDatabase);
                 /*
-                log.log(Level.WARNING, "Drop Table {0}!", refTable.getTableName());
-                dropTable(refTable);
-                */
+                 log.log(Level.WARNING, "Drop Table {0}!", refTable.getTableName());
+                 dropTable(refTable);
+                 */
             }
 
             return createSingleForeignKey(column, destinationDatabase);
         }
 
+        return false;
+    }
+
+    private boolean handleErrorOderSo(SQLException warnings, Reldb_Table table) {
+        if (warnings.getErrorCode() == 955) { //Es gibt bereits ein Objekt mit diesem Namen
+            createdTables.add(table);
+            return true;
+        }
         return false;
     }
 
@@ -430,16 +452,18 @@ public class Reldb_DataMover extends Thread {
             refColumn.setSelected(true);
             // Prüfen, ob die Tabelle bereits schon angelegt wurde
             if (!createdTables.contains(refTable)) {
-                // Also wenn wir hier landen, dann haben wir echt ein Problem...
-                log.log(Level.SEVERE, "Referenzierte Tabelle ist nicht vorhanden ({0})!", refTable.getTableName());
-                return false;
+                if (!createTable(refTable)) {
+                    // Also wenn wir hier landen, dann haben wir echt ein Problem...
+                    log.log(Level.SEVERE, "Referenzierte Tabelle ist nicht vorhanden ({0})!", refTable.getTableName());
+                    return false;
+                }
             }
             // Fremdschlüssel Datensatz holen.
             Reldb_DataContainer cell = data.getCellByColumn(references[1]);
 
             Reldb_Row newRow;
             Reldb_Statement statement = new Reldb_Statement(database.getConnection());
-            ResultSet results = statement.executeQuery(sql_expr.selectFrom(refTable, cell), fetchSize); // Im ResultSet landen die Datensätze
+            ResultSet results = statement.executeQuery(sql_expr.selectFrom(refTable) + " WHERE " + refColumn.getCOLUMN_NAME() + " = " + cell.getData(), fetchSize); // Im ResultSet landen die Datensätze
             try {
                 if (results.next()) {
                     newRow = new Reldb_Row(refTable, results);
@@ -451,9 +475,12 @@ public class Reldb_DataMover extends Thread {
                 log.warning(ex.toString());
             } finally {
                 try {
-                    results.close();
+                    if (results != null) {
+                        results.close();
+                    }
                     statement.close();
-                } catch (SQLException ex) {
+
+                } catch (Exception ex) {
                     log.warning(ex.getMessage());
                 }
             }
@@ -470,16 +497,17 @@ public class Reldb_DataMover extends Thread {
      */
     private String getConstraintString(String errMessage) {
         String result = "xoxo";
-        try {
-            result = errMessage.split("(")[1];
-            result = result.split(")")[0];
-            if (result.contains(".")) {
-                String results[] = result.split(".");
-                result = results[results.length - 1];
-            }
-        } catch (Exception e) {
-            log.log(Level.SEVERE, e.getMessage());
-        }
+        //try {
+        result = errMessage.split("\\(")[1];
+        result = result.split("\\)")[0];
+        if (result.contains(".")) {
+            String results[] = result.split("\\.");
+            result = results[results.length - 1];
+        }/*
+         } catch (Exception e) {
+         log.log(Level.SEVERE, e.getMessage() + "\nMessage: " + errMessage);
+         }*/
+
         return result;
     }
 }

@@ -53,6 +53,7 @@ public class sql_expr {
         return command;
     }
 
+        @Deprecated
         public static String selectFrom(Reldb_Table table, Reldb_DataContainer data) {
         String selectList = "";
         for (Reldb_Column col : table.getSelectedColumns()) {

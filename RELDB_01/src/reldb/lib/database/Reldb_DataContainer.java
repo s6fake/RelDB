@@ -60,6 +60,7 @@ public class Reldb_DataContainer {
         return newObj;
     }
 
+    @Deprecated
     public Object convertTo(DATABASETYPE dbm) {
         if (getDatabase().getDatabaseType() == dbm) {
             return this;
@@ -77,6 +78,7 @@ public class Reldb_DataContainer {
         return this;
     }
 
+    @Deprecated
     private Object convertToOracle() {
         switch (DATA_TYPE) {
             case (-7):     //BIT
@@ -97,12 +99,12 @@ public class Reldb_DataContainer {
             return "";
         }
         //if (database != null && database.databaseType == DATABASETYPE.ORACLE) {
-            try {
-                // Zeichensatz umwandeln
-                return new String(data.toString().getBytes("UTF-8"), "UTF-8");      //ISO-8859-1
-            } catch (UnsupportedEncodingException ex) {
-                log.log(Level.WARNING, ex.getMessage());
-            }
+        try {
+            // Zeichensatz umwandeln
+            return new String(data.toString().getBytes("UTF-8"), "UTF-8");      //ISO-8859-1
+        } catch (UnsupportedEncodingException ex) {
+            log.log(Level.WARNING, ex.getMessage());
+        }
         //}
         return data.toString();
     }
